@@ -3,6 +3,32 @@ library(lubridate)
 library(rEDM)
 library(parallel)
 
+#### function to fit periodic spline through data, using yearday as input x ----
+
+make_surrogate_annual_spline <- function(x, y, num_surr = 100)
+{
+    # filter out NA first
+    n <- length(x)
+    idx <- which(is.finite(x) & is.finite(y))
+    x <- x[idx]
+    y <- y[idx]
+    
+    xx <- c(x - 365, x, x + 365)
+    yy <- c(y, y, y)
+    seasonal_F <- smooth.spline(xx, yy)
+    seasonal_cyc <- predict(seasonal_F, x)$y
+    seasonal_resid <- y - seasonal_cyc
+    
+    vals <- matrix(unlist(
+        lapply(seq(num_surr), function(i) {
+            seasonal_cyc + sample(seasonal_resid, n)
+        })
+    ), ncol = num_surr)
+    
+    out <- matrix(NA, nrow = n, ncol = num_surr)
+    out[idx, ] <- vals 
+}
+
 #' @title compute_simplex
 #' @description Run simplex projection models for each time series in the 
 #'   `block` and save the output, to determine the best embedding dimension for 
@@ -402,6 +428,8 @@ compute_smap_matrices <- function(smap_coeffs, ccm_links)
 compute_eigenvalues <- function(smap_matrices)
 {
     eigenvalues <- map(smap_matrices, function(J) {
+        if (any(is.na(J)))
+            return(NA)
         return(eigen(J)$values)
     })
     return(eigenvalues)

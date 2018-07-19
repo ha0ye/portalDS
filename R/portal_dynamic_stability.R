@@ -1,8 +1,6 @@
 #### setup ----
 
-library(dplyr)
-library(tidyr)
-library(ggplot2)
+library(tidyverse)
 library(lubridate)
 library(rEDM)
 library(parallel)
@@ -10,32 +8,7 @@ library(parallel)
 # devtools::install_github("weecology/LDATS")
 
 source(here::here("R", "dynamic_stability_functions.R"))
-
-#### function to fit periodic spline through data, using yearday as input x ----
-
-make_surrogate_annual_spline <- function(x, y, num_surr = 100)
-{
-    # filter out NA first
-    n <- length(x)
-    idx <- which(is.finite(x) & is.finite(y))
-    x <- x[idx]
-    y <- y[idx]
-    
-    xx <- c(x - 365, x, x + 365)
-    yy <- c(y, y, y)
-    seasonal_F <- smooth.spline(xx, yy)
-    seasonal_cyc <- predict(seasonal_F, x)$y
-    seasonal_resid <- y - seasonal_cyc
-    
-    vals <- matrix(unlist(
-        lapply(seq(num_surr), function(i) {
-            seasonal_cyc + sample(seasonal_resid, n)
-        })
-    ), ncol = num_surr)
-    
-    out <- matrix(NA, nrow = n, ncol = num_surr)
-    out[idx, ] <- vals 
-}
+source(here::here("R", "plotting_functions.R"))
 
 #### function for full dynamic stability analysis ----
 
@@ -109,6 +82,7 @@ compute_portal_dynamic_stability <- function(proc_data_file = "data/portal_block
         saveRDS(block, proc_data_file)
     }
     block <- readRDS(proc_data_file)
+    block_dates <- block$censusdate
     block_yearday <- yday(block$censusdate)
     block <- block %>% select(-censusdate) # drop the time column
     
@@ -142,153 +116,17 @@ compute_portal_dynamic_stability <- function(proc_data_file = "data/portal_block
         ccm_links <- identify_ccm_links(ccm_results)
         smap_coeffs <- compute_smap_coeffs(block, ccm_links)
         smap_matrices <- compute_smap_matrices(smap_coeffs, ccm_links)
+        stopifnot(length(smap_matrices) == length(block_dates))
+        names(smap_matrices) <- block_dates
         saveRDS(smap_matrices, smap_matrices_file)
     }
+    smap_matrices <- readRDS(smap_matrices_file)
     
     if (!file.exists(eigenvalues_file))
     {
         eigenvalues <- compute_eigenvalues(smap_matrices)
         saveRDS(eigenvalues, eigenvalues_file)
     }
-}
-
-#### function to produce eigenvalues plot ----
-
-plot_eigenvalues <- function(proc_data_file = here::here("data", "portal_block.RDS"), 
-                             eigenvalues_file = here::here("output", "portal_eigenvalues.RDS"), 
-                             plot_file = NULL, width = 8, height = 4.5, highlight_shifts = FALSE)
-{
-    # read in data
-    eigenvalues <- readRDS(eigenvalues_file)
-    block <- readRDS(proc_data_file)
-    portal_newmoons_table <- portalr::load_data()$newmoons_table %>%
-        mutate(censusdate = as.Date(censusdate))
-    
-    # generate df for plotting
-    stability_df <- data.frame(censusdate = block$censusdate, 
-                               ds = map_dbl(eigenvalues, ~max(abs({.})))) %>%
-        left_join(portal_newmoons_table, by = "censusdate")
-    
-    # construct plot
-    portal_ds_plot <- stability_df %>%
-        ggplot(aes(x = censusdate, y = ds)) + 
-        geom_line() + 
-        geom_hline(yintercept = 1.0, size = 1, linetype = 2) + 
-        scale_x_date(breaks = seq(from = as.Date("1985-01-01"), 
-                                  to = as.Date("2015-01-01"), 
-                                  by = "5 years"), 
-                     date_labels = "%Y", expand = c(0.01, 0)) + 
-        labs(x = NULL, y = "dynamic stability \n(higher is more unstable)") +
-        theme_bw() + 
-        theme(panel.grid.minor = element_line(size = 0.5))
-    
-    if (highlight_shifts)
-    {
-        portal_ds_plot <- portal_ds_plot + 
-            geom_rect(data = data.frame(xmin = as.Date("1983-12-01"), xmax = as.Date("1984-07-01"), 
-                                        ymin = -Inf, ymax = Inf), 
-                      mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
-                      alpha = 0.3, inherit.aes = FALSE) + 
-            #    geom_rect(data = data.frame(xmin = as.Date("1988-10-01"), xmax = as.Date("1996-01-01"), 
-            #                                ymin = -Inf, ymax = Inf), 
-            #              mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
-            #              alpha = 0.3, inherit.aes = FALSE) + 
-            geom_rect(data = data.frame(xmin = as.Date("1998-09-01"), xmax = as.Date("1999-12-01"), 
-                                        ymin = -Inf, ymax = Inf), 
-                      mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
-                      alpha = 0.3, inherit.aes = FALSE) + 
-            geom_rect(data = data.frame(xmin = as.Date("2009-06-01"), xmax = as.Date("2010-09-01"), 
-                                        ymin = -Inf, ymax = Inf), 
-                      mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
-                      alpha = 0.3, inherit.aes = FALSE)
-    }
-    
-    # save output
-    if (is.null(plot_file)) 
-    {
-        print(portal_ds_plot)
-    } else {
-        ggsave(plot_file, portal_ds_plot, 
-               width = width, height = height)
-    }
-    return()
-}
-
-#### function to produce smap coeffs plot ----
-
-plot_smap_coeffs <- function(proc_data_file = here::here("data", "portal_block.RDS"), 
-                             smap_matrices_file = here::here("output", "portal_smap_matrices.RDS"), 
-                             plot_file = NULL, width = 6, height = NULL)
-{
-    # make data.frame of smap coefficients
-    smap_matrices <- readRDS(smap_matrices_file)
-    smap_coeff_df <- map_df(seq(smap_matrices), function(i) {
-        m <- smap_matrices[[i]]
-        if (is.null(dim(m)))
-            return()
-        row_idx <- grep("_0", rownames(m))
-        out <- reshape2::melt(m[row_idx,])
-        out$t <- i
-        return(out)
-    }) %>%
-    rename(target = Var1, predictor = Var2)
-
-    # identify coefficients that matter
-    to_keep <- smap_coeff_df %>%
-        group_by(target, predictor) %>%
-        summarize(v = max(abs(value))) %>%
-        filter(v > 0) %>%
-        mutate(coeff_name = paste0(target, predictor))
-    smap_coeff_df <- smap_coeff_df %>% 
-        mutate(coeff_name = paste0(target, predictor)) %>%
-        filter(coeff_name %in% to_keep$coeff_name)
-    
-    # convert time index into dates
-    block <- readRDS(proc_data_file)
-    stopifnot(max(smap_coeff_df$t) <= NROW(block))
-    smap_coeff_df$censusdate <- as.Date(block$censusdate[smap_coeff_df$t])
-    
-    # time series plot
-    ts_plot <- ggplot(smap_coeff_df, 
-                      aes(x = censusdate, y = abs(value), color = predictor)) + 
-        facet_grid(target ~ ., scales = "free_y", switch = "y") + 
-        geom_hline(yintercept = 1, size = 1, linetype = 2) +
-        scale_color_viridis_d(option = "E") + 
-        scale_x_date(breaks = seq(from = as.Date("1985-01-01"), 
-                                  to = as.Date("2015-01-01"), 
-                                  by = "5 years"), 
-                     date_labels = "%Y", expand = c(0.01, 0)) + 
-        geom_line() + 
-        theme_bw() +
-        guides(color = FALSE, fill = FALSE)
-    
-    # density plot
-    density_plot <- ggplot(smap_coeff_df, 
-                           aes(x = abs(value), color = predictor)) + 
-        facet_grid(target ~ ., switch = "y") + 
-        geom_vline(xintercept = 1, size = 1, linetype = 2) +
-        scale_color_viridis_d(option = "E") + 
-        geom_density(fill = NA, weight = 0.5) + 
-        coord_flip() + 
-        theme_bw() +
-        guides(color = FALSE, fill = FALSE)
-    
-    combined_plot <- cowplot::plot_grid(ts_plot, density_plot, nrow = 1, 
-                                        rel_widths = c(3, 1))
-    if (is.null(height))
-    {
-        height <- nlevels(smap_coeff_df$target)
-    }
-    
-    # save output
-    if (is.null(plot_file)) 
-    {
-        print(combined_plot)
-    } else {
-        ggsave(plot_file, combined_plot, 
-               width = width, height = height)
-    }
-    return()
 }
 
 #### base run ----
@@ -307,12 +145,10 @@ compute_portal_dynamic_stability(proc_data_file,
                                  smap_matrices_file, 
                                  eigenvalues_file)
 
-plot_eigenvalues(proc_data_file, 
-                 eigenvalues_file, 
+plot_eigenvalues(eigenvalues_file, 
                  eigenvalues_plot_file)
 
-plot_smap_coeffs(proc_data_file, 
-                 smap_matrices_file, 
+plot_smap_coeffs(smap_matrices_file, 
                  smap_plot_file)
 
 #### revised run (50%) ----
@@ -328,17 +164,14 @@ smap_plot_file <- here::here("output", "portal_smap_values_50.pdf")
 eigenvalues_file <- here::here("output", "portal_eigenvalues_50.RDS")
 eigenvalues_plot_file <- here::here("output", "portal_dynamic_stability_50.pdf")
 
-plot_eigenvalues(proc_data_file, 
-                 eigenvalues_file, 
+plot_eigenvalues(eigenvalues_file, 
                  eigenvalues_plot_file)
 
-plot_eigenvalues(proc_data_file, 
-                 eigenvalues_file, 
+plot_eigenvalues(eigenvalues_file, 
                  plot_file = here::here("output", "portal_dynamic_stability_50_highlight.pdf"), 
                  highlight_shifts = TRUE)
 
-plot_smap_coeffs(proc_data_file, 
-                 smap_matrices_file, 
+plot_smap_coeffs(smap_matrices_file, 
                  smap_plot_file)
 
 #### revised run (33%) ----
@@ -354,12 +187,10 @@ smap_plot_file <- here::here("output", "portal_smap_values_33.pdf")
 eigenvalues_file <- here::here("output", "portal_eigenvalues_33.RDS")
 eigenvalues_plot_file <- here::here("output", "portal_dynamic_stability_33.pdf")
 
-plot_eigenvalues(proc_data_file, 
-                 eigenvalues_file, 
+plot_eigenvalues(eigenvalues_file, 
                  eigenvalues_plot_file)
 
-plot_smap_coeffs(proc_data_file, 
-                 smap_matrices_file, 
+plot_smap_coeffs(smap_matrices_file, 
                  smap_plot_file)
 
 #### run on LDA topics ----
@@ -409,11 +240,9 @@ if (!file.exists(proc_data_file))
 
 compute_portal_dynamic_stability(file_suffix = "_lda")
 
-plot_eigenvalues(proc_data_file, 
-                 eigenvalues_file, 
+plot_eigenvalues(eigenvalues_file, 
                  eigenvalues_plot_file)
 
-plot_smap_coeffs(proc_data_file, 
-                 smap_matrices_file, 
+plot_smap_coeffs(smap_matrices_file, 
                  smap_plot_file)
 
