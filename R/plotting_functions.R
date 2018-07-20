@@ -3,6 +3,45 @@ library(igraph)
 library(viridis)
 library(cowplot)
 
+#### make networks from all ccm results, match color and location to first ----
+
+make_combined_network <- function(plot_file = here::here("figure/portal_networks_all.pdf"))
+{
+    portal_network <- here::here("output/portal_ds_results.RDS") %>%
+        readRDS() %>%
+        pull(ccm_results) %>%
+        make_network_from_ccm_results()
+    
+    portal_network_50 <- here::here("output/portal_ds_results_50.RDS") %>%
+        readRDS() %>%
+        pull(ccm_results) %>%
+        make_network_from_ccm_results(palette = portal_network$palette, 
+                                      existing_graph = portal_network$graph)
+    
+    portal_network_33 <- here::here("output/portal_ds_results_33.RDS") %>%
+        readRDS() %>%
+        pull(ccm_results) %>%
+        make_network_from_ccm_results(palette = portal_network$palette, 
+                                      existing_graph = portal_network$graph)
+    
+    combined_network_plot <- plot_grid(portal_network$plot, 
+                                       portal_network_50$plot, 
+                                       portal_network_33$plot, 
+                                       labels = c("all species", 
+                                                  "species present >= 50%", 
+                                                  "species present >= 33%"), 
+                                       align = "v", axis = "l", 
+                                       ncol = 1)
+    
+    if (is.null(plot_file))
+    {
+        ggsave(plot_file, combined_network_plot, width = 6, height = 12)
+    } else {
+        print(combined_network_plot)
+    }
+    return()
+}
+
 #### generate network figure from ccm_results ----
 
 make_network_from_ccm_results <- function(ccm_results, 
