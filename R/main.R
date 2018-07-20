@@ -246,3 +246,32 @@ plot_eigenvalues(eigenvalues_file,
 plot_smap_coeffs(smap_matrices_file, 
                  smap_plot_file)
 
+#### make network figure ----
+portal_network <- readRDS(here::here("output", "portal_ccm_results.RDS")) %>% 
+    make_network_from_ccm_results()
+
+portal_network_50 <- readRDS(here::here("output", "portal_ccm_results_50.RDS")) %>%
+    make_network_from_ccm_results(palette = portal_network$palette, 
+                                  existing_graph = portal_network$graph)
+
+portal_network_33 <- readRDS(here::here("output", "portal_ccm_results_33.RDS")) %>%
+    make_network_from_ccm_results(palette = portal_network$palette, 
+                                  existing_graph = portal_network$graph)
+
+combined_network_plot <- plot_grid(portal_network$plot, 
+                                   portal_network_50$plot, 
+                                   portal_network_33$plot, 
+                                   labels = c("all species", 
+                                              "species present >= 50%", 
+                                              "species present >= 33%"), 
+                                   align = "v", axis = "l", 
+                                   ncol = 1)
+# print(combined_network_plot)
+
+ggsave(here::here("output", "portal_interaction_networks.pdf"),
+       combined_network_plot, width = 6, height = 12)
+
+portal_network_50 <- readRDS(here::here("output", "portal_ccm_results_50.RDS")) %>%
+    make_network_from_ccm_results()
+ggsave(here::here("output", "portal_interaction_network_50.pdf"),
+       portal_network_50$plot, width = 8, height = 6)
