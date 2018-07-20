@@ -5,22 +5,22 @@ library(cowplot)
 
 #### make networks from all ccm results, match color and location to first ----
 
-make_combined_network <- function(plot_file = here::here("figure/portal_networks_all.pdf"))
+make_combined_network <- function(plot_file = NULL)
 {
     portal_network <- here::here("output/portal_ds_results.RDS") %>%
         readRDS() %>%
-        pull(ccm_results) %>%
+        .$ccm_results %>%
         make_network_from_ccm_results()
     
     portal_network_50 <- here::here("output/portal_ds_results_50.RDS") %>%
         readRDS() %>%
-        pull(ccm_results) %>%
+        .$ccm_results %>%
         make_network_from_ccm_results(palette = portal_network$palette, 
                                       existing_graph = portal_network$graph)
     
     portal_network_33 <- here::here("output/portal_ds_results_33.RDS") %>%
         readRDS() %>%
-        pull(ccm_results) %>%
+        .$ccm_results %>%
         make_network_from_ccm_results(palette = portal_network$palette, 
                                       existing_graph = portal_network$graph)
     
@@ -161,23 +161,31 @@ plot_smap_coeffs <- function(smap_matrices, plot_file = NULL,
 
 #### function to produce eigenvalues plot ----
 
-plot_eigenvalues <- function(eigenvalues, plot_file = NULL, 
+plot_eigenvalues <- function(eigenvalues, num_values = 1, plot_file = NULL, 
                              width = 8, height = 4.5, highlight_shifts = FALSE)
 {
     # generate df for plotting
-    stability_df <- data.frame(censusdate = as.Date(names(eigenvalues)), 
-                               ds = map_dbl(eigenvalues, ~max(abs({.}))))
+    eigenvalue_dist <- map_df(seq(eigenvalues), function(i) {
+        lambda <- eigenvalues[[i]]
+        if(any(is.na(lambda)))
+            return(data.frame())
+        lambda <- sort(abs(lambda), decreasing = TRUE)
+        data.frame(lambda = lambda, censusdate = names(eigenvalues)[i], rank = seq(lambda))
+    })
+    eigenvalue_dist$censusdate <- as.Date(eigenvalue_dist$censusdate)
     
     # construct plot
-    portal_ds_plot <- stability_df %>%
-        ggplot(aes(x = censusdate, y = ds)) + 
+    portal_ds_plot <- eigenvalue_dist %>%
+        filter(rank <= num_values) %>% 
+        ggplot(aes(x = censusdate, y = lambda, color = as.factor(rank))) + 
+        scale_color_viridis_d() +
         geom_line() + 
         geom_hline(yintercept = 1.0, size = 1, linetype = 2) + 
         scale_x_date(breaks = seq(from = as.Date("1985-01-01"), 
                                   to = as.Date("2015-01-01"), 
                                   by = "5 years"), 
                      date_labels = "%Y", expand = c(0.01, 0)) + 
-        labs(x = NULL, y = "dynamic stability \n(higher is more unstable)") +
+        labs(x = NULL, y = "dynamic stability \n(higher is more unstable)", color = "rank") +
         theme_bw() + 
         theme(panel.grid.minor = element_line(size = 0.5))
     

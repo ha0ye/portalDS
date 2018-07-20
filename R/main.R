@@ -41,12 +41,12 @@ if (FALSE) #  only species which appear at least 50% of the time)
     plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_50.pdf"))
     plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_50_highlight.pdf"), highlight_shifts = TRUE)
     
-    portal_network_50 <- results %>%
-        pull(ccm_results) %>% 
+    portal_network_50 <- results$ccm_results %>% 
         make_network_from_ccm_results()
     ggsave(here::here("figures/portal_network_50.pdf"),
            portal_network_50$plot, width = 8, height = 6)
     
+    plot_eigenvalues(results$eigenvalues, num_values = 4)
 }
 
 #### revised run (33%) ----
@@ -109,3 +109,5 @@ if (FALSE) # do our own block generation using LDA topics
     plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_lda.pdf"))
     plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_lda_highlight.pdf"), highlight_shifts = TRUE)
 }
+
+make_combined_network(plot_file = here::here("figure/portal_networks_all.pdf"))
