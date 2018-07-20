@@ -3,6 +3,115 @@ library(lubridate)
 library(rEDM)
 library(parallel)
 
+#### function for full dynamic stability analysis ----
+
+compute_dynamic_stability <- function(block, 
+                                      results_file = here::here("output/portal_ds_results.RDS"),
+                                      num_cores = 2)
+{
+    if (!file.exists(results_file))
+    {
+        results <- list()
+    } else {
+        results <- readRDS(results_file)
+    }
+    results$block <- block
+    
+    # check for simplex results, compute if missing
+    if (is.null(results$simplex_results))
+    {
+        simplex_results <- results$block %>%
+            select(-censusdate) %>%
+            compute_simplex(E = 1:18)
+        
+        simplex_results$surrogate_data <- 
+            map(simplex_results$data, function(df) {
+                make_surrogate_annual_spline(yday(results$block$censusdate), 
+                                             df$abundance, 
+                                             num_surr = 200)
+            })
+        
+        results$simplex_results <- simplex_results
+    }
+    
+    # check for ccm results, compute if missing
+    if (is.null(results$ccm_results))
+    {
+        lib_vec <- c(6, 12, 24, 40, 80, 140, 220, 320, NROW(results$block))
+        ccm_results <- compute_CCM(results$simplex_results, lib_sizes = lib_vec, 
+                                   num_samples = 200, num_cores = num_cores)
+        
+        results$ccm_results <- ccm_results
+    }
+    
+    # check for smap matrices, compute if missing
+    if (is.null(results$smap_matrices))
+    {
+        ccm_links <- identify_ccm_links(results$ccm_results)
+        smap_coeffs <- compute_smap_coeffs(results$block, ccm_links)
+        smap_matrices <- compute_smap_matrices(smap_coeffs, ccm_links)
+        
+        # add date labels for each matrix in list
+        stopifnot(length(smap_matrices) == NROW(results$block))
+        names(smap_matrices) <- results$block$censusdate
+        
+        results$smap_matrices <- smap_matrices
+    }
+    
+    # check for eigenvalues
+    if (is.null(results$eigenvalues))
+    {
+        results$eigenvalues <- compute_eigenvalues(results$smap_matrices)
+    }
+    
+    saveRDS(results, file = results_file)
+}
+
+#### process data into block form and interpolated across dates ----
+
+make_portal_block <- function(filter_q = NULL)
+{
+    # options here are:
+    #   time = "all" (allow us to do correct interpolation and accouting for seasonality)
+    #   level = "plot" (allow us to pull out abundances on the plots we want)
+    #   effort = TRUE (so we can check effort)
+    #   na_drop = TRUE (ignore periods where sampling did not occur)
+    raw_rodent_data <- portalr::abundance(time = "all", 
+                                          plots = c(2, 4, 8, 11, 12, 14, 17, 22), 
+                                          effort = TRUE, 
+                                          na_drop = TRUE)
+    
+    # summarize by each newmmonnumber, and for only the control plots we want
+    block <- raw_rodent_data %>% 
+        filter(censusdate < "2015-04-18") %>% 
+        select(-period)
+    
+    # check that effort is equal across samples
+    stopifnot(length(unique(block$ntraps)) == 1)
+    
+    if (!is.null(filter_q))
+    {
+        species_list <- block %>%
+            gather(species, abundance, BA:SO) %>%
+            group_by(species) %>%
+            summarize(quantile_q = quantile(abundance, 1 - filter_q)) %>%
+            filter(quantile_q > 0) %>%
+            pull(species)
+        
+        block <- block %>% 
+            select(c("newmoonnumber", "censusdate", "ntraps", species_list))
+    }
+    
+    # add in NAs for unsampled newmoonnumbers and interpolate
+    block <- block %>%
+        complete(newmoonnumber = full_seq(newmoonnumber, 1), fill = list(NA)) %>%
+        mutate_at(vars(-newmoonnumber, -ntraps), forecast::na.interp) %>%
+        mutate(censusdate = as.Date(as.numeric(censusdate), origin = "1970-01-01")) %>% 
+        select(-newmoonnumber, -ntraps)
+    
+    return(block)
+}
+
 #### function to fit periodic spline through data, using yearday as input x ----
 
 make_surrogate_annual_spline <- function(x, y, num_surr = 100)

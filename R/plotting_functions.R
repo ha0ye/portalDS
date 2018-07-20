@@ -1,8 +1,7 @@
 library(ggraph)
 library(igraph)
 library(viridis)
-
-source(here::here("R", "dynamic_stability_functions.R"))
+library(cowplot)
 
 #### generate network figure from ccm_results ----
 
@@ -50,11 +49,10 @@ make_network_from_ccm_results <- function(ccm_results,
 
 #### function to produce smap coeffs plot ----
 
-plot_smap_coeffs <- function(smap_matrices_file = here::here("output", "portal_smap_matrices.RDS"), 
-                             plot_file = NULL, width = 6, height = NULL)
+plot_smap_coeffs <- function(smap_matrices, plot_file = NULL, 
+                             width = 6, height = NULL)
 {
     # make data.frame of smap coefficients
-    smap_matrices <- readRDS(smap_matrices_file)
     smap_coeff_df <- map_df(seq(smap_matrices), function(i) {
         m <- smap_matrices[[i]]
         if (is.null(dim(m)))
@@ -104,7 +102,7 @@ plot_smap_coeffs <- function(smap_matrices_file = here::here("output", "portal_s
         theme_bw() +
         guides(color = FALSE, fill = FALSE)
     
-    combined_plot <- cowplot::plot_grid(ts_plot, density_plot, nrow = 1, 
+    combined_plot <- plot_grid(ts_plot, density_plot, nrow = 1, 
                                         rel_widths = c(3, 1))
     if (is.null(height))
     {
@@ -124,12 +122,9 @@ plot_smap_coeffs <- function(smap_matrices_file = here::here("output", "portal_s
 
 #### function to produce eigenvalues plot ----
 
-plot_eigenvalues <- function(eigenvalues_file = here::here("output", "portal_eigenvalues.RDS"), 
-                             plot_file = NULL, width = 8, height = 4.5, highlight_shifts = FALSE)
+plot_eigenvalues <- function(eigenvalues, plot_file = NULL, 
+                             width = 8, height = 4.5, highlight_shifts = FALSE)
 {
-    # read in data
-    eigenvalues <- readRDS(eigenvalues_file)
-
     # generate df for plotting
     stability_df <- data.frame(censusdate = as.Date(names(eigenvalues)), 
                                ds = map_dbl(eigenvalues, ~max(abs({.}))))
