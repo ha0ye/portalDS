@@ -114,3 +114,45 @@ if (FALSE) # do our own block generation using LDA topics
 #### misc. graphs ----
 
 make_combined_network(plot_file = here::here("figure/portal_networks_all.pdf"))
+
+#### modified network runs ----
+if (FALSE) # run with 50% species, but fully connected graph
+{          #  DM, DO, DS, NA, OL, OT, PP
+    block <- readRDS("data/portal_block_50.RDS")
+    
+    results <- readRDS(here::here("output/portal_ds_results_50.RDS"))
+    results$ccm_links <- tidyr::complete(results$ccm_links, lib_column, target_column, 
+                                         fill = list(E = 1, delta_rho = NA, 
+                                                     rho_minus_upper_q_null = NA)) %>%
+        group_by(lib_column) %>%
+        mutate(E = max(E)) %>%
+        ungroup()
+    
+    results$smap_matrices <- NULL
+    results$eigenvalues <- NULL
+    
+    results_file <- here::here("output/portal_ds_results_50_full_network.RDS")    
+    saveRDS(results, results_file)
+    compute_dynamic_stability(block, results_file)
+
+    results <- readRDS(results_file)
+    plot_smap_coeffs(results$smap_matrices, here::here("figures/portal_smap_values_50_full_network.pdf"))
+    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_50_full_network.pdf"))
+    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_50_full_network_highlight.pdf"), highlight_shifts = TRUE)
+}
+
+#### revised run (50%, biomass) ----
+
+if (FALSE)
+{
+    block <- make_portal_block(filter_q = 0.5, output = "biomass")
+    saveRDS(block, here::here("data/portal_block_50.RDS"))
+    
+    results_file <- here::here("output/portal_ds_results_50.RDS")
+    compute_dynamic_stability(block, results_file)
+    
+    results <- readRDS(results_file)
+    plot_smap_coeffs(results$smap_matrices, here::here("figures/portal_smap_values_50.pdf"))
+    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_50.pdf"))
+    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_50_highlight.pdf"), highlight_shifts = TRUE)
+}

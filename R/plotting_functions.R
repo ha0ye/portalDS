@@ -161,7 +161,7 @@ plot_smap_coeffs <- function(smap_matrices, plot_file = NULL,
 
 #### function to produce eigenvalues plot ----
 
-plot_eigenvalues <- function(eigenvalues, num_values = 1, plot_file = NULL, 
+plot_eigenvalues <- function(eigenvalues, plot_file = NULL, num_values = 1, 
                              width = 8, height = 4.5, highlight_shifts = FALSE)
 {
     # generate df for plotting

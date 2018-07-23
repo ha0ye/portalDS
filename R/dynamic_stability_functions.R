@@ -7,7 +7,7 @@ library(parallel)
 
 compute_dynamic_stability <- function(block, 
                                       results_file = here::here("output/portal_ds_results.RDS"),
-                                      num_cores = 2)
+                                      num_cores = 2, rescale = TRUE)
 {
     if (!file.exists(results_file))
     {
@@ -22,7 +22,7 @@ compute_dynamic_stability <- function(block,
     {
         simplex_results <- results$block %>%
             select(-censusdate) %>%
-            compute_simplex(E = 1:18)
+            compute_simplex(E = 1:16)
         
         simplex_results$surrogate_data <- 
             map(simplex_results$data, function(df) {
@@ -41,7 +41,8 @@ compute_dynamic_stability <- function(block,
         results$ccm_results <- compute_CCM(results$simplex_results, 
                                            lib_sizes = lib_vec, 
                                            num_samples = 200, 
-                                           num_cores = num_cores)
+                                           num_cores = num_cores, 
+                                           rescale = rescale)
     }
     
     # check for ccm links, comput if missing
@@ -73,17 +74,18 @@ compute_dynamic_stability <- function(block,
 
 #### process data into block form and interpolated across dates ----
 
-make_portal_block <- function(filter_q = NULL)
+make_portal_block <- function(filter_q = NULL, output = "abundance")
 {
     # options here are:
     #   time = "all" (allow us to do correct interpolation and accouting for seasonality)
     #   level = "plot" (allow us to pull out abundances on the plots we want)
     #   effort = TRUE (so we can check effort)
     #   na_drop = TRUE (ignore periods where sampling did not occur)
-    raw_rodent_data <- portalr::abundance(time = "all", 
-                                          plots = c(2, 4, 8, 11, 12, 14, 17, 22), 
-                                          effort = TRUE, 
-                                          na_drop = TRUE)
+    raw_rodent_data <- portalr::get_rodent_data(time = "all", 
+                                                plots = c(2, 4, 8, 11, 12, 14, 17, 22), 
+                                                effort = TRUE, 
+                                                na_drop = TRUE, 
+                                                output = output)
     
     # summarize by each newmmonnumber, and for only the control plots we want
     block <- raw_rodent_data %>% 
@@ -161,6 +163,7 @@ make_surrogate_annual_spline <- function(x, y, num_surr = 100)
 compute_simplex <- function(block, E = 1:10)
 {
     block %>%
+        select(-censusdate) %>%
         gather(species, abundance) %>%
         group_by(species) %>%
         nest() %>% 
@@ -305,7 +308,7 @@ identify_ccm_links <- function(ccm_results,
 #' @return A rescaled vector the same length as `x`
 #' 
 #' @export
-rescale <- function(x, na.rm = TRUE) {(x - mean(x, na.rm = na.rm)) / sd(x, na.rm = na.rm)}
+norm_rescale <- function(x, na.rm = TRUE) {(x - mean(x, na.rm = na.rm)) / sd(x, na.rm = na.rm)}
 
 #' @title Compute S-map coefficients for a community
 #' @description Compute S-map models for each time series in the `block` and 
@@ -337,12 +340,16 @@ rescale <- function(x, na.rm = TRUE) {(x - mean(x, na.rm = na.rm)) / sd(x, na.rm
 #'   and the column names of the matrices use the variable names in the block.
 #' 
 #' @export
-compute_smap_coeffs <- function(block, ccm_links)
+compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE)
 {
     # rescale all the variables
     block <- block %>%
-        mutate_all(rescale)
-    
+        select(-censusdate)
+    if (rescale)
+    {
+        block <- mutate_all(block, norm_rescale)
+    }    
+
     if (is.factor(ccm_links$lib_column)) {
         ccm_links$lib_column <- as.character(ccm_links$lib_column)
     }
