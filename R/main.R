@@ -64,6 +64,7 @@ if (FALSE) #  only species which appear at least 33% of the time)
     plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_33.pdf"))
     plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_33_highlight.pdf"), highlight_shifts = TRUE)
 }
+
 #### run on LDA topics ----
 if (FALSE) # do our own block generation using LDA topics
 {
@@ -109,5 +110,7 @@ if (FALSE) # do our own block generation using LDA topics
     plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_lda.pdf"))
     plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_lda_highlight.pdf"), highlight_shifts = TRUE)
 }
+
+#### misc. graphs ----
 
 make_combined_network(plot_file = here::here("figure/portal_networks_all.pdf"))

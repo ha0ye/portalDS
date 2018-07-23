@@ -38,24 +38,28 @@ compute_dynamic_stability <- function(block,
     if (is.null(results$ccm_results))
     {
         lib_vec <- c(6, 12, 24, 40, 80, 140, 220, 320, NROW(results$block))
-        ccm_results <- compute_CCM(results$simplex_results, lib_sizes = lib_vec, 
-                                   num_samples = 200, num_cores = num_cores)
-        
-        results$ccm_results <- ccm_results
+        results$ccm_results <- compute_CCM(results$simplex_results, 
+                                           lib_sizes = lib_vec, 
+                                           num_samples = 200, 
+                                           num_cores = num_cores)
+    }
+    
+    # check for ccm links, comput if missing
+    if (is.null(results$ccm_links))
+    {
+        results$ccm_links <- identify_ccm_links(results$ccm_results)
     }
     
     # check for smap matrices, compute if missing
     if (is.null(results$smap_matrices))
     {
-        ccm_links <- identify_ccm_links(results$ccm_results)
-        smap_coeffs <- compute_smap_coeffs(results$block, ccm_links)
-        smap_matrices <- compute_smap_matrices(smap_coeffs, ccm_links)
+        smap_coeffs <- compute_smap_coeffs(results$block, results$ccm_links)
+        results$smap_matrices <- compute_smap_matrices(smap_coeffs, 
+                                                       results$ccm_links)
         
         # add date labels for each matrix in list
-        stopifnot(length(smap_matrices) == NROW(results$block))
-        names(smap_matrices) <- results$block$censusdate
-        
-        results$smap_matrices <- smap_matrices
+        stopifnot(length(results$smap_matrices) == NROW(results$block))
+        names(results$smap_matrices) <- results$block$censusdate
     }
     
     # check for eigenvalues
