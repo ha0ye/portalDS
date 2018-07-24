@@ -21,7 +21,6 @@ compute_dynamic_stability <- function(block,
     if (is.null(results$simplex_results))
     {
         simplex_results <- results$block %>%
-            select(-censusdate) %>%
             compute_simplex(E = 1:16)
         
         simplex_results$surrogate_data <- 
@@ -41,8 +40,7 @@ compute_dynamic_stability <- function(block,
         results$ccm_results <- compute_CCM(results$simplex_results, 
                                            lib_sizes = lib_vec, 
                                            num_samples = 200, 
-                                           num_cores = num_cores, 
-                                           rescale = rescale)
+                                           num_cores = num_cores)
     }
     
     # check for ccm links, comput if missing
@@ -54,7 +52,8 @@ compute_dynamic_stability <- function(block,
     # check for smap matrices, compute if missing
     if (is.null(results$smap_matrices))
     {
-        smap_coeffs <- compute_smap_coeffs(results$block, results$ccm_links)
+        smap_coeffs <- compute_smap_coeffs(results$block, results$ccm_links, 
+                                           rescale = rescale)
         results$smap_matrices <- compute_smap_matrices(smap_coeffs, 
                                                        results$ccm_links)
         

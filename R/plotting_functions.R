@@ -92,7 +92,7 @@ plot_smap_coeffs <- function(smap_matrices, plot_file = NULL,
                              width = 6, height = NULL)
 {
     # make data.frame of smap coefficients
-    smap_coeff_df <- map_df(seq(smap_matrices), function(i) {
+    smap_coeff_df <- map_dfr(seq(smap_matrices), function(i) {
         m <- smap_matrices[[i]]
         if (is.null(dim(m)))
             return()
@@ -165,7 +165,7 @@ plot_eigenvalues <- function(eigenvalues, plot_file = NULL, num_values = 1,
                              width = 8, height = 4.5, highlight_shifts = FALSE)
 {
     # generate df for plotting
-    eigenvalue_dist <- map_df(seq(eigenvalues), function(i) {
+    eigenvalue_dist <- map_dfr(seq(eigenvalues), function(i) {
         lambda <- eigenvalues[[i]]
         if(any(is.na(lambda)))
             return(data.frame())

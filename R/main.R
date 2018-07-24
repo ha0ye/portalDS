@@ -146,13 +146,13 @@ if (FALSE) # run with 50% species, but fully connected graph
 if (FALSE)
 {
     block <- make_portal_block(filter_q = 0.5, output = "biomass")
-    saveRDS(block, here::here("data/portal_block_50.RDS"))
+    saveRDS(block, here::here("data/portal_block_50_biomass.RDS"))
     
-    results_file <- here::here("output/portal_ds_results_50.RDS")
-    compute_dynamic_stability(block, results_file)
+    results_file <- here::here("output/portal_ds_results_50_biomass.RDS")
+    compute_dynamic_stability(block, results_file, rescale = FALSE)
     
     results <- readRDS(results_file)
-    plot_smap_coeffs(results$smap_matrices, here::here("figures/portal_smap_values_50.pdf"))
-    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_50.pdf"))
-    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_50_highlight.pdf"), highlight_shifts = TRUE)
+    plot_smap_coeffs(results$smap_matrices, here::here("figures/portal_smap_values_50_biomass.pdf"))
+    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_50_biomass.pdf"))
+    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_50_biomass_highlight.pdf"), highlight_shifts = TRUE)
 }
