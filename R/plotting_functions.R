@@ -225,7 +225,8 @@ plot_eigenvectors <- function(eigenvectors, plot_file = NULL, num_values = 1,
     }) %>% 
         rename(variable = Var1, rank = Var2) %>%
         mutate(censusdate = as.Date(names(eigenvectors)[t]), 
-               variable = as.factor(var_names[variable]))
+               variable = as.factor(var_names[variable]), 
+               value = abs(Re(value)))
     
     # compute IPR = Inverse Participation Ratio
     #   for each eigenvector
@@ -242,37 +243,54 @@ plot_eigenvectors <- function(eigenvectors, plot_file = NULL, num_values = 1,
         group_by(t, rank) %>%
         summarize(value = compute_ipr(value)) %>%
         ungroup() %>%
-        mutate(censusdate = as.Date(names(eigenvectors)[t]))
+        mutate(censusdate = as.Date(names(eigenvectors)[t]), 
+               variable = "IPR")
     
-    # eigenvector plot
+    v_df$component <- "eigenvector"
+    ipr_df$component <- "IPR"
+    
     ev_plot <- ggplot(v_df, 
-                      aes(x = censusdate, y = abs(Re(value)), color = variable)) + 
-        facet_grid(rank ~ ., scales = "free_y", switch = "y") + 
+           aes(x = censusdate, y = value, color = variable)) + 
+        facet_grid(component + rank ~ ., scales = "free", switch = "y") + 
         scale_color_viridis(discrete = TRUE, option = "plasma") + 
         scale_x_date(breaks = seq(from = as.Date("1985-01-01"), 
                                   to = as.Date("2015-01-01"), 
                                   by = "5 years"), 
                      date_labels = "%Y", expand = c(0.01, 0)) + 
         geom_line() + 
-        geom_line(data = ipr_df, color = "black", size = 1) + 
+        theme_bw()
+    ipr_plot <- ggplot(ipr_df, 
+           aes(x = censusdate, y = value)) + 
+        facet_grid(component + rank ~ ., switch = "y") + 
+        scale_y_continuous(limits = c(1/num_vars, 1)) + 
+        scale_x_date(breaks = seq(from = as.Date("1985-01-01"), 
+                                  to = as.Date("2015-01-01"), 
+                                  by = "5 years"), 
+                     date_labels = "%Y", expand = c(0.01, 0)) + 
+        geom_line(color = "black") + 
         theme_bw()
     
     if (highlight_shifts)
     {
         ev_plot <- add_regime_shift_highlight(ev_plot)
+        ipr_plot <- add_regime_shift_highlight(ipr_plot)
     }
     
     if (is.null(height))
     {
-        height <- num_vars
+        height <- num_vars * 2
     }
+    
+    my_plot <- cowplot::plot_grid(ev_plot, ipr_plot, 
+                                  align = "v", axis = "lr", 
+                                  ncol = 1, labels = NA)
     
     # save output
     if (is.null(plot_file)) 
     {
-        print(ev_plot)
+        print(my_plot)
     } else {
-        ggsave(plot_file, ev_plot, 
+        ggsave(plot_file, my_plot, 
                width = width, height = height)
     }
     return()
