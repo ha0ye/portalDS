@@ -101,8 +101,8 @@ plot_smap_coeffs <- function(smap_matrices, plot_file = NULL,
         out$t <- i
         return(out)
     }) %>%
-        rename(target = Var1, predictor = Var2) %>%
-
+        rename(target = Var1, predictor = Var2)
+    
     # identify coefficients that matter
     to_keep <- smap_coeff_df %>%
         group_by(target, predictor) %>%
