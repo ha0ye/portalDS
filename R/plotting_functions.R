@@ -101,8 +101,8 @@ plot_smap_coeffs <- function(smap_matrices, plot_file = NULL,
         out$t <- i
         return(out)
     }) %>%
-        rename(target = Var1, predictor = Var2)
-    
+        rename(target = Var1, predictor = Var2) %>%
+
     # identify coefficients that matter
     to_keep <- smap_coeff_df %>%
         group_by(target, predictor) %>%
@@ -167,7 +167,7 @@ plot_eigenvalues <- function(eigenvalues, plot_file = NULL, num_values = 1,
     # generate df for plotting
     eigenvalue_dist <- map_dfr(seq(eigenvalues), function(i) {
         lambda <- eigenvalues[[i]]
-        if(any(is.na(lambda)))
+        if (any(is.na(lambda)))
             return(data.frame())
         lambda <- sort(abs(lambda), decreasing = TRUE)
         data.frame(lambda = lambda, censusdate = names(eigenvalues)[i], rank = seq(lambda))
@@ -191,23 +191,7 @@ plot_eigenvalues <- function(eigenvalues, plot_file = NULL, num_values = 1,
     
     if (highlight_shifts)
     {
-        portal_ds_plot <- portal_ds_plot + 
-            geom_rect(data = data.frame(xmin = as.Date("1983-12-01"), xmax = as.Date("1984-07-01"), 
-                                        ymin = -Inf, ymax = Inf), 
-                      mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
-                      alpha = 0.3, inherit.aes = FALSE) + 
-            #    geom_rect(data = data.frame(xmin = as.Date("1988-10-01"), xmax = as.Date("1996-01-01"), 
-            #                                ymin = -Inf, ymax = Inf), 
-            #              mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
-            #              alpha = 0.3, inherit.aes = FALSE) + 
-            geom_rect(data = data.frame(xmin = as.Date("1998-09-01"), xmax = as.Date("1999-12-01"), 
-                                        ymin = -Inf, ymax = Inf), 
-                      mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
-                      alpha = 0.3, inherit.aes = FALSE) + 
-            geom_rect(data = data.frame(xmin = as.Date("2009-06-01"), xmax = as.Date("2010-09-01"), 
-                                        ymin = -Inf, ymax = Inf), 
-                      mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
-                      alpha = 0.3, inherit.aes = FALSE)
+        portal_ds_plot <- add_regime_shift_highlight(portal_ds_plot)
     }
     
     # save output
@@ -219,4 +203,97 @@ plot_eigenvalues <- function(eigenvalues, plot_file = NULL, num_values = 1,
                width = width, height = height)
     }
     return()
+}
+
+plot_eigenvectors <- function(eigenvectors, plot_file = NULL, num_values = 1, 
+                              width = 6, height = NULL, highlight_shifts = FALSE)
+{
+    # extract vars
+    non_null_idx <- first(which(!sapply(eigenvectors, is.null)))
+    var_names <- rownames(eigenvectors[[non_null_idx]])
+    var_idx <- grep("_0", var_names)
+    var_names <- gsub("_0", "", var_names[var_idx])
+
+    # make data.frame of eigenvector components
+    v_df <- map_dfr(seq(eigenvectors), function(i) {
+        v <- eigenvectors[[i]]
+        if (is.null(v))
+            return()
+        out <- reshape2::melt(v[seq(num_vars), seq(num_values)])
+        out$t <- i
+        return(out)
+    }) %>% 
+        rename(variable = Var1, rank = Var2) %>%
+        mutate(censusdate = as.Date(names(eigenvectors)[t]), 
+               variable = as.factor(var_names[variable]))
+    
+    # compute IPR = Inverse Participation Ratio
+    #   for each eigenvector
+    #     normalize so that sum([v_i]^2) = 1
+    #     IPR = sum([v_i]^4)
+    #     ranges from 1/N (N = length of eigenvector) to 1
+    compute_ipr <- function(v)
+    {
+        sum_sq <- sum(abs(v)^2)
+        v <- v / sqrt(sum_sq)
+        return(sum(abs(v)^4))
+    }
+    ipr_df <- v_df %>% 
+        group_by(t, rank) %>%
+        summarize(value = compute_ipr(value)) %>%
+        ungroup() %>%
+        mutate(censusdate = as.Date(names(eigenvectors)[t]))
+    
+    # eigenvector plot
+    ev_plot <- ggplot(v_df, 
+                      aes(x = censusdate, y = abs(Re(value)), color = variable)) + 
+        facet_grid(rank ~ ., scales = "free_y", switch = "y") + 
+        scale_color_viridis(discrete = TRUE, option = "plasma") + 
+        scale_x_date(breaks = seq(from = as.Date("1985-01-01"), 
+                                  to = as.Date("2015-01-01"), 
+                                  by = "5 years"), 
+                     date_labels = "%Y", expand = c(0.01, 0)) + 
+        geom_line() + 
+        geom_line(data = ipr_df, color = "black", size = 1) + 
+        theme_bw()
+    
+    if (highlight_shifts)
+    {
+        ev_plot <- add_regime_shift_highlight(ev_plot)
+    }
+    
+    if (is.null(height))
+    {
+        height <- num_vars
+    }
+    
+    # save output
+    if (is.null(plot_file)) 
+    {
+        print(ev_plot)
+    } else {
+        ggsave(plot_file, ev_plot, 
+               width = width, height = height)
+    }
+    return()
+}
+
+add_regime_shift_highlight <- function(my_plot)
+{
+    my_plot + geom_rect(data = data.frame(xmin = as.Date("1983-12-01"), xmax = as.Date("1984-07-01"), 
+                                          ymin = -Inf, ymax = Inf), 
+                        mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
+                        alpha = 0.3, inherit.aes = FALSE) + 
+        #    geom_rect(data = data.frame(xmin = as.Date("1988-10-01"), xmax = as.Date("1996-01-01"), 
+        #                                ymin = -Inf, ymax = Inf), 
+        #              mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
+        #              alpha = 0.3, inherit.aes = FALSE) + 
+        geom_rect(data = data.frame(xmin = as.Date("1998-09-01"), xmax = as.Date("1999-12-01"), 
+                                    ymin = -Inf, ymax = Inf), 
+                  mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
+                  alpha = 0.3, inherit.aes = FALSE) + 
+        geom_rect(data = data.frame(xmin = as.Date("2009-06-01"), xmax = as.Date("2010-09-01"), 
+                                    ymin = -Inf, ymax = Inf), 
+                  mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
+                  alpha = 0.3, inherit.aes = FALSE)
 }

@@ -113,7 +113,10 @@ if (FALSE) # do our own block generation using LDA topics
 
 #### misc. graphs ----
 
-make_combined_network(plot_file = here::here("figure/portal_networks_all.pdf"))
+if (FALSE) 
+{
+    make_combined_network(plot_file = here::here("figure/portal_networks_all.pdf"))
+}
 
 #### modified network runs ----
 if (FALSE) # run with 50% species, but fully connected graph

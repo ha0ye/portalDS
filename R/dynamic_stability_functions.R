@@ -63,9 +63,11 @@ compute_dynamic_stability <- function(block,
     }
     
     # check for eigenvalues
-    if (is.null(results$eigenvalues))
+    if (is.null(results$eigenvalues) || is.null(results$eigenvectors))
     {
-        results$eigenvalues <- compute_eigenvalues(results$smap_matrices)
+        eigen_decomp <- compute_eigen_decomp(results$smap_matrices)
+        results$eigenvalues <- eigen_decomp$values
+        results$eigenvectors <- eigen_decomp$vectors
     }
     
     saveRDS(results, file = results_file)
@@ -544,13 +546,15 @@ compute_smap_matrices <- function(smap_coeffs, ccm_links)
     return(smap_matrices)
 }
 
-compute_eigenvalues <- function(smap_matrices)
+compute_eigen_decomp <- function(smap_matrices)
 {
-    eigenvalues <- map(smap_matrices, function(J) {
+    eigen_decomp <- map(smap_matrices, function(J) {
         if (any(is.na(J)))
             return(NA)
-        return(eigen(J)$values)
+        out <- eigen(J)
+        rownames(out$vectors) <- rownames(J)
+        return(out)
     })
-    return(eigenvalues)
+    return(transpose(eigen_decomp, .names = c("values", "vectors")))
 }
 
