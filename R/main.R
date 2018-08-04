@@ -55,16 +55,19 @@ block <- readRDS(here::here("data/portal_block_50.RDS"))
 to_plot <- block %>%
     gather(species, abundance, -censusdate)
 n <- length(unique(to_plot$species))
+palette <- viridis(n, option = "plasma")
+sp_list <- c("DM", "DS", "PP")
 portal_time_series <- to_plot %>%
+    filter(species %in% sp_list) %>% 
     ggplot(aes(x = censusdate, y = abundance, color = species)) + 
     geom_line(size = 1) + 
-    scale_x_date(limits = as.Date(c("2005-03-01", "2011-01-01")), 
-                 date_breaks = "1 year", date_labels = "%Y", expand = c(0.01, 0)) + 
-    scale_color_manual(values = viridis(n)) + 
+    scale_x_date(breaks = seq(from = as.Date("1980-01-01"), to = as.Date("2015-01-01"), by = "5 years"), 
+                 date_labels = "%Y", expand = c(0.01, 0)) + 
+    scale_color_manual(values = palette[match(sp_list, sort(unique(to_plot$species)))]) + 
     labs(x = NULL, y = "relative abundance") + 
 #    guides(color = FALSE) + 
     theme_bw(base_size = 20, base_family = "Helvetica", 
              base_line_size = 1) + 
     theme(panel.grid.minor = element_line(size = 1))
 ggsave(here::here("figures/portal_time_series.pdf"),
-       portal_time_series, width = 9, height = 4.5)
+       portal_time_series, width = 12, height = 6)
