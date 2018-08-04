@@ -33,28 +33,28 @@ make_combined_network <- function(plot_file = NULL)
                                        align = "v", axis = "l", 
                                        ncol = 1)
     
-    if (is.null(plot_file))
+    if (!is.null(plot_file))
     {
         ggsave(plot_file, combined_network_plot, width = 6, height = 12)
-    } else {
-        print(combined_network_plot)
     }
-    return()
+    return(combined_network_plot)
 }
 
 #### generate network figure from ccm_results ----
 
-make_network_from_ccm_results <- function(ccm_results, 
+make_network_from_ccm_results <- function(results_file = here::here("output/portal_ds_results.RDS"), 
                                           layout = "circle", 
                                           palette = NULL, 
                                           palette_option = "plasma", 
                                           existing_graph = NULL)
 {
-    my_graph <- ccm_results %>% 
-        identify_ccm_links() %>%
+    results <- readRDS(results_file)
+
+    my_graph <- results$ccm_links %>%
+        filter(lib_column != target_column) %>% 
         arrange(target_column) %>%
         select(target_column, lib_column) %>%
-        graph_from_data_frame()
+        graph_from_data_frame(vertices = levels(.$target_column))
     
     if (is.null(palette))
     {
@@ -72,14 +72,17 @@ make_network_from_ccm_results <- function(ccm_results,
     }
     
     my_plot <- ggraph(my_graph) + 
-        geom_edge_fan(edge_width = 0.5) + 
-        geom_node_circle(aes(r = 0.05, fill = name)) + 
+        geom_edge_link(edge_width = 0.5, start_cap = circle(0.3, "inches"), 
+                       end_cap = circle(0.3, "inches"),
+                       arrow = arrow(angle = 20, type = "closed")) + 
+        geom_node_circle(aes(r = 0.08, fill = name)) + 
         theme_graph(foreground = "black", fg_text_colour = "white", 
                     background = "transparent") + 
         coord_fixed() + 
         theme(text = element_text(family = "Helvetica"),
               panel.border = element_rect(color = NA, fill = NA)) + 
-        scale_fill_manual(values = palette)
+        scale_fill_manual(values = palette) + 
+        guides(fill = guide_legend(title = "Species"))
     
     return(list(plot = my_plot, 
                 palette = palette, 
@@ -88,9 +91,12 @@ make_network_from_ccm_results <- function(ccm_results,
 
 #### function to produce smap coeffs plot ----
 
-plot_smap_coeffs <- function(smap_matrices, plot_file = NULL, 
-                             width = 6, height = NULL)
+plot_smap_coeffs <- function(results_file = here::here("output/portal_ds_results.RDS"), 
+                             plot_file = NULL, width = 6, height = NULL)
 {
+    results <- readRDS(results_file)
+    smap_matrices <- results$smap_matrices
+    
     # make data.frame of smap coefficients
     smap_coeff_df <- map_dfr(seq(smap_matrices), function(i) {
         m <- smap_matrices[[i]]
@@ -149,21 +155,23 @@ plot_smap_coeffs <- function(smap_matrices, plot_file = NULL,
     }
     
     # save output
-    if (is.null(plot_file)) 
+    if (!is.null(plot_file)) 
     {
-        print(combined_plot)
-    } else {
-        ggsave(plot_file, combined_plot, 
+         ggsave(plot_file, combined_plot, 
                width = width, height = height)
     }
-    return()
+    return(combined_plot)
 }
 
 #### function to produce eigenvalues plot ----
 
-plot_eigenvalues <- function(eigenvalues, plot_file = NULL, num_values = 1, 
-                             width = 8, height = 4.5, highlight_shifts = FALSE)
+plot_eigenvalues <- function(results_file = here::here("output/portal_ds_results.RDS"), 
+                             num_values = 1, plot_file = NULL, 
+                             highlight_shifts = TRUE, width = 8, height = 4.5)
 {
+    results <- readRDS(results_file)
+    eigenvalues <- results$eigenvalues
+    
     # generate df for plotting
     eigenvalue_dist <- map_dfr(seq(eigenvalues), function(i) {
         lambda <- eigenvalues[[i]]
@@ -175,39 +183,42 @@ plot_eigenvalues <- function(eigenvalues, plot_file = NULL, num_values = 1,
     eigenvalue_dist$censusdate <- as.Date(eigenvalue_dist$censusdate)
     
     # construct plot
-    portal_ds_plot <- eigenvalue_dist %>%
+    ds_plot <- eigenvalue_dist %>%
         filter(rank <= num_values) %>% 
         ggplot(aes(x = censusdate, y = lambda, color = as.factor(rank))) + 
-        scale_color_viridis_d() +
+        scale_color_manual(values = viridis(7, option = "A")[c(1, 3, 4, 5, 6)]) +
         geom_line() + 
         geom_hline(yintercept = 1.0, size = 1, linetype = 2) + 
         scale_x_date(breaks = seq(from = as.Date("1985-01-01"), 
                                   to = as.Date("2015-01-01"), 
                                   by = "5 years"), 
                      date_labels = "%Y", expand = c(0.01, 0)) + 
+        #scale_y_continuous(limits = c(0.90, 1.04)) + 
         labs(x = NULL, y = "dynamic stability \n(higher is more unstable)", color = "rank") +
         theme_bw() + 
         theme(panel.grid.minor = element_line(size = 0.5))
     
     if (highlight_shifts)
     {
-        portal_ds_plot <- add_regime_shift_highlight(portal_ds_plot)
+        ds_plot <- add_regime_shift_highlight(ds_plot)
     }
     
     # save output
-    if (is.null(plot_file)) 
+    if (!is.null(plot_file)) 
     {
-        print(portal_ds_plot)
-    } else {
-        ggsave(plot_file, portal_ds_plot, 
+        ggsave(plot_file, ds_plot, 
                width = width, height = height)
     }
-    return()
+    return(ds_plot)
 }
 
-plot_eigenvectors <- function(eigenvectors, plot_file = NULL, num_values = 1, 
-                              width = 6, height = NULL, highlight_shifts = FALSE)
+plot_eigenvectors <- function(results_file = here::here("output/portal_ds_results.RDS"), 
+                              num_values = 1, plot_file = NULL, 
+                              highlight_shifts = TRUE, width = 8, height = NULL)
 {
+    results <- readRDS(results_file)
+    eigenvectors <- results$eigenvectors
+    
     # extract vars
     non_null_idx <- first(which(!sapply(eigenvectors, is.null)))
     var_names <- rownames(eigenvectors[[non_null_idx]])
@@ -219,7 +230,7 @@ plot_eigenvectors <- function(eigenvectors, plot_file = NULL, num_values = 1,
         v <- eigenvectors[[i]]
         if (is.null(v))
             return()
-        out <- reshape2::melt(v[seq(num_vars), seq(num_values)])
+        out <- reshape2::melt(v[var_idx, seq(num_values)])
         out$t <- i
         return(out)
     }) %>% 
@@ -262,7 +273,7 @@ plot_eigenvectors <- function(eigenvectors, plot_file = NULL, num_values = 1,
     ipr_plot <- ggplot(ipr_df, 
            aes(x = censusdate, y = value)) + 
         facet_grid(component + rank ~ ., switch = "y") + 
-        scale_y_continuous(limits = c(1/num_vars, 1)) + 
+        scale_y_continuous(limits = c(1/length(var_idx), 1)) + 
         scale_x_date(breaks = seq(from = as.Date("1985-01-01"), 
                                   to = as.Date("2015-01-01"), 
                                   by = "5 years"), 
@@ -278,7 +289,7 @@ plot_eigenvectors <- function(eigenvectors, plot_file = NULL, num_values = 1,
     
     if (is.null(height))
     {
-        height <- num_vars * 2
+        height <- num_values * 3
     }
     
     my_plot <- cowplot::plot_grid(ev_plot, ipr_plot, 
@@ -286,32 +297,49 @@ plot_eigenvectors <- function(eigenvectors, plot_file = NULL, num_values = 1,
                                   ncol = 1, labels = NA)
     
     # save output
-    if (is.null(plot_file)) 
+    if (!is.null(plot_file))
     {
-        print(my_plot)
-    } else {
         ggsave(plot_file, my_plot, 
                width = width, height = height)
     }
-    return()
+    return(my_plot)
 }
 
 add_regime_shift_highlight <- function(my_plot)
 {
-    my_plot + geom_rect(data = data.frame(xmin = as.Date("1983-12-01"), xmax = as.Date("1984-07-01"), 
-                                          ymin = -Inf, ymax = Inf), 
-                        mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
-                        alpha = 0.3, inherit.aes = FALSE) + 
-        #    geom_rect(data = data.frame(xmin = as.Date("1988-10-01"), xmax = as.Date("1996-01-01"), 
-        #                                ymin = -Inf, ymax = Inf), 
-        #              mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
-        #              alpha = 0.3, inherit.aes = FALSE) + 
-        geom_rect(data = data.frame(xmin = as.Date("1998-09-01"), xmax = as.Date("1999-12-01"), 
-                                    ymin = -Inf, ymax = Inf), 
-                  mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
-                  alpha = 0.3, inherit.aes = FALSE) + 
-        geom_rect(data = data.frame(xmin = as.Date("2009-06-01"), xmax = as.Date("2010-09-01"), 
-                                    ymin = -Inf, ymax = Inf), 
-                  mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
+    ## using dates from Christensen et al. 2018
+    # my_plot + geom_rect(data = data.frame(xmin = as.Date("1983-12-01"), xmax = as.Date("1984-07-01"), 
+    #                                       ymin = -Inf, ymax = Inf), 
+    #                     mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
+    #                     alpha = 0.3, inherit.aes = FALSE) + 
+    #     #    geom_rect(data = data.frame(xmin = as.Date("1988-10-01"), xmax = as.Date("1996-01-01"), 
+    #     #                                ymin = -Inf, ymax = Inf), 
+    #     #              mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
+    #     #              alpha = 0.3, inherit.aes = FALSE) + 
+    #     geom_rect(data = data.frame(xmin = as.Date("1998-09-01"), xmax = as.Date("1999-12-01"), 
+    #                                 ymin = -Inf, ymax = Inf), 
+    #               mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
+    #               alpha = 0.3, inherit.aes = FALSE) + 
+    #     geom_rect(data = data.frame(xmin = as.Date("2009-06-01"), xmax = as.Date("2010-09-01"), 
+    #                                 ymin = -Inf, ymax = Inf), 
+    #               mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
+    #               alpha = 0.3, inherit.aes = FALSE)
+    
+    ## using dates from updated analysis code (weecology/LDA-kratplots)
+    my_plot + geom_rect(data = data.frame(xmin = as.Date("1983-11-12"), xmax = as.Date("1985-03-16"),
+                                          ymin = -Inf, ymax = Inf),
+                        mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+                        alpha = 0.3, inherit.aes = FALSE) +
+        geom_rect(data = data.frame(xmin = as.Date("1990-01-06"), xmax = as.Date("1992-04-04"),
+                                    ymin = -Inf, ymax = Inf),
+                  mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+                  alpha = 0.3, inherit.aes = FALSE) +
+        geom_rect(data = data.frame(xmin = as.Date("1998-12-22"), xmax = as.Date("1999-11-06"),
+                                    ymin = -Inf, ymax = Inf),
+                  mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+                  alpha = 0.3, inherit.aes = FALSE) +
+        geom_rect(data = data.frame(xmin = as.Date("2009-05-23"), xmax = as.Date("2011-01-05"),
+                                    ymin = -Inf, ymax = Inf),
+                  mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
                   alpha = 0.3, inherit.aes = FALSE)
 }

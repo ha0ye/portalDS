@@ -11,151 +11,60 @@ library(parallel)
 source(here::here("R/dynamic_stability_functions.R"))
 source(here::here("R/plotting_functions.R"))
 
-#### base run ----
-if (FALSE) #  using all species in the dataset and default options
+#### default run using all species in the dataset ----
+if (FALSE)
 {
-    
     block <- make_portal_block()
     saveRDS(block, here::here("data/portal_block.RDS"))
     
     results_file <- here::here("output/portal_ds_results.RDS")
     compute_dynamic_stability(block, results_file)
     
-    results <- readRDS(results_file)
-    plot_smap_coeffs(results$smap_matrices, here::here("figures/portal_smap_values.pdf"))
-    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues.pdf"))
+    plot_smap_coeffs(results_file, 
+                     here::here("figures/portal_smap_values.pdf"))
+    plot_eigenvalues(results_file, 
+                     here::here("figures/portal_eigenvalues.pdf"))
+    plot_eigenvectors(results_file, 
+                     here::here("figures/portal_eigenvectors.pdf"))
 }
 
-#### revised run (50%) ----
-if (FALSE) #  only species which appear at least 50% of the time)
-{          #  DM, DO, DS, NA, OL, OT, PP
-    
+#### run with species that are present at least 1/2 of the time ----
+if (FALSE) #  DM, DO, DS, NA, OL, OT, PP
+{
     block <- make_portal_block(filter_q = 0.5)
     saveRDS(block, here::here("data/portal_block_50.RDS"))
     
     results_file <- here::here("output/portal_ds_results_50.RDS")
     compute_dynamic_stability(block, results_file)
     
-    results <- readRDS(results_file)
-    plot_smap_coeffs(results$smap_matrices, here::here("figures/portal_smap_values_50.pdf"))
-    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_50.pdf"))
-    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_50_highlight.pdf"), highlight_shifts = TRUE)
+    plot_smap_coeffs(results_file, 
+                     here::here("figures/portal_smap_values_50.pdf"))
+    plot_eigenvalues(results_file, num_values = 2, 
+                     here::here("figures/portal_eigenvalues_50.pdf"))
+    plot_eigenvectors(results_file, num_values = 2, 
+                      here::here("figures/portal_eigenvectors_50.pdf"))
     
-    portal_network_50 <- results$ccm_results %>% 
-        make_network_from_ccm_results()
+    portal_network_50 <- make_network_from_ccm_results(results_file)
     ggsave(here::here("figures/portal_network_50.pdf"),
            portal_network_50$plot, width = 8, height = 6)
-    
-    plot_eigenvalues(results$eigenvalues, num_values = 4)
 }
 
-#### revised run (33%) ----
-if (FALSE) #  only species which appear at least 33% of the time)
-{          #  DM, DO, DS, NA, OL, OT, PB, PE, PF, PP, RM
-    
-    block <- make_portal_block(filter_q = 1/3)
-    saveRDS(block, here::here("data/portal_block_33.RDS"))
-    
-    results_file <- here::here("output/portal_ds_results_33.RDS")
-    compute_dynamic_stability(block, results_file)
-    
-    results <- readRDS(results_file)
-    plot_smap_coeffs(results$smap_matrices, here::here("figures/portal_smap_values_33.pdf"))
-    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_33.pdf"))
-    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_33_highlight.pdf"), highlight_shifts = TRUE)
-}
+block <- readRDS(here::here("data/portal_block_50.RDS"))
 
-#### run on LDA topics ----
-if (FALSE) # do our own block generation using LDA topics
-{
-    block_file <- here::here("data/portal_block_lda.RDS")
-    if (!file.exists(block_file))
-    {
-        raw_rodent_data <- portalr::abundance(time = "all", 
-                                              plots = c(2, 4, 8, 11, 12, 14, 17, 22), 
-                                              effort = TRUE, 
-                                              na_drop = TRUE)
-        
-        # summarize by each newmmonnumber, and for only the control plots we want
-        block <- raw_rodent_data %>% 
-            filter(censusdate < "2015-04-18") %>% 
-            select(-period)
-        
-        # check that effort is equal across samples
-        stopifnot(length(unique(block$ntraps)) == 1)
-        
-        # generate LDA
-        LDA_models <- LDATS::parLDA(data = select(block, BA:SO), ntopics = 2:5, nseeds = 200, ncores = 2)
-        best_LDA <- LDATS::LDA_select(LDA_models, correction = TRUE)
-        topic_block <- data.frame(best_LDA@gamma)
-        names(topic_block) <- paste0("Topic", seq(NCOL(topic_block)))
-        topic_block <- cbind(select(block, -(BA:SO)), topic_block)
-        
-        # add in NAs for unsampled newmoonnumbers and interpolate
-        block <- topic_block %>%
-            complete(newmoonnumber = full_seq(newmoonnumber, 1), fill = list(NA)) %>%
-            mutate_at(vars(-newmoonnumber, -ntraps), forecast::na.interp) %>%
-            mutate(censusdate = as.Date(as.numeric(censusdate), origin = "1970-01-01")) %>% 
-            select(-newmoonnumber, -ntraps)
-        
-        saveRDS(block, file = block_file)
-    }
-    
-    block <- readRDS(block_file)
-    results_file <- here::here("output/portal_ds_results_lda.RDS")
-    compute_dynamic_stability(block, results_file)
-    
-    results <- readRDS(results_file)
-    plot_smap_coeffs(results$smap_matrices, here::here("figures/portal_smap_values_lda.pdf"))
-    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_lda.pdf"))
-    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_lda_highlight.pdf"), highlight_shifts = TRUE)
-}
-
-#### misc. graphs ----
-
-if (FALSE) 
-{
-    make_combined_network(plot_file = here::here("figure/portal_networks_all.pdf"))
-}
-
-#### modified network runs ----
-if (FALSE) # run with 50% species, but fully connected graph
-{          #  DM, DO, DS, NA, OL, OT, PP
-    block <- readRDS("data/portal_block_50.RDS")
-    
-    results <- readRDS(here::here("output/portal_ds_results_50.RDS"))
-    results$ccm_links <- tidyr::complete(results$ccm_links, lib_column, target_column, 
-                                         fill = list(E = 1, delta_rho = NA, 
-                                                     rho_minus_upper_q_null = NA)) %>%
-        group_by(lib_column) %>%
-        mutate(E = max(E)) %>%
-        ungroup()
-    
-    results$smap_matrices <- NULL
-    results$eigenvalues <- NULL
-    
-    results_file <- here::here("output/portal_ds_results_50_full_network.RDS")    
-    saveRDS(results, results_file)
-    compute_dynamic_stability(block, results_file)
-
-    results <- readRDS(results_file)
-    plot_smap_coeffs(results$smap_matrices, here::here("figures/portal_smap_values_50_full_network.pdf"))
-    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_50_full_network.pdf"))
-    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_50_full_network_highlight.pdf"), highlight_shifts = TRUE)
-}
-
-#### revised run (50%, biomass) ----
-
-if (FALSE)
-{
-    block <- make_portal_block(filter_q = 0.5, output = "biomass")
-    saveRDS(block, here::here("data/portal_block_50_biomass.RDS"))
-    
-    results_file <- here::here("output/portal_ds_results_50_biomass.RDS")
-    compute_dynamic_stability(block, results_file, rescale = FALSE)
-    
-    results <- readRDS(results_file)
-    plot_smap_coeffs(results$smap_matrices, here::here("figures/portal_smap_values_50_biomass.pdf"))
-    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_50_biomass.pdf"))
-    plot_eigenvalues(results$eigenvalues, here::here("figures/portal_eigenvalues_50_biomass_highlight.pdf"), highlight_shifts = TRUE)
-}
+## plot time series ----
+to_plot <- block %>%
+    gather(species, abundance, -censusdate)
+n <- length(unique(to_plot$species))
+portal_time_series <- to_plot %>%
+    ggplot(aes(x = censusdate, y = abundance, color = species)) + 
+    geom_line(size = 1) + 
+    scale_x_date(limits = as.Date(c("2005-03-01", "2011-01-01")), 
+                 date_breaks = "1 year", date_labels = "%Y", expand = c(0.01, 0)) + 
+    scale_color_manual(values = viridis(n)) + 
+    labs(x = NULL, y = "relative abundance") + 
+#    guides(color = FALSE) + 
+    theme_bw(base_size = 20, base_family = "Helvetica", 
+             base_line_size = 1) + 
+    theme(panel.grid.minor = element_line(size = 1))
+ggsave(here::here("figures/portal_time_series.pdf"),
+       portal_time_series, width = 9, height = 4.5)

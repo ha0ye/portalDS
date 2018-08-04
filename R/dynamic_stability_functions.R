@@ -7,7 +7,7 @@ library(parallel)
 
 compute_dynamic_stability <- function(block, 
                                       results_file = here::here("output/portal_ds_results.RDS"),
-                                      num_cores = 2, rescale = TRUE)
+                                      num_cores = 2, ...)
 {
     if (!file.exists(results_file))
     {
@@ -52,8 +52,7 @@ compute_dynamic_stability <- function(block,
     # check for smap matrices, compute if missing
     if (is.null(results$smap_matrices))
     {
-        smap_coeffs <- compute_smap_coeffs(results$block, results$ccm_links, 
-                                           rescale = rescale)
+        smap_coeffs <- compute_smap_coeffs(results$block, results$ccm_links, ...)
         results$smap_matrices <- compute_smap_matrices(smap_coeffs, 
                                                        results$ccm_links)
         
@@ -113,6 +112,7 @@ make_portal_block <- function(filter_q = NULL, output = "abundance")
     block <- block %>%
         complete(newmoonnumber = full_seq(newmoonnumber, 1), fill = list(NA)) %>%
         mutate_at(vars(-newmoonnumber, -ntraps), forecast::na.interp) %>%
+        mutate_at(vars(-newmoonnumber, -ntraps), as.numeric) %>%
         mutate(censusdate = as.Date(as.numeric(censusdate), origin = "1970-01-01")) %>% 
         select(-newmoonnumber, -ntraps)
     
@@ -335,14 +335,36 @@ norm_rescale <- function(x, na.rm = TRUE) {(x - mean(x, na.rm = na.rm)) / sd(x, 
 #'   \item{`xmap_to`}{the column index of the predicted variable in CCM}
 #'   \item{`best_E`}{the best embedding dimension for CCM}
 #'   }
+#' @param rescale A logical, indicating whether to rescale each time series
+#' @param rolling_forecast A logical, indicating whether to make individual 
+#'   rolling forecasts for the second half of the time series.
 #' 
 #' @return A list with the matrix smap-coefficients for each predictor variable
 #'   identified in CCM (these are the affected variables). The names in the list
 #'   and the column names of the matrices use the variable names in the block.
 #' 
 #' @export
-compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE)
+compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE, 
+                                rolling_forecast = FALSE)
 {
+    get_smap_coefficients <- function(temp_block, lib = c(1, NROW(block)), 
+                                      pred = c(1, NROW(block)), 
+                                      theta_list = c(seq(0, 1, by = 0.1), seq(1.5, 10, by = 0.5)))
+    {
+        # determine best theta
+        theta_test <- block_lnlp(temp_block, lib = lib, pred = pred, 
+                                 method = "s-map", tp = 1,
+                                 theta  = theta_list, silent = TRUE)
+        best_theta <- theta_test$theta[which.min(theta_test$mae)]
+        
+        # re-run to get s-map coefficients
+        smap_out <- block_lnlp(temp_block, lib = lib, pred = pred, 
+                               method = "s-map", tp = 1,
+                               theta  = best_theta, silent = TRUE, 
+                               save_smap_coefficients = TRUE)
+        return(smap_out$smap_coefficients[[1]])
+    }
+    
     # rescale all the variables
     block <- block %>%
         select(-censusdate)
@@ -414,18 +436,29 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE)
                                 make_block(block[, effect_var, drop = FALSE], 
                                            max_lag = num_effect_lags)[, -c(1, 2), drop = FALSE])
         }
-        # determine best theta
-        theta_list <- c(seq(0, 1, by = 0.1), seq(1.5, 10, by = 0.5)) #seq(0, 10, by = 0.1)
-        theta_test <- block_lnlp(temp_block, method = "s-map", tp = 1,
-                                 theta  = theta_list, silent = TRUE)
-        best_theta <- theta_test$theta[which.min(theta_test$mae)]
-        
-        # re-run to get s-map coefficients
-        smap_out <- block_lnlp(temp_block, method = "s-map", tp = 1,
-                               theta  = best_theta, silent = TRUE, 
-                               save_smap_coefficients = TRUE)
-        
-        smap_coeff <- smap_out$smap_coefficients[[1]]
+    
+        if (!rolling_forecast)
+        {
+            smap_coeff <- get_smap_coefficients(temp_block)
+        } else {
+            n <- NROW(block)
+            lib <- c(1, floor(n/2))
+            # initialize smap_coeff
+            smap_coeff <- get_smap_coefficients(temp_block, 
+                                                lib = lib, pred = lib)
+            to_fill <- data.frame(matrix(NA, nrow = n - NROW(smap_coeff), ncol = NCOL(smap_coeff)))
+            names(to_fill) <- names(smap_coeff)
+            smap_coeff <- rbind(smap_coeff, to_fill)
+            
+            # loop and generate new smap_coeff at each row
+            for (lib_end in seq(floor(n/2) + 1, n))
+            {
+                lib <- c(1, lib_end)
+                temp_smap_coeff <- get_smap_ceofficients(temp_block, 
+                                              lib = lib, pred = lib)
+                smap_coeff[lib_end - 1, ] <- temp_smap_coeff[lib_end - 1, ]
+            }
+        }
         names(smap_coeff) <- c(names(temp_block), "const")
         return(smap_coeff)
     })
