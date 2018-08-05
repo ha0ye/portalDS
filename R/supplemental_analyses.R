@@ -1,3 +1,16 @@
+#### setup ----
+
+library(tidyverse)
+library(lubridate)
+library(rEDM)
+library(parallel)
+
+# devtools::install_github("weecology/portalr")
+# devtools::install_github("weecology/LDATS")
+
+source(here::here("R/dynamic_stability_functions.R"))
+source(here::here("R/plotting_functions.R"))
+
 #### run with species that are present at least 1/3 of the time ----
 if (FALSE) #  DM, DO, DS, NA, OL, OT, PB, PE, PF, PP, RM
 {
