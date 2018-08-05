@@ -166,7 +166,7 @@ plot_smap_coeffs <- function(results_file = here::here("output/portal_ds_results
 #### function to produce eigenvalues plot ----
 
 plot_eigenvalues <- function(results_file = here::here("output/portal_ds_results.RDS"), 
-                             num_values = 1, plot_file = NULL, 
+                             num_values = 1, plot_file = NULL, highlight_complex = FALSE, 
                              highlight_shifts = TRUE, width = 8, height = 4.5)
 {
     results <- readRDS(results_file)
@@ -182,12 +182,14 @@ plot_eigenvalues <- function(results_file = here::here("output/portal_ds_results
     })
     eigenvalue_dist$censusdate <- as.Date(eigenvalue_dist$censusdate)
     
+    to_plot <- eigenvalue_dist %>%
+        filter(rank <= num_values)
+    
     # construct plot
-    ds_plot <- eigenvalue_dist %>%
-        filter(rank <= num_values) %>% 
-        ggplot(aes(x = censusdate, y = lambda, color = as.factor(rank))) + 
+    ds_plot <- to_plot %>% 
+        ggplot(aes(x = censusdate, y = lambda, color = as.factor(rank), group = rev(rank))) + 
         scale_color_manual(values = viridis(7, option = "A")[c(1, 3, 4, 5, 6)]) +
-        geom_line() + 
+        geom_line(size = 1) + 
         geom_hline(yintercept = 1.0, size = 1, linetype = 2) + 
         scale_x_date(breaks = seq(from = as.Date("1985-01-01"), 
                                   to = as.Date("2015-01-01"), 
@@ -195,8 +197,23 @@ plot_eigenvalues <- function(results_file = here::here("output/portal_ds_results
                      date_labels = "%Y", expand = c(0.01, 0)) + 
         #scale_y_continuous(limits = c(0.90, 1.04)) + 
         labs(x = NULL, y = "dynamic stability \n(higher is more unstable)", color = "rank") +
-        theme_bw() + 
-        theme(panel.grid.minor = element_line(size = 0.5))
+        theme_bw(base_size = 20, base_family = "Helvetica", 
+                 base_line_size = 1) + 
+        theme(panel.grid.minor = element_line(size = 1)) + 
+        guides(color = FALSE)
+    
+    if (highlight_complex)
+    {
+        complex_df <- data.frame(censusdate = to_plot %>% 
+                                     spread(rank, lambda) %>%
+                                     filter(`1` < `2` + 0.001) %>%
+                                     select(censusdate), 
+                                 lambda = min(to_plot$lambda, na.rm = TRUE), 
+                                 rank = 1) %>%
+            complete(censusdate = to_plot$censusdate, fill = list(lambda = NA, rank = 1))
+        ds_plot <- ds_plot + 
+            geom_point(data = complex_df, color = "red")
+    }
     
     if (highlight_shifts)
     {
