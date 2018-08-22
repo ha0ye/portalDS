@@ -189,6 +189,24 @@ make_eigenvector_plots <- function()
         ggplot(aes(x = censusdate, y = value, color = variable)) + 
         scale_color_viridis(discrete = TRUE, option = "plasma") + 
         scale_x_date(expand = c(0.01, 0)) + 
+        geom_line(size = NA) + 
+        labs(x = "", y = "magnitude", color = "Species") + 
+        theme_bw(base_size = 20, base_family = "Helvetica", 
+                 base_line_size = 1) + 
+        theme(panel.background = element_rect(fill = "#AAAABB", color = NA), 
+              panel.grid.major = element_line(color = "grey30", size = 1), 
+              panel.grid.minor = element_line(color = "grey30", size = 1), 
+              legend.key = element_rect(fill = "#AAAABB")) + 
+        guides(color = guide_legend(override.aes = list(size = 1)))
+    ggsave(here::here("figures/portal_eigenvector_null.pdf"),
+           width = 12, height = 6)
+    
+    v_df %>%
+        filter(censusdate >= lower_date[1], censusdate <= upper_date[1], 
+               rank == 1) %>%
+        ggplot(aes(x = censusdate, y = value, color = variable)) + 
+        scale_color_viridis(discrete = TRUE, option = "plasma") + 
+        scale_x_date(expand = c(0.01, 0)) + 
         geom_line(size = 1) + 
         labs(x = "", y = "magnitude", color = "Species") + 
         theme_bw(base_size = 20, base_family = "Helvetica", 
@@ -218,41 +236,21 @@ make_eigenvector_plots <- function()
            width = 12, height = 6)
     
     v_df %>%
-        filter(censusdate >= lower_date[1], censusdate <= upper_date[1], 
+        filter(censusdate >= lower_date[3], censusdate <= upper_date[3], 
                rank == 1) %>%
         ggplot(aes(x = censusdate, y = value, color = variable)) + 
         scale_color_viridis(discrete = TRUE, option = "plasma") + 
         scale_x_date(expand = c(0.01, 0)) + 
-        geom_line(size = NA) + 
+        geom_line(size = 1) + 
         labs(x = "", y = "magnitude", color = "Species") + 
         theme_bw(base_size = 20, base_family = "Helvetica", 
                  base_line_size = 1) + 
         theme(panel.background = element_rect(fill = "#AAAABB", color = NA), 
               panel.grid.major = element_line(color = "grey30", size = 1), 
               panel.grid.minor = element_line(color = "grey30", size = 1), 
-              legend.key = element_rect(fill = "#AAAABB")) + 
-        guides(color = guide_legend(override.aes = list(size = 1)))
-    ggsave(here::here("figures/portal_eigenvector_null.pdf"),
+              legend.key = element_rect(fill = "#AAAABB"))
+    ggsave(here::here("figures/portal_eigenvector_c.pdf"),
            width = 12, height = 6)
-    
-    block <- results$block %>% 
-        mutate_at(vars(-censusdate), 
-                  function(x) {(x - min(x, na.rm = TRUE)) / 
-                          (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))}) %>%
-        filter(censusdate >= lower_date, censusdate <= upper_date) %>%
-        mutate_at(vars(-censusdate), 
-                  as.numeric) %>%
-        gather(species, abundance, -censusdate)
-    
-    ggplot(block, 
-           aes(x = censusdate, y = abundance, color = species)) + 
-        scale_color_viridis(discrete = TRUE, option = "plasma") + 
-        scale_x_date(expand = c(0.01, 0)) + 
-        geom_line() + 
-        geom_point() + 
-        theme_bw()
-    
-    
 }
 
 make_eigenvector_plots()
