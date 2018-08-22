@@ -242,6 +242,13 @@ plot_eigenvectors <- function(results_file = here::here("output/portal_ds_result
     var_idx <- grep("_0", var_names)
     var_names <- gsub("_0", "", var_names[var_idx])
 
+    # normalize eigenvectors so that length = 1
+    vector_scale <- function(v)
+    {
+        sum_sq <- sum(abs(v)^2)
+        v / sqrt(sum_sq)
+    }
+    
     # make data.frame of eigenvector components
     v_df <- map_dfr(seq(eigenvectors), function(i) {
         v <- eigenvectors[[i]]
@@ -254,22 +261,19 @@ plot_eigenvectors <- function(results_file = here::here("output/portal_ds_result
         rename(variable = Var1, rank = Var2) %>%
         mutate(censusdate = as.Date(names(eigenvectors)[t]), 
                variable = as.factor(var_names[variable]), 
-               value = abs(Re(value)))
-    
+               value = abs(Re(value))) %>%
+        group_by(t, rank) %>%
+        mutate(value = vector_scale(value)) %>%
+        ungroup()
+
     # compute IPR = Inverse Participation Ratio
     #   for each eigenvector
     #     normalize so that sum([v_i]^2) = 1
     #     IPR = sum([v_i]^4)
     #     ranges from 1/N (N = length of eigenvector) to 1
-    compute_ipr <- function(v)
-    {
-        sum_sq <- sum(abs(v)^2)
-        v <- v / sqrt(sum_sq)
-        return(sum(abs(v)^4))
-    }
     ipr_df <- v_df %>% 
         group_by(t, rank) %>%
-        summarize(value = compute_ipr(value)) %>%
+        summarize(value = sum(abs(value)^4)) %>%
         ungroup() %>%
         mutate(censusdate = as.Date(names(eigenvectors)[t]), 
                variable = "IPR")
@@ -309,9 +313,10 @@ plot_eigenvectors <- function(results_file = here::here("output/portal_ds_result
         height <- num_values * 3
     }
     
-    my_plot <- cowplot::plot_grid(ev_plot, ipr_plot, 
-                                  align = "v", axis = "lr", 
-                                  ncol = 1, labels = NA)
+    my_plot <- ev_plot
+    # my_plot <- cowplot::plot_grid(ev_plot, ipr_plot, 
+    #                               align = "v", axis = "lr", 
+    #                               ncol = 1, labels = NA)
     
     # save output
     if (!is.null(plot_file))
@@ -322,41 +327,18 @@ plot_eigenvectors <- function(results_file = here::here("output/portal_ds_result
     return(my_plot)
 }
 
-add_regime_shift_highlight <- function(my_plot)
+add_regime_shift_highlight <- function(my_plot, alpha = 0.5, fill = "grey30")
 {
     ## using dates from Christensen et al. 2018
-    # my_plot + geom_rect(data = data.frame(xmin = as.Date("1983-12-01"), xmax = as.Date("1984-07-01"), 
-    #                                       ymin = -Inf, ymax = Inf), 
-    #                     mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
-    #                     alpha = 0.3, inherit.aes = FALSE) + 
-    #     #    geom_rect(data = data.frame(xmin = as.Date("1988-10-01"), xmax = as.Date("1996-01-01"), 
-    #     #                                ymin = -Inf, ymax = Inf), 
-    #     #              mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
-    #     #              alpha = 0.3, inherit.aes = FALSE) + 
-    #     geom_rect(data = data.frame(xmin = as.Date("1998-09-01"), xmax = as.Date("1999-12-01"), 
-    #                                 ymin = -Inf, ymax = Inf), 
-    #               mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
-    #               alpha = 0.3, inherit.aes = FALSE) + 
-    #     geom_rect(data = data.frame(xmin = as.Date("2009-06-01"), xmax = as.Date("2010-09-01"), 
-    #                                 ymin = -Inf, ymax = Inf), 
-    #               mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax), 
-    #               alpha = 0.3, inherit.aes = FALSE)
+    # lower_date <- as.Date(c("1983-12-01", "1988-10-01", "1998-09-01", "2009-06-01"))
+    # upper_date <- as.Date(c("1984-07-01", "1996-01-01", "1999-12-01", "2010-09-01"))
     
     ## using dates from updated analysis code (weecology/LDA-kratplots)
-    my_plot + geom_rect(data = data.frame(xmin = as.Date("1983-11-12"), xmax = as.Date("1985-03-16"),
+    lower_date <- as.Date(c("1983-11-12", "1990-01-06", "1998-12-22", "2009-05-23"))
+    upper_date <- as.Date(c("1985-03-16", "1992-04-04", "1999-11-06", "2011-01-05"))
+    
+    my_plot + geom_rect(data = data.frame(xmin = lower_date, xmax = upper_date,
                                           ymin = -Inf, ymax = Inf),
                         mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
-                        alpha = 0.3, inherit.aes = FALSE) +
-        geom_rect(data = data.frame(xmin = as.Date("1990-01-06"), xmax = as.Date("1992-04-04"),
-                                    ymin = -Inf, ymax = Inf),
-                  mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
-                  alpha = 0.3, inherit.aes = FALSE) +
-        geom_rect(data = data.frame(xmin = as.Date("1998-12-22"), xmax = as.Date("1999-11-06"),
-                                    ymin = -Inf, ymax = Inf),
-                  mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
-                  alpha = 0.3, inherit.aes = FALSE) +
-        geom_rect(data = data.frame(xmin = as.Date("2009-05-23"), xmax = as.Date("2011-01-05"),
-                                    ymin = -Inf, ymax = Inf),
-                  mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
-                  alpha = 0.3, inherit.aes = FALSE)
+                        alpha = alpha, inherit.aes = FALSE, fill = fill)
 }
