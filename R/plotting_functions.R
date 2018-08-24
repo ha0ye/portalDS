@@ -165,7 +165,7 @@ plot_smap_coeffs <- function(results_file = here::here("output/portal_ds_results
 
 #### function to produce eigenvalues plot ----
 
-plot_eigenvalues <- function(eigenvalues, num_values = 1, highlight_complex = FALSE)
+plot_eigenvalues <- function(eigenvalues, num_values = 1, highlight_complex = FALSE, line_size = 1)
 {
     # generate df for plotting
     eigenvalue_dist <- map_dfr(seq(eigenvalues), function(i) {
@@ -180,7 +180,7 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1, highlight_complex = FA
     
     ds_plot <- eigenvalue_dist %>%
         ggplot(aes(x = censusdate, y = lambda, color = as.factor(rank), group = rev(rank))) + 
-        geom_line(size = 1) + 
+        geom_line(size = line_size) + 
         scale_color_manual(values = viridis(7, option = "magma")[c(1, 3, 5, 6, 7)]) + 
         geom_hline(yintercept = 1.0, size = 1, linetype = 2) + 
         labs(x = NULL, y = "dynamic stability \n(higher is more unstable)", color = "rank") +
@@ -204,13 +204,8 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1, highlight_complex = FA
     return(ds_plot)
 }
 
-plot_eigenvectors <- function(results_file = here::here("output/portal_ds_results.RDS"), 
-                              num_values = 1, plot_file = NULL, 
-                              highlight_shifts = TRUE, width = 8, height = NULL)
+plot_eigenvectors <- function(eigenvectors, num_values = 1, add_IPR = FALSE, line_size = 1)
 {
-    results <- readRDS(results_file)
-    eigenvectors <- results$eigenvectors
-    
     # extract vars
     non_null_idx <- first(which(!sapply(eigenvectors, is.null)))
     var_names <- rownames(eigenvectors[[non_null_idx]])
@@ -229,7 +224,7 @@ plot_eigenvectors <- function(results_file = here::here("output/portal_ds_result
         v <- eigenvectors[[i]]
         if (is.null(v))
             return()
-        out <- reshape2::melt(v[var_idx, seq(num_values)])
+        out <- reshape2::melt(v[var_idx, seq(num_values), drop = FALSE])
         out$t <- i
         return(out)
     }) %>% 
@@ -240,65 +235,57 @@ plot_eigenvectors <- function(results_file = here::here("output/portal_ds_result
         group_by(t, rank) %>%
         mutate(value = vector_scale(value)) %>%
         ungroup()
-
-    # compute IPR = Inverse Participation Ratio
-    #   for each eigenvector
-    #     normalize so that sum([v_i]^2) = 1
-    #     IPR = sum([v_i]^4)
-    #     ranges from 1/N (N = length of eigenvector) to 1
-    ipr_df <- v_df %>% 
-        group_by(t, rank) %>%
-        summarize(value = sum(abs(value)^4)) %>%
-        ungroup() %>%
-        mutate(censusdate = as.Date(names(eigenvectors)[t]), 
-               variable = "IPR")
     
-    v_df$component <- "eigenvector"
-    ipr_df$component <- "IPR"
-    
-    ev_plot <- ggplot(v_df, 
-           aes(x = censusdate, y = value, color = variable)) + 
-        facet_grid(component + rank ~ ., scales = "free", switch = "y") + 
-        scale_color_viridis(discrete = TRUE, option = "plasma") + 
-        scale_x_date(breaks = seq(from = as.Date("1985-01-01"), 
-                                  to = as.Date("2015-01-01"), 
-                                  by = "5 years"), 
-                     date_labels = "%Y", expand = c(0.01, 0)) + 
-        geom_line() + 
-        theme_bw()
-    ipr_plot <- ggplot(ipr_df, 
-           aes(x = censusdate, y = value)) + 
-        facet_grid(component + rank ~ ., switch = "y") + 
-        scale_y_continuous(limits = c(1/length(var_idx), 1)) + 
-        scale_x_date(breaks = seq(from = as.Date("1985-01-01"), 
-                                  to = as.Date("2015-01-01"), 
-                                  by = "5 years"), 
-                     date_labels = "%Y", expand = c(0.01, 0)) + 
-        geom_line(color = "black") + 
-        theme_bw()
-    
-    if (highlight_shifts)
+    if (add_IPR)
     {
-        ev_plot <- add_regime_shift_highlight(ev_plot)
-        ipr_plot <- add_regime_shift_highlight(ipr_plot)
+        # compute IPR = Inverse Participation Ratio
+        #   for each eigenvector
+        #     normalize so that sum([v_i]^2) = 1
+        #     IPR = sum([v_i]^4)
+        #     ranges from 1/N (N = length of eigenvector) to 1
+        ipr_df <- v_df %>% 
+            group_by(t, rank) %>%
+            summarize(value = sum(abs(value)^4)) %>%
+            ungroup() %>%
+            mutate(censusdate = as.Date(names(eigenvectors)[t]), 
+                   variable = "IPR")
+        
+        v_df$component <- "eigenvector"
+        ipr_df$component <- "IPR"
+        
+        dat <- bind_rows(v_df, ipr_df)
+        dat$variable <- as.factor(dat$variable)
+        dat$variable <- fct_relevel(dat$variable, c(var_names, "IPR"))
+        palette <- c(viridis(length(var_names), option = "plasma"), "black")
+        
+        my_plot <- dat %>%
+            ggplot(aes(x = censusdate, y = value, color = variable)) + 
+            facet_grid(component + rank ~ ., switch = "y") + 
+            scale_y_continuous(limits = c(0, 1)) + 
+            scale_color_manual(values = palette)
+    } else {
+        my_plot <- v_df %>%
+            ggplot(aes(x = censusdate, y = value, color = variable)) + 
+            facet_grid(rank ~ ., scales = "free", switch = "y") + 
+            scale_color_viridis(discrete = TRUE, option = "plasma")
+    }
+    my_plot <- my_plot + 
+        scale_x_date(expand = c(0.01, 0)) + 
+        geom_line(size = line_size) + 
+        theme_bw(base_size = 20, base_family = "Helvetica", 
+                 base_line_size = 1) + 
+        theme(panel.background = element_rect(fill = "#AAAABB", color = NA), 
+              panel.grid.major = element_line(color = "grey30", size = 1), 
+              panel.grid.minor = element_line(color = "grey30", size = 1), 
+              legend.key = element_rect(fill = "#AAAABB")) + 
+        guides(color = guide_legend(override.aes = list(size = 1))) 
+    
+    if (num_values == 1)
+    {
+        my_plot <- my_plot + theme(strip.background = element_blank(),
+                                   strip.text.y = element_blank())
     }
     
-    if (is.null(height))
-    {
-        height <- num_values * 3
-    }
-    
-    my_plot <- ev_plot
-    # my_plot <- cowplot::plot_grid(ev_plot, ipr_plot, 
-    #                               align = "v", axis = "lr", 
-    #                               ncol = 1, labels = NA)
-    
-    # save output
-    if (!is.null(plot_file))
-    {
-        ggsave(plot_file, my_plot, 
-               width = width, height = height)
-    }
     return(my_plot)
 }
 
