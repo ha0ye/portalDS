@@ -45,35 +45,32 @@ portal_time_series <- make_time_series_plots()
 make_eigenvalue_plots <- function()
 {
     results_file <- here::here("output/portal_ds_results_50.RDS")
+    results <- readRDS(results_file)
     
-    ggsave(here::here("figures/portal_eigenvalues_50_dom.pdf"), 
-           plot_eigenvalues(results_file, num_values = 1, 
-                            highlight_shifts = FALSE) + 
-               scale_y_continuous(limits = c(0.90, 1.03)), 
-           width = 12, height = 6)
-    
-    two_ev_plot <- plot_eigenvalues(results_file, num_values = 2, 
-                                    highlight_shifts = FALSE) + 
+    dom_ev_plot <- results$eigenvalues %>%
+        plot_eigenvalues() + 
         scale_y_continuous(limits = c(0.90, 1.03))
+    ggsave(here::here("figures/portal_eigenvalues_50_dom.pdf"), 
+           dom_ev_plot, width = 12, height = 6)
+    
+    two_ev_plot <- results$eigenvalues %>%
+        plot_eigenvalues(num_values = 2) + 
+        scale_y_continuous(limits = c(0.90, 1.03)) 
     ggsave(here::here("figures/portal_eigenvalues_50.pdf"), 
            two_ev_plot, width = 12, height = 6)
     
+    two_ev_plot_complex <- results$eigenvalues %>%
+        plot_eigenvalues(num_values = 2, highlight_complex = TRUE) + 
+        scale_y_continuous(limits = c(0.90, 1.03)) 
     ggsave(here::here("figures/portal_eigenvalues_50_complex.pdf"), 
-           plot_eigenvalues(results_file, num_values = 2, 
-                            highlight_complex = TRUE, highlight_shifts = FALSE) + 
-               scale_y_continuous(limits = c(0.90, 1.03)), 
-           width = 12, height = 6)
+           two_ev_plot_complex, width = 12, height = 6)
     
     lower_date <- as.Date("1984-09-29")
     upper_date <- as.Date("1996-06-13")
-    two_ev_plot_a <- plot_eigenvalues(results_file, num_values = 2, 
-                                      highlight_shifts = FALSE, highlight_complex = TRUE) + 
-        scale_y_continuous(limits = c(0.90, 1.03)) + 
-        geom_rect(data = data.frame(xmin = lower_date, 
-                                    xmax = upper_date,
-                                    ymin = -Inf, ymax = Inf),
-                  mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
-                  alpha = 0.5, inherit.aes = FALSE, fill = "grey30")
+    two_ev_plot_a <- results$eigenvalues %>%
+        plot_eigenvalues(num_values = 2, highlight_complex = TRUE) %>% 
+        add_regime_shift_highlight(lower_date, upper_date) + 
+        scale_y_continuous(limits = c(0.90, 1.03))
     ggsave(here::here("figures/portal_eigenvalues_50_a.pdf"), 
            two_ev_plot_a, width = 12, height = 6)
     
@@ -84,12 +81,8 @@ make_eigenvalue_plots <- function()
                                                             to = as.Date("2015-01-01"), 
                                                             by = "5 years"), 
                                                date_labels = "%Y", expand = c(0.01, 0)), 
-                              portal_time_series + 
-                                  geom_rect(data = data.frame(xmin = lower_date, 
-                                                              xmax = upper_date,
-                                                              ymin = -Inf, ymax = Inf),
-                                            mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
-                                            alpha = 0.5, inherit.aes = FALSE, fill = "grey30") + 
+                              portal_time_series %>% 
+                                  add_regime_shift_highlight(lower_date, upper_date) + 
                                   scale_x_date(limits = as.Date(c("1979-09-22", "2015-03-26")), 
                                                breaks = seq(from = as.Date("1980-01-01"), 
                                                             to = as.Date("2015-01-01"), 
@@ -100,14 +93,10 @@ make_eigenvalue_plots <- function()
     
     lower_date <- as.Date(c("1999-01-12", "2003-09-17", "2009-08-13"))
     upper_date <- as.Date(c("2000-01-12", "2004-09-17", "2011-01-15"))
-    two_ev_plot_b <- plot_eigenvalues(results_file, num_values = 2, 
-                                      highlight_shifts = FALSE, highlight_complex = TRUE) + 
-        scale_y_continuous(limits = c(0.90, 1.03)) + 
-        geom_rect(data = data.frame(xmin = lower_date, 
-                                    xmax = upper_date,
-                                    ymin = -Inf, ymax = Inf),
-                  mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
-                  alpha = 0.5, inherit.aes = FALSE, fill = "grey30")
+    two_ev_plot_b <- results$eigenvalues %>%
+        plot_eigenvalues(num_values = 2, highlight_complex = TRUE) %>%
+        add_regime_shift_highlight(lower_date, upper_date) + 
+        scale_y_continuous(limits = c(0.90, 1.03)) 
     ggsave(here::here("figures/portal_eigenvalues_50_b.pdf"), 
            two_ev_plot_b, width = 12, height = 6)
     
@@ -118,12 +107,8 @@ make_eigenvalue_plots <- function()
                                                             to = as.Date("2015-01-01"), 
                                                             by = "5 years"), 
                                                date_labels = "%Y", expand = c(0.01, 0)), 
-                              portal_time_series + 
-                                  geom_rect(data = data.frame(xmin = lower_date, 
-                                                              xmax = upper_date,
-                                                              ymin = -Inf, ymax = Inf),
-                                            mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
-                                            alpha = 0.5, inherit.aes = FALSE, fill = "grey30") + 
+                              portal_time_series %>%
+                                  add_regime_shift_highlight(lower_date, upper_date) + 
                                   scale_x_date(limits = as.Date(c("1979-09-22", "2015-03-26")), 
                                                breaks = seq(from = as.Date("1980-01-01"), 
                                                             to = as.Date("2015-01-01"), 

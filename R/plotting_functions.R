@@ -165,13 +165,8 @@ plot_smap_coeffs <- function(results_file = here::here("output/portal_ds_results
 
 #### function to produce eigenvalues plot ----
 
-plot_eigenvalues <- function(results_file = here::here("output/portal_ds_results.RDS"), 
-                             num_values = 1, plot_file = NULL, highlight_complex = FALSE, 
-                             highlight_shifts = TRUE, width = 8, height = 4.5)
+plot_eigenvalues <- function(eigenvalues, num_values = 1, highlight_complex = FALSE)
 {
-    results <- readRDS(results_file)
-    eigenvalues <- results$eigenvalues
-    
     # generate df for plotting
     eigenvalue_dist <- map_dfr(seq(eigenvalues), function(i) {
         lambda <- eigenvalues[[i]]
@@ -179,23 +174,15 @@ plot_eigenvalues <- function(results_file = here::here("output/portal_ds_results
             return(data.frame())
         lambda <- sort(abs(lambda), decreasing = TRUE)
         data.frame(lambda = lambda, censusdate = names(eigenvalues)[i], rank = seq(lambda))
-    })
-    eigenvalue_dist$censusdate <- as.Date(eigenvalue_dist$censusdate)
+    }) %>%
+        filter(rank <= num_values) %>%
+        mutate(censusdate = as.Date(censusdate))
     
-    to_plot <- eigenvalue_dist %>%
-        filter(rank <= num_values)
-    
-    # construct plot
-    ds_plot <- to_plot %>% 
+    ds_plot <- eigenvalue_dist %>%
         ggplot(aes(x = censusdate, y = lambda, color = as.factor(rank), group = rev(rank))) + 
-        scale_color_manual(values = viridis(7, option = "A")[c(1, 3, 4, 5, 6)]) +
         geom_line(size = 1) + 
+        scale_color_manual(values = viridis(7, option = "magma")[c(1, 3, 5, 6, 7)]) + 
         geom_hline(yintercept = 1.0, size = 1, linetype = 2) + 
-        scale_x_date(breaks = seq(from = as.Date("1985-01-01"), 
-                                  to = as.Date("2015-01-01"), 
-                                  by = "5 years"), 
-                     date_labels = "%Y", expand = c(0.01, 0)) + 
-        #scale_y_continuous(limits = c(0.90, 1.04)) + 
         labs(x = NULL, y = "dynamic stability \n(higher is more unstable)", color = "rank") +
         theme_bw(base_size = 20, base_family = "Helvetica", 
                  base_line_size = 1) + 
@@ -204,27 +191,15 @@ plot_eigenvalues <- function(results_file = here::here("output/portal_ds_results
     
     if (highlight_complex)
     {
-        complex_df <- data.frame(censusdate = to_plot %>% 
+        complex_df <- data.frame(censusdate = eigenvalue_dist %>% 
                                      spread(rank, lambda) %>%
                                      filter(`1` < `2` + 0.001) %>%
                                      select(censusdate), 
-                                 lambda = min(to_plot$lambda, na.rm = TRUE), 
+                                 lambda = min(eigenvalue_dist$lambda, na.rm = TRUE), 
                                  rank = 1) %>%
-            complete(censusdate = to_plot$censusdate, fill = list(lambda = NA, rank = 1))
+            complete(censusdate = eigenvalue_dist$censusdate, fill = list(lambda = NA, rank = 1))
         ds_plot <- ds_plot + 
             geom_point(data = complex_df, color = "red")
-    }
-    
-    if (highlight_shifts)
-    {
-        ds_plot <- add_regime_shift_highlight(ds_plot)
-    }
-    
-    # save output
-    if (!is.null(plot_file)) 
-    {
-        ggsave(plot_file, ds_plot, 
-               width = width, height = height)
     }
     return(ds_plot)
 }
@@ -342,15 +317,15 @@ plot_time_series <- function(block)
         theme(panel.grid.minor = element_line(size = 1))
 }
 
-add_regime_shift_highlight <- function(my_plot, alpha = 0.5, fill = "grey30")
+add_regime_shift_highlight <- function(my_plot, 
+                                       ## using dates from updated analysis code (weecology/LDA-kratplots)
+                                       lower_date = as.Date(c("1983-11-12", "1990-01-06", "1998-12-22", "2009-05-23")), 
+                                       upper_date = as.Date(c("1985-03-16", "1992-04-04", "1999-11-06", "2011-01-05")), 
+                                       alpha = 0.5, fill = "grey30")
 {
     ## using dates from Christensen et al. 2018
     # lower_date <- as.Date(c("1983-12-01", "1988-10-01", "1998-09-01", "2009-06-01"))
     # upper_date <- as.Date(c("1984-07-01", "1996-01-01", "1999-12-01", "2010-09-01"))
-    
-    ## using dates from updated analysis code (weecology/LDA-kratplots)
-    lower_date <- as.Date(c("1983-11-12", "1990-01-06", "1998-12-22", "2009-05-23"))
-    upper_date <- as.Date(c("1985-03-16", "1992-04-04", "1999-11-06", "2011-01-05"))
     
     my_plot + geom_rect(data = data.frame(xmin = lower_date, xmax = upper_date,
                                           ymin = -Inf, ymax = Inf),

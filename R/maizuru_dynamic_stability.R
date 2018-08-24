@@ -103,37 +103,19 @@ if (FALSE)
            maizuru_network_subset, width = 8, height = 6)
     
     ## plot eigenvalues ----
-    eigenvalues <- results$eigenvalues
-    num_values <- 1
-    eigenvalue_dist <- map_dfr(seq(eigenvalues), function(i) {
-        lambda <- eigenvalues[[i]]
-        if (any(is.na(lambda)))
-            return(data.frame())
-        lambda <- sort(abs(lambda), decreasing = TRUE)
-        data.frame(lambda = lambda, censusdate = names(eigenvalues)[i], rank = seq(lambda))
-    })
-    eigenvalue_dist$censusdate <- as.Date(eigenvalue_dist$censusdate)
-    
-    # construct plot
-    ds_plot <- eigenvalue_dist %>%
-        filter(rank <= num_values) %>% 
-        ggplot(aes(x = censusdate, y = lambda, color = as.factor(rank))) + 
-        scale_color_manual(values = viridis(7, option = "A")[c(1, 3, 4, 5, 6)]) +
+    ds_plot <- results$eigenvalues %>%
+        plot_eigenvalues() + 
+        scale_color_manual(values = NA) + 
         scale_x_date(limits = as.Date(c("2005-03-01", "2011-01-01")), 
-                     date_breaks = "1 year", date_labels = "%Y", expand = c(0.01, 0)) + 
-        labs(x = NULL, y = "dynamic stability \n(higher is more unstable)") +
-        theme_bw(base_size = 20, base_family = "Helvetica", 
-                 base_line_size = 1) + 
-        theme(panel.grid.minor = element_line(size = 1)) + 
-        guides(color = FALSE)
+                     date_breaks = "1 year", date_labels = "%Y", expand = c(0.01, 0))
+        
     ggsave(here::here("figures/maizuru_ds_blank.pdf"),
            ds_plot, width = 10, height = 5)
     ggsave(here::here("figures/maizuru_ds_threshold.pdf"),
-           ds_plot + geom_hline(yintercept = 1.0, size = 1, linetype = 2) + 
-               geom_blank(), 
+           ds_plot + geom_hline(yintercept = 1.0, size = 1, linetype = 2), 
            width = 10, height = 5)
     ggsave(here::here("figures/maizuru_ds.pdf"),
-           ds_plot + geom_line(size = 1) + 
+           ds_plot + scale_color_manual(values = "black") + 
                geom_hline(yintercept = 1.0, size = 1, linetype = 2), 
            width = 10, height = 5)
 }
