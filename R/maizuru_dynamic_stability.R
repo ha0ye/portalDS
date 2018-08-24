@@ -20,23 +20,11 @@ if (FALSE)
     results <- readRDS(results_file)
     
     ## plot time series ----
-    to_plot <- block %>%
-        mutate_at(vars(-censusdate), 
-                  function(x) {(x - min(x, na.rm = TRUE)) / 
-                          (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))}) %>%
-        gather(species, abundance, -censusdate)
-    n <- length(unique(to_plot$species))
-    maizuru_time_series <- to_plot %>%
-        ggplot(aes(x = censusdate, y = abundance, color = species)) + 
-        geom_line(size = 1) + 
+    maizuru_time_series <- plot_time_series(block) + 
         scale_x_date(limits = as.Date(c("2005-03-01", "2011-01-01")), 
                      date_breaks = "1 year", date_labels = "%Y", expand = c(0.01, 0)) + 
-        scale_color_manual(values = viridis(n)) + 
-        labs(x = NULL, y = "relative abundance") + 
-        guides(color = FALSE) + 
-        theme_bw(base_size = 20, base_family = "Helvetica", 
-                 base_line_size = 1) + 
-        theme(panel.grid.minor = element_line(size = 1))
+        scale_color_viridis(discrete = TRUE) + 
+        guides(color = FALSE)
     ggsave(here::here("figures/maizuru_time_series.pdf"),
            maizuru_time_series, width = 9, height = 4.5)
     
@@ -70,19 +58,16 @@ if (FALSE)
     
     ## plot subset of time series ----
     sp_list <- c("Rudarius.ercodes", "Trachurus.japonicus")
-    maizuru_time_series_subset <- to_plot %>% 
-        filter(species %in% sp_list) %>%
-        ggplot(aes(x = censusdate, y = abundance, color = species)) + 
-        facet_wrap(~species, ncol = 1) + 
-        geom_line(size = 1) + 
+    palette <- viridis(NCOL(block)-1)[match(sp_list, sort(colnames(select(block, -censusdate))))]
+    maizuru_time_series_subset <- 
+        select(block, c("censusdate", sp_list)) %>%
+        plot_time_series() + 
         scale_x_date(limits = as.Date(c("2005-03-01", "2011-01-01")), 
                      date_breaks = "1 year", date_labels = "%Y", expand = c(0.01, 0)) + 
-        scale_color_manual(values = viridis(n)[match(sp_list, sort(unique(to_plot$species)))]) +  
-        labs(x = NULL, y = "relative abundance") + 
+        scale_color_manual(values = palette) + 
         guides(color = FALSE) + 
-        theme_bw(base_size = 20, base_family = "Helvetica", 
-                 base_line_size = 1) + 
-        theme(panel.grid.minor = element_line(size = 1))
+        facet_wrap(~species, ncol = 1)
+    
     ggsave(here::here("figures/maizuru_time_series_subset.pdf"),
            maizuru_time_series_subset, width = 9, height = 5)
     

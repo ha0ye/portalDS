@@ -327,6 +327,21 @@ plot_eigenvectors <- function(results_file = here::here("output/portal_ds_result
     return(my_plot)
 }
 
+plot_time_series <- function(block)
+{
+    block %>%
+        mutate_at(vars(-censusdate), 
+                  function(x) {(x - min(x, na.rm = TRUE)) / 
+                          (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))}) %>%
+        gather(species, abundance, -censusdate) %>%
+        ggplot(aes(x = censusdate, y = abundance, color = species)) + 
+        geom_line(size = 1) + 
+        labs(x = NULL, y = "relative abundance") + 
+        theme_bw(base_size = 20, base_family = "Helvetica", 
+                 base_line_size = 1) + 
+        theme(panel.grid.minor = element_line(size = 1))
+}
+
 add_regime_shift_highlight <- function(my_plot, alpha = 0.5, fill = "grey30")
 {
     ## using dates from Christensen et al. 2018

@@ -18,29 +18,19 @@ make_time_series_plots <- function()
     block <- readRDS(here::here("data/portal_block_50.RDS"))
     
     ## plot time series ----
-    to_plot <- block %>%
-        mutate_at(vars(-censusdate), 
-                  function(x) {(x - min(x, na.rm = TRUE)) / 
-                          (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))}) %>% 
-        gather(species, abundance, -censusdate)
-    n <- length(unique(to_plot$species))
-    palette <- viridis(n, option = "plasma")
     sp_list <- c("DM", "DS", "PP")
+    palette <- viridis(NCOL(block)-1, option = "plasma")[match(sp_list, sort(colnames(select(block, -censusdate))))]
     portal_time_series <- 
-        to_plot %>%
-        filter(species %in% sp_list) %>% 
-        ggplot(aes(x = censusdate, y = abundance, color = species)) + 
-        geom_line(size = 1) + 
+        select(block, c("censusdate", sp_list)) %>%
+        plot_time_series() + 
         scale_x_date(breaks = seq(from = as.Date("1980-01-01"), to = as.Date("2015-01-01"), by = "5 years"), 
                      date_labels = "%Y", expand = c(0.01, 0)) + 
-        scale_color_manual(values = palette[match(sp_list, sort(unique(to_plot$species)))]) + 
-        labs(x = NULL, y = "relative abundance") + 
-        theme_bw(base_size = 20, base_family = "Helvetica", 
-                 base_line_size = 1) + 
+        scale_color_manual(values = palette) + 
         theme(panel.background = element_rect(fill = "#AAAABB", color = NA), 
               panel.grid.major = element_line(color = "grey30", size = 1), 
               panel.grid.minor = element_line(color = "grey30", size = 1), 
               legend.key = element_rect(fill = "#AAAABB"))
+    
     ggsave(here::here("figures/portal_time_series.pdf"),
            portal_time_series, width = 12, height = 6)
     ggsave(here::here("figures/portal_time_series_highlight.pdf"),
