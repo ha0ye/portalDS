@@ -74,7 +74,8 @@ compute_dynamic_stability <- function(block,
 
 #### process data into block form and interpolated across dates ----
 
-make_portal_block <- function(filter_q = NULL, output = "abundance")
+make_portal_block <- function(filter_q = NULL, output = "abundance", 
+                              plots = c(2, 4, 8, 11, 12, 14, 17, 22), ...)
 {
     # options here are:
     #   time = "all" (allow us to do correct interpolation and accouting for seasonality)
@@ -82,10 +83,11 @@ make_portal_block <- function(filter_q = NULL, output = "abundance")
     #   effort = TRUE (so we can check effort)
     #   na_drop = TRUE (ignore periods where sampling did not occur)
     raw_rodent_data <- portalr::get_rodent_data(time = "all", 
-                                                plots = c(2, 4, 8, 11, 12, 14, 17, 22), 
+                                                plots = plots, 
                                                 effort = TRUE, 
                                                 na_drop = TRUE, 
-                                                output = output)
+                                                output = output, 
+                                                ...)
     
     # summarize by each newmmonnumber, and for only the control plots we want
     block <- raw_rodent_data %>% 
