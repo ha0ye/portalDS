@@ -36,7 +36,7 @@ if (FALSE) #  DM, DO, DS, NA, OL, OT, PP
 }
 
 #### run with species that are present at least 1/2 of the time (K-rat exclosures) ----
-if (FALSE) #  DM, DO, DS, NA, OL, OT, PP
+if (FALSE) #  DM, NA, OT, PE, PF, PP, RM
 {
     block <- make_portal_block(filter_q = 0.5, 
                                plots = c(3, 6, 13, 15, 18, 19, 20, 21))
