@@ -20,9 +20,10 @@ This document demonstrates the dynamic stability analysis for the Maizuru Bay fi
 
 ```{r}
 library(portalDS)
+library(ggplot2)
 data(maizuru_block)
 
-maizuru_time_series <- plot_time_series(block) +
+plot_time_series(maizuru_block) +
     # scale_x_date(limits = as.Date(c("2005-03-01", "2011-01-01")),
     #              date_breaks = "1 year", date_labels = "%Y", expand = c(0.01, 0)) +
     scale_color_viridis_d() +

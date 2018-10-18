@@ -7,23 +7,6 @@
 compute_CCM(simplex_results, lib_sizes = seq(10, 100, by = 10),
   silent = TRUE, RNGseed = 42, ..., num_cores = 1)
 }
-\arguments{
-\item{...}{Remaining arguments are passed directly into `rEDM::simplex()`}
-
-\item{block}{A data.frame containing time series for the community. Each
-column is a time series of abundances.}
-
-\item{E}{The embedding dimension or range of embedding dimensions to search
-over. (default is `1:10`)}
-}
-\value{
-A tibble with columns for the species name (taken from the original
-  column names), the abundance time series for each species, the output from
-  `rEDM::simplex()` and the best embedding dimension, as determined by the E
-  that minimizes MAE
-}
 \description{
-Run pairwise CCM starting from the simplex_output. simplex projection models for each time series in the
-  `block` and save the output, to determine the best embedding dimension for
-  each column.
+Run pairwise CCM starting from the simplex_output
 }

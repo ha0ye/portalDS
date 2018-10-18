@@ -2,9 +2,6 @@
 #' @import ggraph
 #' @import ggplot2
 
-library(igraph)
-library(viridis)
-
 #### make networks from all ccm results, match color and location to first ----
 
 make_combined_network <- function(plot_file = NULL)
@@ -307,30 +304,34 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1, add_IPR = FALSE, lin
 #'
 #' @export
 
-
 plot_time_series <- function(block,
-                             time_column = "censusdate",
+                             time_column = censusdate,
                              scale = "unif",
-                             theme = "print")
+                             theme = "print",
+                             base_size = 11,
+                             base_family = "Helvetica",
+                             base_line_size = 1)
 {
+    time_column <- rlang::enquo(time_column)
+    time <- dplyr::pull(block, !!time_column)
+    block <- dplyr::select(block, -!!time_column)
+
     if (tolower(scale) == "unif")
     {
         block <- block %>%
-            dplyr::mutate_at(vars(-censusdate),
-                             scales::rescale)
+            dplyr::mutate_all(scales::rescale)
     } else if (tolower(scale) == "norm") {
         block <- block %>%
-            dplyr::mutate_at(vars(-censusdate),
-                             norm_rescale)
+            dplyr::mutate_all(norm_rescale)
     }
-
- %>%
-        dplyr::gather(species, abundance, -censusdate) %>%
-        ggplot(aes(x = censusdate, y = abundance, color = species)) +
+    block %>%
+        dplyr::mutate(time = time) %>%
+        tidyr::gather(species, abundance, -time) %>%
+        ggplot(aes(x = time, y = abundance, color = species)) +
         geom_line(size = 1) +
         labs(x = NULL, y = "relative abundance") +
-        theme_bw(base_size = 20, base_family = "Helvetica",
-                 base_line_size = 1) +
+        theme_bw(base_size = base_size, base_family = base_family,
+                 base_line_size = base_line_size) +
         theme(panel.grid.minor = element_line(size = 1))
 }
 
