@@ -51,8 +51,8 @@ results_file <- here::here("output/maizuru_ds_results.RDS")
 
 compute_dynamic_stability(maizuru_block, results_file, 
                           quantile_vec = c(0.875, 0.88, 0.89, 0.90, 0.91, 0.92, 
-                                                     0.93, 0.94, 0.95, 0.85, 0.84, 0.83, 
-                                                     0.82, 0.81, 0.80, 0.96))
+                                           0.93, 0.94, 0.95, 0.85, 0.84, 0.83, 
+                                           0.82, 0.81, 0.80, 0.96))
 ```
 
 ## Plot outputs

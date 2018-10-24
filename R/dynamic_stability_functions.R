@@ -217,10 +217,7 @@ compute_simplex <- function(block, E_list, surrogate_method, num_surr, ...)
             purrr::pmap(select(simplex_results, data, best_E),
                         ~make_surrogate_twin(ts = ..1, dim = ..2,
                                              num_surr = num_surr,
-                                             T_period = 24,
-                                             quantile_vec = c(0.875, 0.88, 0.89, 0.90, 0.91, 0.92,
-                                                              0.93, 0.94, 0.95, 0.85, 0.84, 0.83,
-                                                              0.82, 0.81, 0.80, 0.96))
+                                             ...)
             )
     )
     return(simplex_results)
