@@ -4,17 +4,19 @@ author: "Hao Ye"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+%\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
----
-
-```{r setup, include = FALSE}
+  ---
+  
+  ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+collapse = TRUE,
+comment = "#>"
 )
 ```
+
+## Intro Look at the Data
 
 This document demonstrates the dynamic stability analysis for the Maizuru Bay fish community. First, we load in the data and take a look at the time series for the fish populations.
 
@@ -29,6 +31,8 @@ plot_time_series(maizuru_block) +
     scale_color_viridis_d() +
     guides(color = FALSE)
 ```
+
+## Dynamic Stability Calculations
 
 Do the dynamic stability analysis for the maizuru system. The steps involved in the full analysis are:
 
@@ -45,28 +49,30 @@ We also need to specify an output file -- the `compute_dynamic_stability` functi
 ```{r}
 results_file <- here::here("output/maizuru_ds_results.RDS")
 
-compute_dynamic_stability(maizuru_block, results_file)
+compute_dynamic_stability(maizuru_block, results_file, 
+                          quantile_vec = c(0.875, 0.88, 0.89, 0.90, 0.91, 0.92, 
+                                                     0.93, 0.94, 0.95, 0.85, 0.84, 0.83, 
+                                                     0.82, 0.81, 0.80, 0.96))
 ```
 
+## Plot outputs
 
-#### run using Maizuru Bay fish community ----
+```{r}
 if (FALSE)
 {
-
-
-
+    
     ## plot network ----
     my_graph <- results$ccm_links %>%
         filter(lib_column != target_column) %>%
         arrange(target_column) %>%
         select(target_column, lib_column) %>%
         graph_from_data_frame(vertices = levels(.$target_column))
-
+    
     palette <- viridis(length(V(my_graph)))
     names(palette) <- as_ids(V(my_graph))
-
+    
     my_graph <- create_layout(my_graph, layout = layout)
-
+    
     maizuru_network <- ggraph(my_graph) +
         geom_edge_fan(edge_width = 1, start_cap = circle(0.3, "inches"),
                       end_cap = circle(0.3, "inches"),
@@ -82,7 +88,7 @@ if (FALSE)
         guides(fill = guide_legend(title = "Species"))
     ggsave(here::here("figures/maizuru_network.pdf"),
            maizuru_network, width = 8, height = 6)
-
+    
     ## plot subset of time series ----
     sp_list <- c("Rudarius.ercodes", "Trachurus.japonicus")
     palette <- viridis(NCOL(block)-1)[match(sp_list, sort(colnames(select(block, -censusdate))))]
@@ -94,25 +100,25 @@ if (FALSE)
         scale_color_manual(values = palette) +
         guides(color = FALSE) +
         facet_wrap(~species, ncol = 1)
-
+    
     ggsave(here::here("figures/maizuru_time_series_subset.pdf"),
            maizuru_time_series_subset, width = 9, height = 5)
-
+    
     ## plot subset of network ----
     existing_graph <- my_graph # save old graph layout
-
+    
     my_graph <- results$ccm_links %>%
         filter(lib_column != target_column) %>%
         arrange(target_column) %>%
         select(target_column, lib_column) %>%
         filter(target_column %in% sp_list, lib_column %in% sp_list) %>%
         graph_from_data_frame()
-
+    
     my_graph <- create_layout(my_graph, layout = layout)
     idx <- match(my_graph$name, existing_graph$name)
     my_graph$x <- existing_graph$x[idx]
     my_graph$y <- existing_graph$y[idx]
-
+    
     maizuru_network_subset <- ggraph(my_graph) +
         geom_edge_fan(edge_width = 1, start_cap = circle(0.3, "inches"),
                       end_cap = circle(0.3, "inches"),
@@ -128,14 +134,14 @@ if (FALSE)
         guides(fill = guide_legend(title = "Species"))
     ggsave(here::here("figures/maizuru_network_subset.pdf"),
            maizuru_network_subset, width = 8, height = 6)
-
+    
     ## plot eigenvalues ----
     ds_plot <- results$eigenvalues %>%
         plot_eigenvalues() +
         scale_color_manual(values = NA) +
         scale_x_date(limits = as.Date(c("2005-03-01", "2011-01-01")),
                      date_breaks = "1 year", date_labels = "%Y", expand = c(0.01, 0))
-
+    
     ggsave(here::here("figures/maizuru_ds_blank.pdf"),
            ds_plot, width = 10, height = 5)
     ggsave(here::here("figures/maizuru_ds_threshold.pdf"),

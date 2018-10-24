@@ -151,19 +151,19 @@ make_portal_block <- function(filter_q = NULL, output = "abundance",
 
 #### function to fit periodic spline through data, using yearday as input x ----
 
-make_surrogate_annual_spline <- function(x, y, num_surr = 100)
+make_surrogate_annual_spline <- function(day_of_year, ts, num_surr = 100)
 {
     # filter out NA first
-    n <- length(x)
-    idx <- which(is.finite(x) & is.finite(y))
-    x <- x[idx]
-    y <- y[idx]
+    n <- length(day_of_year)
+    idx <- which(is.finite(day_of_year) & is.finite(y))
+    day_of_year <- day_of_year[idx]
+    ts <- ts[idx]
 
-    xx <- c(x - 365, x, x + 365)
-    yy <- c(y, y, y)
+    xx <- c(day_of_year - 365, day_of_year, day_of_year + 365)
+    yy <- c(ts, ts, ts)
     seasonal_F <- smooth.spline(xx, yy)
-    seasonal_cyc <- predict(seasonal_F, x)$y
-    seasonal_resid <- y - seasonal_cyc
+    seasonal_cyc <- predict(seasonal_F, day_of_year)$y
+    seasonal_resid <- ts - seasonal_cyc
 
     vals <- matrix(unlist(
         lapply(seq(num_surr), function(i) {
@@ -196,7 +196,7 @@ compute_simplex <- function(block, E_list, surrogate_method, num_surr, ...)
 {
     simplex_results <- block %>%
         dplyr::select(-censusdate) %>%
-        dplyr::gather(species, abundance) %>%
+        tidyr::gather(species, abundance) %>%
         dplyr::group_by(species) %>%
         tidyr::nest() %>%
         dplyr::mutate(simplex_out =
@@ -207,20 +207,29 @@ compute_simplex <- function(block, E_list, surrogate_method, num_surr, ...)
     simplex_results$surrogate_data <- switch(
         surrogate_method,
         annual_spline =
-            purrr::map(simplex_results$data, function(df) {
-                make_surrogate_annual_spline(yday(results$block$censusdate),
-                                             df$abundance,
-                                             num_surr = num_surr)
-            }),
+            purrr::pmap(select(simplex_results, data),
+                        ~make_surrogate_annual_spline(yday(results$block$censusdate),
+                                                      ..1,
+                                                      num_surr = num_surr)
+            )
+        ,
         twin =
-            purrr::map(simplex_results$data, function(df) {
-                rEDM::make_surrogate_data(df$abundance,
-                                          method = "twin",
-                                          num_surr = num_surr)
-            }))
-
+            purrr::pmap(select(simplex_results, data, best_E),
+                        ~make_surrogate_twin(ts = ..1, dim = ..2,
+                                             num_surr = num_surr,
+                                             T_period = 24,
+                                             quantile_vec = c(0.875, 0.88, 0.89, 0.90, 0.91, 0.92,
+                                                              0.93, 0.94, 0.95, 0.85, 0.84, 0.83,
+                                                              0.82, 0.81, 0.80, 0.96))
+            )
+    )
     return(simplex_results)
 }
+
+
+
+
+
 
 #' @title compute_ccm
 #' @description Run pairwise CCM based on the simplex_output - using the best
