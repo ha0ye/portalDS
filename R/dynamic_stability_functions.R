@@ -17,18 +17,28 @@
 #'   (6) extract out the s-map coefficients from the models and assemble
 #'       matrices for the system
 #'   (7) perform eigen-decomposition on the s-map coefficient matrices
-#' @param block A data.frame containing time series for the community. Each
+#' @param block a data.frame containing time series for the community. Each
 #'   column is a time series of abundances.
-#' @param results_file The location of the results to be stored on disk.
-#' @param num_cores The number of cores to use for the parallelized run of CCM
-#' @param ... Remaining arguments are passed directly into compute_smap_coeffs
+#' @param results_file the location of the results to be stored on disk.
+#' @param max_E largest E to examine using simplex projection; this sets the
+#'   default range for `E_list`, but any setting for `E_list` will override the
+#'   value for `max_E`
+#' @inheritParams compute_simplex
+#' @inheritParams compute_ccm
+#' @inheritParams compute_smap_coeffs
 #'
 #' @return none
 #'
 #' @export
 compute_dynamic_stability <- function(block,
                                       results_file = here::here("output/portal_ds_results.RDS"),
-                                      num_cores = 2, ...)
+                                      max_E = 16, E_list = seq(max_E),
+                                      surrogate_method = "annual_spline", num_surr = 200,
+                                      lib_vec = c(6, 12, 24, 40, 80, 140, 220, 320, NROW(results$block)),
+                                      num_cores = 2,
+                                      rescale = TRUE,
+                                      rolling_forecast = FALSE,
+                                      ...)
 {
     if (!file.exists(results_file))
     {
@@ -36,29 +46,26 @@ compute_dynamic_stability <- function(block,
     } else {
         results <- readRDS(results_file)
     }
-    results$block <- block
+
+    # check if data has been stored yet
+    if (is.null(results$block))
+    {
+        results$block <- block
+    }
 
     # check for simplex results, compute if missing
     if (is.null(results$simplex_results))
     {
-        simplex_results <- results$block %>%
-            compute_simplex(E = 1:16)
-
-        simplex_results$surrogate_data <-
-            purrr::map(simplex_results$data, function(df) {
-                make_surrogate_annual_spline(yday(results$block$censusdate),
-                                             df$abundance,
-                                             num_surr = 200)
-            })
-
-        results$simplex_results <- simplex_results
+        results$simplex_results <- compute_simplex(block,
+                                                   E_list,
+                                                   surrogate_method,
+                                                   num_surr)
     }
 
     # check for ccm results, compute if missing
     if (is.null(results$ccm_results))
     {
-        lib_vec <- c(6, 12, 24, 40, 80, 140, 220, 320, NROW(results$block))
-        results$ccm_results <- compute_CCM(results$simplex_results,
+        results$ccm_results <- compute_ccm(results$simplex_results,
                                            lib_sizes = lib_vec,
                                            num_samples = 200,
                                            num_cores = num_cores)
@@ -172,48 +179,74 @@ make_surrogate_annual_spline <- function(x, y, num_surr = 100)
 #' @description Run simplex projection models for each time series in the
 #'   `block` and save the output, to determine the best embedding dimension for
 #'   each column.
-#' @param block A data.frame containing time series for the community. Each
+#' @param block a data.frame containing time series for the community. Each
 #'   column is a time series of abundances.
-#' @param E The embedding dimension or range of embedding dimensions to search
-#'   over. (default is `1:10`)
-#' @param ... Remaining arguments are passed directly into `rEDM::simplex()`
-#'
+#' @param E_list the embedding dimension or range of embedding dimensions to
+#'   search over.
+#' @param surrogate_method which surrogate method to use
+#' @param num_surr number of surrogates to compute
+#' @param ... remaining arguments are passed into the surrogate data function
 #' @return A tibble with columns for the species name (taken from the original
 #'   column names), the abundance time series for each species, the output from
-#'   `rEDM::simplex()` and the best embedding dimension, as determined by the E
-#'   that minimizes MAE
+#'   `rEDM::simplex()`, the best embedding dimension, as determined by the E
+#'   that minimizes MAE, and surrogate time series
 #'
 #' @export
-compute_simplex <- function(block, E = 1:10)
+compute_simplex <- function(block, E_list, surrogate_method, num_surr, ...)
 {
-    block %>%
+    simplex_results <- block %>%
         dplyr::select(-censusdate) %>%
         dplyr::gather(species, abundance) %>%
         dplyr::group_by(species) %>%
         tidyr::nest() %>%
         dplyr::mutate(simplex_out =
-                   purrr::map(data, ~ rEDM::simplex(.$abundance, E = E, silent = TRUE))) %>%
+                          purrr::map(data, ~ rEDM::simplex(.$abundance, E = E_list, silent = TRUE))) %>%
         dplyr::mutate(best_E = purrr::map_int(simplex_out, ~ dplyr::filter(., mae == min(mae)) %>%
                                                   dplyr::pull(E)))
+
+    simplex_results$surrogate_data <- switch(
+        surrogate_method,
+        annual_spline =
+            purrr::map(simplex_results$data, function(df) {
+                make_surrogate_annual_spline(yday(results$block$censusdate),
+                                             df$abundance,
+                                             num_surr = num_surr)
+            }),
+        twin =
+            purrr::map(simplex_results$data, function(df) {
+                rEDM::make_surrogate_data(df$abundance,
+                                          method = "twin",
+                                          num_surr = num_surr)
+            }))
+
+    return(simplex_results)
 }
 
+#' @title compute_ccm
+#' @description Run pairwise CCM based on the simplex_output - using the best
+#'   embedding dimension there, along with the surrogate time series
 
-#' @title compute_CCM
-#' @description Run pairwise CCM starting from the simplex_output
-
-compute_CCM <- function(simplex_results,
+#' @param simplex_results the output of \code{\link{compute_simplex}}
+#' @inheritParams rEDM::ccm
+#' @return A tibble with columns for the variables that we use in CCM, the data
+#'   type (whether it's the "actual" time series or "surrogate"), the library
+#'   size, and the results from CCM
+#'
+#' @export
+compute_ccm <- function(simplex_results,
                         lib_sizes = seq(10, 100, by = 10),
-                        silent = TRUE, RNGseed = 42,
-                        ...,
-                        num_cores = 1)
+                        random_libs = TRUE, num_samples = 100,
+                        replace = TRUE, RNGseed = 42,
+                        silent = TRUE, num_cores = 1)
 {
     ccm_func <- function(block, E)
     {
         cbind(block) %>%
             rEDM::ccm(E = E, lib_sizes = lib_sizes,
-                lib_column = 1, target_column = 2,
-                silent = silent, RNGseed = RNGseed,
-                ...) %>%
+                      random_libs = random_libs, num_samples = num_samples,
+                      replace = TRUE,
+                      lib_column = 1, target_column = 2,
+                      RNGseed = RNGseed, silent = silent) %>%
             rEDM::ccm_means(na.rm = TRUE) %>%
             dplyr::select(lib_size, num_pred, rho, mae, rmse)
     }
@@ -236,13 +269,13 @@ compute_CCM <- function(simplex_results,
 
         # compute CCM for actual connection
         ccm_actual <- ccm_func(cbind(lib_ts, pred_ts), E) %>%
-            dplyr::mutate(data = "actual")
+            dplyr::mutate(data_type = "actual")
         # generate surrogates and compute CCM
         surr_ts <- simplex_results[[from_idx, "surrogate_data"]]
 
         ccm_surr <- purrr::map_dfr(seq(NCOL(surr_ts)),
                             ~ccm_func(cbind(surr_ts[, .], pred_ts), E)) %>%
-            dplyr::mutate(data = "surrogate")
+            dplyr::mutate(data_type = "surrogate")
 
         # combine outputs
         ccm_out <- dplyr::bind_rows(ccm_actual, ccm_surr) %>%
@@ -253,8 +286,8 @@ compute_CCM <- function(simplex_results,
     }, mc.cores = num_cores)
 
     do.call(bind_rows, out) %>%
-        dplyr::select(lib_column, target_column, data, dplyr::everything()) %>%
-        dplyr::mutate_at(c("lib_column", "target_column", "data", "lib_size"), as.factor)
+        dplyr::select(lib_column, target_column, data_type, dplyr::everything()) %>%
+        dplyr::mutate_at(c("lib_column", "target_column", "data_type", "lib_size"), as.factor)
 }
 
 # Define causal links as those for which:

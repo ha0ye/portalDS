@@ -4,22 +4,26 @@
 \alias{compute_simplex}
 \title{compute_simplex}
 \usage{
-compute_simplex(block, E = 1:10)
+compute_simplex(block, E_list, surrogate_method, num_surr, ...)
 }
 \arguments{
-\item{block}{A data.frame containing time series for the community. Each
+\item{block}{a data.frame containing time series for the community. Each
 column is a time series of abundances.}
 
-\item{E}{The embedding dimension or range of embedding dimensions to search
-over. (default is `1:10`)}
+\item{E_list}{the embedding dimension or range of embedding dimensions to
+search over.}
 
-\item{...}{Remaining arguments are passed directly into `rEDM::simplex()`}
+\item{surrogate_method}{which surrogate method to use}
+
+\item{num_surr}{number of surrogates to compute}
+
+\item{...}{remaining arguments are passed into the surrogate data function}
 }
 \value{
 A tibble with columns for the species name (taken from the original
   column names), the abundance time series for each species, the output from
-  `rEDM::simplex()` and the best embedding dimension, as determined by the E
-  that minimizes MAE
+  `rEDM::simplex()`, the best embedding dimension, as determined by the E
+  that minimizes MAE, and surrogate time series
 }
 \description{
 Run simplex projection models for each time series in the

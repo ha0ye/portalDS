@@ -5,18 +5,34 @@
 \title{compute_dynamic_stability}
 \usage{
 compute_dynamic_stability(block,
-  results_file = here::here("output/portal_ds_results.RDS"), num_cores = 2,
-  ...)
+  results_file = here::here("output/portal_ds_results.RDS"), max_E = 16,
+  E_list = seq(max_E), surrogate_method = "annual_spline", num_surr = 200,
+  lib_vec = c(6, 12, 24, 40, 80, 140, 220, 320, NROW(results$block)),
+  num_cores = 2, rescale = TRUE, rolling_forecast = FALSE, ...)
 }
 \arguments{
-\item{block}{A data.frame containing time series for the community. Each
+\item{block}{a data.frame containing time series for the community. Each
 column is a time series of abundances.}
 
-\item{results_file}{The location of the results to be stored on disk.}
+\item{results_file}{the location of the results to be stored on disk.}
 
-\item{num_cores}{The number of cores to use for the parallelized run of CCM}
+\item{max_E}{largest E to examine using simplex projection; this sets the
+default range for `E_list`, but any setting for `E_list` will override the
+value for `max_E`}
 
-\item{...}{Remaining arguments are passed directly into compute_smap_coeffs}
+\item{E_list}{the embedding dimension or range of embedding dimensions to
+search over.}
+
+\item{surrogate_method}{which surrogate method to use}
+
+\item{num_surr}{number of surrogates to compute}
+
+\item{rescale}{A logical, indicating whether to rescale each time series}
+
+\item{rolling_forecast}{A logical, indicating whether to make individual
+rolling forecasts for the second half of the time series.}
+
+\item{...}{remaining arguments are passed into the surrogate data function}
 }
 \value{
 none

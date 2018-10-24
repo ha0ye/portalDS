@@ -30,14 +30,23 @@ plot_time_series(maizuru_block) +
     guides(color = FALSE)
 ```
 
+Do the dynamic stability analysis for the maizuru system. The steps involved in the full analysis are:
 
+1. run simplex projection on each time series to identify the optimal embedding dimension
+2. generate surrogate time series, assumming that the data have just a seasonal pattern
+3. run ccm on each pairwise interaction, including the surrogate data
+4. identify the significant interactions by comparing the CCM for the real time series against the calculations for the surrogate data
+5. run S-map models for each time series, using the appropriate number of lags, and including the important interacting variables
+6. extract out the s-map coefficients from the models and assemble matrices for the system
+7. perform eigen-decomposition on the s-map coefficient matrices
 
+We also need to specify an output file -- the `compute_dynamic_stability` function saves intermediate results in that file, which allows us to do calculations across multiple sessions. This can be useful because of the time required to do CCM calculations for all of the surrogates.
 
-
-
+```{r}
 results_file <- here::here("output/maizuru_ds_results.RDS")
+
 compute_dynamic_stability(maizuru_block, results_file)
-results <- readRDS(results_file)
+```
 
 
 #### run using Maizuru Bay fish community ----
