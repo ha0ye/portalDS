@@ -164,6 +164,7 @@ plot_smap_coeffs <- function(results_file = here::here("output/portal_ds_results
 
 #### function to produce eigenvalues plot ----
 
+#' @export
 plot_eigenvalues <- function(eigenvalues, num_values = 1, highlight_complex = FALSE, line_size = 1)
 {
     # generate df for plotting
@@ -203,6 +204,7 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1, highlight_complex = FA
     return(ds_plot)
 }
 
+#' @export
 plot_eigenvectors <- function(eigenvectors, num_values = 1, add_IPR = FALSE, line_size = 1)
 {
     # extract vars
@@ -335,6 +337,7 @@ plot_time_series <- function(block,
         theme(panel.grid.minor = element_line(size = 1))
 }
 
+#' @export
 add_regime_shift_highlight <- function(my_plot,
                                        ## using dates from updated analysis code (weecology/LDA-kratplots)
                                        lower_date = as.Date(c("1983-11-12", "1990-01-06", "1998-12-22", "2009-05-23")),
