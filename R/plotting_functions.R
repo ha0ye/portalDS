@@ -41,15 +41,35 @@ make_combined_network <- function(plot_file = NULL)
 
 #### generate network figure from ccm_results ----
 
-make_network_from_ccm_results <- function(results_file = here::here("output/portal_ds_results.RDS"),
-                                          layout = "circle",
-                                          palette = NULL,
-                                          palette_option = "plasma",
-                                          existing_graph = NULL)
+#' @title plot_network
+#' @description Visuzalize the interactions from running CCM on community time
+#'   series
+#' @param ccm_links a data.frame containing the inferred interactions from CCM,
+#'   it should have a `lib_column` and `target_column` to specify the causal
+#'   links (where directed edges are from `target_column` to `lib_column`)
+#' @param palette a data.frame with the colors for each vertex; if NULL, one
+#'   will be created using \code{\link{viridis::viridis}}
+#' @param palette_option the color palette to use (see \code{\link{viridis::viridis}}
+#'   for more info)
+#' @param existing_graph a data.frame specifying the layout of nodes (e.g. from a
+#'   previous call to plot_network); if NULL, one will be created
+#' @inheritParams ggraph::ggraph
+#'
+#' @return a list with three elements:
+#' \tabular{ll}{
+#'   \code{plot} \tab the ggraph object to plot or save\cr
+#'   \code{palette} \tab the palette (for a future `plot_network` call)\cr
+#'   \code{graph} \tab the graph (for a future `plot_network` call)\cr
+#' }
+#'
+#' @export
+plot_network <- function(ccm_links,
+                         layout = "circle",
+                         palette = NULL,
+                         palette_option = "plasma",
+                         existing_graph = NULL)
 {
-    results <- readRDS(results_file)
-
-    my_graph <- results$ccm_links %>%
+    my_graph <- ccm_links %>%
         dplyr::filter(lib_column != target_column) %>%
         dplyr::arrange(target_column) %>%
         dplyr::select(target_column, lib_column) %>%
@@ -57,8 +77,9 @@ make_network_from_ccm_results <- function(results_file = here::here("output/port
 
     if (is.null(palette))
     {
-        palette <- viridis::viridis(length(V(my_graph)), option = palette_option)
-        names(palette) <- igraph::as_ids(V(my_graph))
+        vertices <- igraph::V(my_graph)
+        palette <- viridis::viridis(length(vertices), option = palette_option)
+        names(palette) <- igraph::as_ids(vertices)
     }
 
     my_graph <- create_layout(my_graph, layout = layout)
@@ -147,7 +168,7 @@ plot_smap_coeffs <- function(results_file = here::here("output/portal_ds_results
         guides(color = FALSE, fill = FALSE)
 
     combined_plot <- plot_grid(ts_plot, density_plot, nrow = 1,
-                                        rel_widths = c(3, 1))
+                               rel_widths = c(3, 1))
     if (is.null(height))
     {
         height <- nlevels(smap_coeff_df$target)
@@ -156,7 +177,7 @@ plot_smap_coeffs <- function(results_file = here::here("output/portal_ds_results
     # save output
     if (!is.null(plot_file))
     {
-         ggsave(plot_file, combined_plot,
+        ggsave(plot_file, combined_plot,
                width = width, height = height)
     }
     return(combined_plot)
@@ -231,8 +252,8 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1, add_IPR = FALSE, lin
     }) %>%
         dplyr::rename(variable = Var1, rank = Var2) %>%
         dplyr::mutate(censusdate = as.Date(names(eigenvectors)[t]),
-               variable = as.factor(var_names[variable]),
-               value = abs(Re(value))) %>%
+                      variable = as.factor(var_names[variable]),
+                      value = abs(Re(value))) %>%
         dplyr::group_by(t, rank) %>%
         dplyr::mutate(value = vector_scale(value)) %>%
         dplyr::ungroup()
@@ -249,7 +270,7 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1, add_IPR = FALSE, lin
             dplyr::summarize(value = sum(abs(value)^4)) %>%
             dplyr::ungroup() %>%
             dplyr::mutate(censusdate = as.Date(names(eigenvectors)[t]),
-                   variable = "IPR")
+                          variable = "IPR")
 
         v_df$component <- "eigenvector"
         ipr_df$component <- "IPR"

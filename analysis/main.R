@@ -19,7 +19,8 @@ if (FALSE) #  DM, DO, DS, NA, OL, OT, PP
     results_file <- here::here("output/portal_ds_results_50.RDS")
     compute_dynamic_stability(block, results_file)
 
-    portal_network_50 <- make_network_from_ccm_results(results_file)
+    results <- readRDS(results_file)
+    portal_network_50 <- plot_network(results$ccm_links)
     ggsave(here::here("figures/portal_network_50.pdf"),
            portal_network_50$plot, width = 8, height = 6)
 }
