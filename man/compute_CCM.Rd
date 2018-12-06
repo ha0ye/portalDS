@@ -5,8 +5,8 @@
 \title{compute_ccm}
 \usage{
 compute_ccm(simplex_results, lib_sizes = seq(10, 100, by = 10),
-  random_libs = TRUE, num_samples = 100, replace = TRUE, RNGseed = 42,
-  silent = TRUE, num_cores = 1)
+  random_libs = TRUE, num_samples = 100, replace = TRUE,
+  RNGseed = 42, silent = TRUE, num_cores = 1)
 }
 \arguments{
 \item{simplex_results}{the output of \code{\link{compute_simplex}}}

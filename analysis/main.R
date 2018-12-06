@@ -1,5 +1,21 @@
 library(portalDS)
 
+
+#### run with species that are present at least 1/2 of the time ----
+# species = {DM, DO, DS, NA, OL, OT, PP}
+
+block <- make_portal_block(filter_q = 0.5)
+saveRDS(block, here::here("data/portal_block_50.RDS"))
+
+results_file <- here::here("output/portal_ds_results_50.RDS")
+compute_dynamic_stability(block, results_file)
+
+results <- readRDS(results_file)
+portal_network_50 <- plot_network(results$ccm_links)
+ggsave(here::here("figures/portal_network_50.pdf"),
+       portal_network_50$plot, width = 8, height = 6)
+
+
 #### default run using all species in the dataset ----
 if (FALSE)
 {

@@ -8,19 +8,19 @@ make_combined_network <- function(plot_file = NULL)
 {
     portal_network <- here::here("output/portal_ds_results.RDS") %>%
         readRDS() %>%
-        .$ccm_results %>%
-        make_network_from_ccm_results()
+        .$ccm_links %>%
+        plot_network()
 
     portal_network_50 <- here::here("output/portal_ds_results_50.RDS") %>%
         readRDS() %>%
-        .$ccm_results %>%
-        make_network_from_ccm_results(palette = portal_network$palette,
+        .$ccm_links %>%
+        plot_network(palette = portal_network$palette,
                                       existing_graph = portal_network$graph)
 
     portal_network_33 <- here::here("output/portal_ds_results_33.RDS") %>%
         readRDS() %>%
-        .$ccm_results %>%
-        make_network_from_ccm_results(palette = portal_network$palette,
+        .$ccm_links %>%
+        plot_network(palette = portal_network$palette,
                                       existing_graph = portal_network$graph)
 
     combined_network_plot <- plot_grid(portal_network$plot,
@@ -42,8 +42,8 @@ make_combined_network <- function(plot_file = NULL)
 #### generate network figure from ccm_results ----
 
 #' @title plot_network
-#' @description Visuzalize the interactions from running CCM on community time
-#'   series
+#' @description Visualize the network of interactions, created from running CCM
+#'   on community time series as part of the dynamic stability analysis
 #' @param ccm_links a data.frame containing the inferred interactions from CCM,
 #'   it should have a `lib_column` and `target_column` to specify the causal
 #'   links (where directed edges are from `target_column` to `lib_column`)
@@ -111,14 +111,26 @@ plot_network <- function(ccm_links,
 
 #### function to produce smap coeffs plot ----
 
-plot_smap_coeffs <- function(results_file = here::here("output/portal_ds_results.RDS"),
+#' @title plot_smap_coeffs
+#' @description Visualize the smap-coefficients from running the S-map model on
+#'   the community time series as part of the dynamic stability analysis
+#' @param smap_matrices a list of matrices for the s-map coefficients:
+#'   the number of elements in the list corresponds to the time points of the
+#'   s-map model, and each element is a matrix of the s-map coefficients at
+#'   that time step
+#' @param plot_file the filepath to where to save the plot; if `NULL` (the
+#'   default), then the plot is not saved to a file
+#' @param width width of the saved plot
+#' @param height height of the saved plot
+#'
+#' @return the plot object,
+#'
+#' @export
+plot_smap_coeffs <- function(smap_matrices,
                              plot_file = NULL, width = 6, height = NULL)
 {
-    results <- readRDS(results_file)
-    smap_matrices <- results$smap_matrices
-
     # make data.frame of smap coefficients
-    smap_coeff_df <- map_dfr(seq(smap_matrices), function(i) {
+    smap_coeff_df <- purrr::map_dfr(seq(smap_matrices), function(i) {
         m <- smap_matrices[[i]]
         if (is.null(dim(m)))
             return()
@@ -127,7 +139,7 @@ plot_smap_coeffs <- function(results_file = here::here("output/portal_ds_results
         out$t <- i
         return(out)
     }) %>%
-        rename(target = Var1, predictor = Var2)
+        dplyr::rename(target = Var1, predictor = Var2)
 
     # identify coefficients that matter
     to_keep <- smap_coeff_df %>%
@@ -167,8 +179,8 @@ plot_smap_coeffs <- function(results_file = here::here("output/portal_ds_results
         theme_bw() +
         guides(color = FALSE, fill = FALSE)
 
-    combined_plot <- plot_grid(ts_plot, density_plot, nrow = 1,
-                               rel_widths = c(3, 1))
+    combined_plot <- cowplot::plot_grid(ts_plot, density_plot, nrow = 1,
+                                        rel_widths = c(3, 1))
     if (is.null(height))
     {
         height <- nlevels(smap_coeff_df$target)
@@ -177,8 +189,8 @@ plot_smap_coeffs <- function(results_file = here::here("output/portal_ds_results
     # save output
     if (!is.null(plot_file))
     {
-        ggsave(plot_file, combined_plot,
-               width = width, height = height)
+        cowplot::ggsave(plot_file, combined_plot,
+                        width = width, height = height)
     }
     return(combined_plot)
 }
