@@ -29,7 +29,7 @@ default), then the plot is not saved to a file}
 \item{height}{height of the saved plot}
 }
 \value{
-the plot object
+A ggplot object of the eigenvalue plot
 }
 \description{
 Visualize the dominant eigenvalue(s) from running the S-map

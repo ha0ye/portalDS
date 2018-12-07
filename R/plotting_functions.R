@@ -119,7 +119,7 @@ plot_network <- function(ccm_links,
 #' @param width width of the saved plot
 #' @param height height of the saved plot
 #'
-#' @return the plot object
+#' @return A ggplot object of the smap coefficients plot
 #'
 #' @export
 plot_smap_coeffs <- function(smap_matrices,
@@ -204,7 +204,7 @@ plot_smap_coeffs <- function(smap_matrices,
 #' @param line_size the line width for the plot
 #' @inheritParams plot_smap_coeffs
 #'
-#' @return the plot object
+#' @return A ggplot object of the eigenvalue plot
 #'
 #' @export
 plot_eigenvalues <- function(eigenvalues, num_values = 1,
@@ -273,7 +273,7 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
 #' @inheritParams plot_network
 #' @inheritParams plot_smap_coeffs
 #'
-#' @return the plot object
+#' @return A ggplot object of the eigenvector plot
 #'
 #' @export
 plot_eigenvectors <- function(eigenvectors, num_values = 1,
@@ -383,7 +383,6 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
 #' @return A ggplot object of the time series plot
 #'
 #' @export
-
 plot_time_series <- function(block,
                              time_column = censusdate,
                              scale = "unif",
@@ -415,6 +414,16 @@ plot_time_series <- function(block,
         theme(panel.grid.minor = element_line(size = 1))
 }
 
+#' @title add_regime_shift_highlight
+#' @description add transparent bars to highlight specific time spans
+#' @param my_plot the original ggplot object
+#' @param lower_date a vector of the beginnings of the time spans
+#' @param upper_date a vector of the ends of the time spans
+#' @param alpha the transparency of the bars to add to the plot
+#' @param fill the fill color of the bars to add to the plot
+#'
+#' @return A ggplot object with the bars added
+#'
 #' @export
 add_regime_shift_highlight <- function(my_plot,
                                        ## using dates from updated analysis code (weecology/LDA-kratplots)
