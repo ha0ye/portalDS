@@ -39,8 +39,6 @@ make_combined_network <- function(plot_file = NULL)
     return(combined_network_plot)
 }
 
-#### generate network figure from ccm_results ----
-
 #' @title plot_network
 #' @description Visualize the network of interactions, created from running CCM
 #'   on community time series as part of the dynamic stability analysis
@@ -109,8 +107,6 @@ plot_network <- function(ccm_links,
                 graph = my_graph))
 }
 
-#### function to produce smap coeffs plot ----
-
 #' @title plot_smap_coeffs
 #' @description Visualize the smap-coefficients from running the S-map model on
 #'   the community time series as part of the dynamic stability analysis
@@ -123,7 +119,7 @@ plot_network <- function(ccm_links,
 #' @param width width of the saved plot
 #' @param height height of the saved plot
 #'
-#' @return the plot object,
+#' @return the plot object
 #'
 #' @export
 plot_smap_coeffs <- function(smap_matrices,
@@ -195,10 +191,25 @@ plot_smap_coeffs <- function(smap_matrices,
     return(combined_plot)
 }
 
-#### function to produce eigenvalues plot ----
-
+#' @title plot_eigenvalues
+#' @description Visualize the dominant eigenvalue(s) from running the S-map
+#'   model on the community time series as part of the dynamic stability analysis
+#' @param eigenvalues a list of vectors for the eigenvalues:
+#'   the number of elements in the list corresponds to the time points of the
+#'   s-map model, and each element is a vector of the eigenvalues, computed
+#'   from the matrix of the s-map coefficients at that time step
+#' @param num_values the number of eigenvalues to plot
+#' @param highlight_complex whether to also draw points to indicate when the
+#'   dominant eigenvalue is complex
+#' @param line_size the line width for the plot
+#' @inheritParams plot_smap_coeffs
+#'
+#' @return the plot object
+#'
 #' @export
-plot_eigenvalues <- function(eigenvalues, num_values = 1, highlight_complex = FALSE, line_size = 1)
+plot_eigenvalues <- function(eigenvalues, num_values = 1,
+                             highlight_complex = FALSE, line_size = 1,
+                             plot_file = NULL, width = 6, height = NULL)
 {
     # generate df for plotting
     eigenvalue_dist <- purrr::map_dfr(seq(eigenvalues), function(i) {
@@ -206,15 +217,17 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1, highlight_complex = FA
         if (any(is.na(lambda)))
             return(data.frame())
         lambda <- sort(abs(lambda), decreasing = TRUE)
-        data.frame(lambda = lambda, censusdate = names(eigenvalues)[i], rank = seq(lambda))
+        data.frame(lambda = lambda, censusdate = names(eigenvalues)[i],
+                   rank = seq(lambda), stringsAsFactors = FALSE)
     }) %>%
         dplyr::filter(rank <= num_values) %>%
         dplyr::mutate(censusdate = as.Date(censusdate))
 
-    ds_plot <- eigenvalue_dist %>%
-        ggplot(aes(x = censusdate, y = lambda, color = as.factor(rank), group = rev(rank))) +
+    my_plot <- eigenvalue_dist %>%
+        ggplot(aes(x = censusdate, y = lambda,
+                   color = as.factor(rank), group = rev(rank))) +
         geom_line(size = line_size) +
-        scale_color_manual(values = viridis(7, option = "magma")[c(1, 3, 5, 6, 7)]) +
+        scale_color_viridis_d(option = "Magma") +
         geom_hline(yintercept = 1.0, size = 1, linetype = 2) +
         labs(x = NULL, y = "dynamic stability \n(higher is more unstable)", color = "rank") +
         theme_bw(base_size = 20, base_family = "Helvetica",
@@ -231,14 +244,42 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1, highlight_complex = FA
                                  lambda = min(eigenvalue_dist$lambda, na.rm = TRUE),
                                  rank = 1) %>%
             tidyr::complete(censusdate = eigenvalue_dist$censusdate, fill = list(lambda = NA, rank = 1))
-        ds_plot <- ds_plot +
+        my_plot <- my_plot +
             geom_point(data = complex_df, color = "red")
     }
-    return(ds_plot)
+
+    # save output
+    if (!is.null(plot_file))
+    {
+        cowplot::ggsave(plot_file, my_plot,
+                        width = width, height = height)
+    }
+    return(my_plot)
 }
 
+#' @title plot_eigenvectors
+#' @description Visualize the dominant eigenvector(s) from running the S-map
+#'   model on the community time series as part of the dynamic stability analysis
+#' @param eigenvectors a list of matrices for the eigenvectors:
+#'   the number of elements in the list corresponds to the time points of the
+#'   s-map model, and each element is a matrix, where the columns are the
+#'   eigenvectors, in descending order, the rows correspond to the axes of the
+#'   system
+#' @param num_values the number of eigenvectors to plot
+#' @param add_IPR whether to also plot the Inverse Participation Ratio, a
+#'   numerical quantity that measures how evenly the different components
+#'   contribute to the eigenvector
+#' @param line_size the line width for the plot
+#' @inheritParams plot_network
+#' @inheritParams plot_smap_coeffs
+#'
+#' @return the plot object
+#'
 #' @export
-plot_eigenvectors <- function(eigenvectors, num_values = 1, add_IPR = FALSE, line_size = 1)
+plot_eigenvectors <- function(eigenvectors, num_values = 1,
+                              add_IPR = FALSE, line_size = 1,
+                              palette_option = "plasma",
+                              plot_file = NULL, width = 6, height = NULL)
 {
     # extract vars
     non_null_idx <- dplyr::first(which(!sapply(eigenvectors, is.null)))
@@ -290,13 +331,12 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1, add_IPR = FALSE, lin
         dat <- dplyr::bind_rows(v_df, ipr_df)
         dat$variable <- as.factor(dat$variable)
         dat$variable <- forcats::fct_relevel(dat$variable, c(var_names, "IPR"))
-        palette <- c(viridis::viridis(length(var_names), option = "plasma"), "black")
 
         my_plot <- dat %>%
             ggplot(aes(x = censusdate, y = value, color = variable)) +
             facet_grid(component + rank ~ ., switch = "y") +
             scale_y_continuous(limits = c(0, 1)) +
-            scale_color_manual(values = palette)
+            scale_color_viridis_d(option = palette_option)
     } else {
         my_plot <- v_df %>%
             ggplot(aes(x = censusdate, y = value, color = variable)) +
@@ -320,6 +360,11 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1, add_IPR = FALSE, lin
                                    strip.text.y = element_blank())
     }
 
+    if (!is.null(plot_file))
+    {
+        cowplot::ggsave(plot_file, my_plot,
+                        width = width, height = height)
+    }
     return(my_plot)
 }
 

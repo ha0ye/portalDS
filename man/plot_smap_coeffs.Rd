@@ -21,7 +21,7 @@ default), then the plot is not saved to a file}
 \item{height}{height of the saved plot}
 }
 \value{
-the plot object,
+the plot object
 }
 \description{
 Visualize the smap-coefficients from running the S-map model on
