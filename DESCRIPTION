@@ -36,5 +36,7 @@ Remotes:
     weecology/LDATS
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat,
+    pkgdown
 VignetteBuilder: knitr
