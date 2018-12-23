@@ -29,7 +29,8 @@ Imports:
     scales,
     igraph,
     rlang,
-    magrittr
+    magrittr,
+    forecast
 RoxygenNote: 6.1.0
 Remotes: 
     weecology/portalr,

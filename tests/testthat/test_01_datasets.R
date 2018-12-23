@@ -18,7 +18,7 @@ test_that("Portal Block is correct", {
                  "098292880fbb46a6365a20e9ed257936")
 })
 
-test_that("Maizuru Block is correct", {
+test_that("Portal Block 50 is correct", {
     expect_error(portal_block_50 <- readRDS(here::here("data/portal_block_50.RDS")), NA)
     expect_true(exists("portal_block_50"))
     expect_equal(dim(portal_block_50), c(440, 8))

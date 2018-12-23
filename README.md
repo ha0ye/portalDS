@@ -3,6 +3,9 @@
 
 # portalDS
 
+[![Build
+Status](https://travis-ci.org/ha0ye/portalDS.svg?branch=master)](https://travis-ci.org/ha0ye/portalDS)
+
 The goal of portalDS is to apply “dynamic stability” (Ushio et al. 2018)
 to the long-term rodent time series at Portal, to test whether this
 indicator of whole-ecosystem change predicts or lines up with abrupt
