@@ -28,7 +28,8 @@ Imports:
     forcats,
     scales,
     igraph,
-    rlang
+    rlang,
+    magrittr
 RoxygenNote: 6.1.0
 Remotes: 
     weecology/portalr,

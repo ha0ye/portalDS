@@ -39,7 +39,7 @@ rolling forecasts for the second half of the time series.}
 none
 }
 \description{
-Compute dynamic stability for community time series. The
+Full dynamic stability analysis for community time series. The
   analysis has multiple components:
   (1) run simplex projection on each time series to identify the optimal
       embedding dimension

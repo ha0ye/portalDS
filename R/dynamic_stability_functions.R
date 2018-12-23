@@ -1,5 +1,3 @@
-#' @importFrom magrittr "%>%"
-
 #' @title compute_dynamic_stability
 #' @description Full dynamic stability analysis for community time series. The
 #'   analysis has multiple components:

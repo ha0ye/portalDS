@@ -1,6 +1,3 @@
-#' @importFrom magrittr "%>%"
-
-
 #' @title make_portal_block
 #' @description Create a data.frame from the Portal rodent data with specified
 #'   arguments, each row corresponds to a newmmoonnumber, and missing data are

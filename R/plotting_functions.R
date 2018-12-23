@@ -1,7 +1,3 @@
-#' @importFrom magrittr "%>%"
-#' @import ggraph
-#' @import ggplot2
-
 #' @title plot_network
 #' @description Visualize the network of interactions, created from running CCM
 #'   on community time series as part of the dynamic stability analysis
