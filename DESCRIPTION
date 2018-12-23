@@ -1,0 +1,39 @@
+Package: portalDS
+Title: Compute Dynamic Stability for Rodents at Portal
+Version: 0.0.1
+Authors@R: 
+    person(given = "Hao",
+           family = "Ye",
+           role = c("aut", "cre"),
+           email = "hao.ye@weecology.org")
+Description: What the package does (one paragraph).
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    rEDM,
+    parallel,
+    lubridate,
+    dplyr,
+    ggplot2,
+    purrr,
+    here,
+    tidyr,
+    portalr (>= 0.1.2),
+    LDATS (>= 0.0.5),
+    ggraph,
+    cowplot,
+    viridis,
+    reshape2,
+    forcats,
+    scales,
+    igraph,
+    rlang
+RoxygenNote: 6.1.0
+Remotes: 
+    weecology/portalr,
+    weecology/LDATS
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
