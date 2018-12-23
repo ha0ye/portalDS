@@ -1,5 +1,11 @@
 library(portalDS)
 
+results_file <- here::here("output/portal_ds_results_50.RDS")
+results <- readRDS(results_file)
+portal_smap_coeffs <- plot_smap_coeffs(results$smap_matrices)
+portal_eigenvalues <- plot_eigenvalues(results$eigenvalues)
+portal_eigenvectors <- plot_eigenvectors(results$eigenvectors)
+
 
 #### run with species that are present at least 1/2 of the time ----
 # species = {DM, DO, DS, NA, OL, OT, PP}
@@ -14,6 +20,11 @@ results <- readRDS(results_file)
 portal_network_50 <- plot_network(results$ccm_links)
 ggsave(here::here("figures/portal_network_50.pdf"),
        portal_network_50$plot, width = 8, height = 6)
+
+portal_smap_coeffs <- plot_smap_coeffs(results$smap_matrices)
+portal_eigenvalues <- plot_eigenvalues(results$eigenvalues)
+portal_eigenvectors <- plot_eigenvectors(results$eigenvectors)
+
 
 
 #### default run using all species in the dataset ----

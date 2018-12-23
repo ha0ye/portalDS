@@ -2,13 +2,13 @@
 % Please edit documentation in R/dynamic_stability_functions.R
 \name{compute_smap_matrices}
 \alias{compute_smap_matrices}
-\title{Compute eigenvalues from the S-map coefficients}
+\title{Generate the matrices of S-map coefficients}
 \usage{
 compute_smap_matrices(smap_coeffs, ccm_links)
 }
 \arguments{
-\item{smap_coeffs}{A list of the S-map coefficients matrices (as returned
-from \code{\link{compute_smap_coeffs}}}
+\item{smap_coeffs}{A list of the S-map coefficients for each predictor
+variable (as returned from \code{\link{compute_smap_coeffs}}}
 
 \item{ccm_links}{A data.frame containing the significant causal links. Each
 row is a causal link. The columns are:
@@ -23,7 +23,7 @@ A list with the matrix of smap-coefficients at each time point
 }
 \description{
 Using the S-map coefficients, assemble the appropriate
-  Jacobian matrices for each time point, and then compute the eigenvalues.
+  Jacobian matrices for each time point
 }
 \details{
 See \code{\link{compute_smap_coeffs}} for details on the input data.
@@ -38,6 +38,5 @@ See \code{\link{compute_smap_coeffs}} for details on the input data.
   where K is the maximum lag, and C^{tau} is the matrix formed by the values
   c^{tau}_{ij}. (Note that many of these values will be 0.)
 
-  This function computes J at each time step and then the corresponding
-  eigenvalues if all the values are present (e.g. not NA).
+  This function computes J at each time step.
 }

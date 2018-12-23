@@ -1,9 +1,7 @@
 #' @importFrom magrittr "%>%"
 
-#### function for full dynamic stability analysis ----
-
 #' @title compute_dynamic_stability
-#' @description Compute dynamic stability for community time series. The
+#' @description Full dynamic stability analysis for community time series. The
 #'   analysis has multiple components:
 #'   (1) run simplex projection on each time series to identify the optimal
 #'       embedding dimension
@@ -100,93 +98,6 @@ compute_dynamic_stability <- function(block,
     saveRDS(results, file = results_file)
 }
 
-#### process data into block form and interpolated across dates ----
-#' @title make_portal_block
-#' @description Create a data.frame from the Portal rodent data with specified
-#'   arguments, each row corresponds to a newmmoonnumber, and missing data are
-#'   interpolated.
-#' @param filter_q the numerical quantile by which to filter species. Only
-#'   species that are present at least `filter_q` fraction of the time are
-#'   included; default (NULL) keeps all species.
-#' @inheritParams portalr::get_rodent_data
-#'
-#' @return a data.frame with columns for `censusdate`, and each species
-#'
-#' @export
-
-make_portal_block <- function(filter_q = NULL, output = "abundance",
-                              plots = c(2, 4, 8, 11, 12, 14, 17, 22), ...)
-{
-    # options here are:
-    #   time = "all" (allow us to do correct interpolation and accouting for seasonality)
-    #   level = "plot" (allow us to pull out abundances on the plots we want)
-    #   effort = TRUE (so we can check effort)
-    #   na_drop = TRUE (ignore periods where sampling did not occur)
-    raw_rodent_data <- portalr::get_rodent_data(time = "all",
-                                                plots = plots,
-                                                effort = TRUE,
-                                                na_drop = TRUE,
-                                                output = output,
-                                                ...)
-
-    # summarize by each newmmonnumber, and for only the control plots we want
-    block <- raw_rodent_data %>%
-        dplyr::filter(censusdate < "2015-04-18") %>%
-        dplyr::select(-period)
-
-    # check that effort is equal across samples
-    stopifnot(length(unique(block$ntraps)) == 1)
-
-    if (!is.null(filter_q))
-    {
-        species_list <- block %>%
-            tidyr::gather(species, abundance, BA:SO) %>%
-            dplyr::group_by(species) %>%
-            dplyr::summarize(quantile_q = quantile(abundance, 1 - filter_q)) %>%
-            dplyr::filter(quantile_q > 0) %>%
-            dplyr::pull(species)
-
-        block <- block %>%
-            dplyr::select(c("newmoonnumber", "censusdate", "ntraps", species_list))
-    }
-
-    # add in NAs for unsampled newmoonnumbers and interpolate
-    block <- block %>%
-        tidyr::complete(newmoonnumber = tidyr::full_seq(newmoonnumber, 1), fill = list(NA)) %>%
-        dplyr::mutate_at(vars(-newmoonnumber, -ntraps), forecast::na.interp) %>%
-        dplyr::mutate_at(vars(-newmoonnumber, -ntraps), as.numeric) %>%
-        dplyr::mutate(censusdate = as.Date(as.numeric(censusdate), origin = "1970-01-01")) %>%
-        dplyr::select(-newmoonnumber, -ntraps)
-
-    return(block)
-}
-
-#### function to fit periodic spline through data, using yearday as input x ----
-
-make_surrogate_annual_spline <- function(day_of_year, ts, num_surr = 100)
-{
-    # filter out NA first
-    n <- length(day_of_year)
-    idx <- which(is.finite(day_of_year) & is.finite(y))
-    day_of_year <- day_of_year[idx]
-    ts <- ts[idx]
-
-    xx <- c(day_of_year - 365, day_of_year, day_of_year + 365)
-    yy <- c(ts, ts, ts)
-    seasonal_F <- smooth.spline(xx, yy)
-    seasonal_cyc <- predict(seasonal_F, day_of_year)$y
-    seasonal_resid <- ts - seasonal_cyc
-
-    vals <- matrix(unlist(
-        lapply(seq(num_surr), function(i) {
-            seasonal_cyc + sample(seasonal_resid, n)
-        })
-    ), ncol = num_surr)
-
-    out <- matrix(NA, nrow = n, ncol = num_surr)
-    out[idx, ] <- vals
-}
-
 #' @title compute_simplex
 #' @description Run simplex projection models for each time series in the
 #'   `block` and save the output, to determine the best embedding dimension for
@@ -234,11 +145,6 @@ compute_simplex <- function(block, E_list, surrogate_method, num_surr, ...)
     )
     return(simplex_results)
 }
-
-
-
-
-
 
 #' @title compute_ccm
 #' @description Run pairwise CCM based on the simplex_output - using the best
@@ -516,9 +422,9 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
     return(smap_coeffs)
 }
 
-#' @title Compute eigenvalues from the S-map coefficients
+#' @title Generate the matrices of S-map coefficients
 #' @description Using the S-map coefficients, assemble the appropriate
-#'   Jacobian matrices for each time point, and then compute the eigenvalues.
+#'   Jacobian matrices for each time point
 #' @details See \code{\link{compute_smap_coeffs}} for details on the input data.
 #'   Let the variables in the system be x^{i} with i = 1..N.
 #'   For the S-map model predicting x^{i}_{t+1}, let the coefficient
@@ -531,10 +437,9 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
 #'   where K is the maximum lag, and C^{tau} is the matrix formed by the values
 #'   c^{tau}_{ij}. (Note that many of these values will be 0.)
 #'
-#'   This function computes J at each time step and then the corresponding
-#'   eigenvalues if all the values are present (e.g. not NA).
-#' @param smap_coeffs A list of the S-map coefficients matrices (as returned
-#'   from \code{\link{compute_smap_coeffs}}
+#'   This function computes J at each time step.
+#' @param smap_coeffs A list of the S-map coefficients for each predictor
+#'   variable (as returned from \code{\link{compute_smap_coeffs}}
 #' @param ccm_links A data.frame containing the significant causal links. Each
 #'   row is a causal link. The columns are:
 #'   \describe{
@@ -629,6 +534,19 @@ compute_smap_matrices <- function(smap_coeffs, ccm_links)
     return(smap_matrices)
 }
 
+#' @title compute_eigen_decomp
+#' @description Compute the eigen-decomposition of the smap matrices
+
+#' @param smap_matrices A list with the matrix of smap-coefficients at each
+#'   time point \code{\link{compute_smap_matrices}}
+#' @return A list with two elements:
+#'   \describe{
+#'     \item{`values`}{a list of the eigenvalues (a vector) for each time point}
+#'     \item{`vectors`}{a list of the eigenvectors (a matrix, each column is an
+#'       eigenvector) for each time point}
+#'   }
+#'
+#' @export
 compute_eigen_decomp <- function(smap_matrices)
 {
     eigen_decomp <- purrr::map(smap_matrices, function(J) {
@@ -638,6 +556,6 @@ compute_eigen_decomp <- function(smap_matrices)
         rownames(out$vectors) <- rownames(J)
         return(out)
     })
-    return(transpose(eigen_decomp, .names = c("values", "vectors")))
+    return(purrr::transpose(eigen_decomp, .names = c("values", "vectors")))
 }
 
