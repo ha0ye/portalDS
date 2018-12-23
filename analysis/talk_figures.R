@@ -3,10 +3,9 @@ library(dplyr)
 
 #### plotting code ----
 
-make_time_series_plots <- function()
+make_time_series_plots <- function(block = readRDS(here::here("data/portal_block_50.RDS")),
+                                   sp_list)
 {
-    block <- readRDS(here::here("data/portal_block_50.RDS"))
-
     ## plot time series ----
     sp_list <- c("DM", "DS", "PP")
     palette <- viridis(NCOL(block) - 1, option = "plasma")[
@@ -153,3 +152,39 @@ make_eigenvector_plots <- function()
 }
 
 make_eigenvector_plots()
+
+make_combined_network <- function(plot_file = NULL)
+{
+    portal_network <- here::here("output/portal_ds_results.RDS") %>%
+        readRDS() %>%
+        .$ccm_links %>%
+        plot_network()
+
+    portal_network_50 <- here::here("output/portal_ds_results_50.RDS") %>%
+        readRDS() %>%
+        .$ccm_links %>%
+        plot_network(palette = portal_network$palette,
+                     existing_graph = portal_network$graph)
+
+    portal_network_33 <- here::here("output/portal_ds_results_33.RDS") %>%
+        readRDS() %>%
+        .$ccm_links %>%
+        plot_network(palette = portal_network$palette,
+                     existing_graph = portal_network$graph)
+
+    combined_network_plot <- plot_grid(portal_network$plot,
+                                       portal_network_50$plot,
+                                       portal_network_33$plot,
+                                       labels = c("all species",
+                                                  "species present >= 50%",
+                                                  "species present >= 33%"),
+                                       align = "v", axis = "l",
+                                       ncol = 1)
+
+    if (!is.null(plot_file))
+    {
+        ggsave(plot_file, combined_network_plot, width = 6, height = 12)
+    }
+    return(combined_network_plot)
+}
+
