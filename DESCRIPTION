@@ -13,14 +13,11 @@ LazyData: true
 Imports: 
     rEDM,
     parallel,
-    lubridate,
     dplyr,
     ggplot2,
     purrr,
-    here,
     tidyr,
     portalr (>= 0.1.2),
-    LDATS (>= 0.0.5),
     ggraph,
     cowplot,
     viridis,
@@ -39,5 +36,7 @@ Suggests:
     knitr,
     rmarkdown,
     testthat,
-    pkgdown
+    pkgdown, 
+    here, 
+    LDATS (>= 0.0.5),
 VignetteBuilder: knitr
