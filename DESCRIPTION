@@ -28,7 +28,8 @@ Imports:
     rlang,
     magrittr,
     forecast,
-    stringr
+    stringr, 
+    lubridate
 RoxygenNote: 6.1.0
 Remotes: 
     weecology/portalr,

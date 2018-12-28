@@ -302,24 +302,6 @@ identify_ccm_links <- function(ccm_results,
 compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
                                 rolling_forecast = FALSE)
 {
-    get_smap_coefficients <- function(temp_block, lib = c(1, NROW(block)),
-                                      pred = c(1, NROW(block)),
-                                      theta_list = c(seq(0, 1, by = 0.1), seq(1.5, 10, by = 0.5)))
-    {
-        # determine best theta
-        theta_test <- rEDM::block_lnlp(temp_block, lib = lib, pred = pred,
-                                       method = "s-map", tp = 1,
-                                       theta  = theta_list, silent = TRUE)
-        best_theta <- theta_test$theta[which.min(theta_test$mae)]
-
-        # re-run to get s-map coefficients
-        smap_out <- rEDM::block_lnlp(temp_block, lib = lib, pred = pred,
-                                     method = "s-map", tp = 1,
-                                     theta  = best_theta, silent = TRUE,
-                                     save_smap_coefficients = TRUE)
-        return(smap_out$smap_coefficients[[1]])
-    }
-
     # rescale all the variables
     block <- block %>%
         dplyr::select(-censusdate)
@@ -421,6 +403,24 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
     return(smap_coeffs)
 }
 
+get_smap_coefficients <- function(temp_block, lib = c(1, NROW(block)),
+                                  pred = c(1, NROW(block)),
+                                  theta_list = c(seq(0, 1, by = 0.1), seq(1.5, 10, by = 0.5)))
+{
+    # determine best theta
+    theta_test <- rEDM::block_lnlp(temp_block, lib = lib, pred = pred,
+                                   method = "s-map", tp = 1,
+                                   theta  = theta_list, silent = TRUE)
+    best_theta <- theta_test$theta[which.min(theta_test$mae)]
+    
+    # re-run to get s-map coefficients
+    smap_out <- rEDM::block_lnlp(temp_block, lib = lib, pred = pred,
+                                 method = "s-map", tp = 1,
+                                 theta  = best_theta, silent = TRUE,
+                                 save_smap_coefficients = TRUE)
+    return(smap_out$smap_coefficients[[1]])
+}
+
 #' @title Generate the matrices of S-map coefficients
 #' @description Using the S-map coefficients, assemble the appropriate
 #'   Jacobian matrices for each time point
@@ -467,7 +467,7 @@ compute_smap_matrices <- function(smap_coeffs, ccm_links)
     jacobian_dim <- max_E * length(vars)
 
     # check number of time points
-    ts_length <- unique(map_dbl(smap_coeffs, NROW))
+    ts_length <- unique(purrr::map_dbl(smap_coeffs, NROW))
     stopifnot(length(ts_length) == 1)
 
     # for each predicted variable,
@@ -476,7 +476,7 @@ compute_smap_matrices <- function(smap_coeffs, ccm_links)
     smap_matrix_rows <- purrr::map(vars, function(var_name) {
         # get s-map coefficients without const column
         smap_df <- smap_coeffs[[var_name]] %>%
-            select(-const)
+            dplyr::select(-const)
 
         # output matrix (each row is 1 time step, each col is a var x lag)
         out <- matrix(0, nrow = ts_length, ncol = jacobian_dim)

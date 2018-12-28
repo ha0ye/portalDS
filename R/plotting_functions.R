@@ -99,8 +99,7 @@ plot_smap_coeffs <- function(smap_matrices,
     # identify coefficients that matter
     to_keep <- smap_coeff_df %>%
         dplyr::group_by(target, predictor) %>%
-        dplyr::summarize(v = max(abs(value))) %>%
-        dplyr::filter(v > 0) %>%
+        dplyr::filter(max(abs(value)) > 0) %>%
         dplyr::mutate(coeff_name = paste0(target, predictor))
     smap_coeff_df <- smap_coeff_df %>%
         dplyr::mutate(coeff_name = paste0(target, predictor)) %>%
