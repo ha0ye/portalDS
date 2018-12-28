@@ -27,9 +27,10 @@ Imports:
     igraph,
     rlang,
     magrittr,
-    forecast
+    forecast,
+    stringr
 RoxygenNote: 6.1.0
-Remotes:  
+Remotes: 
     weecology/portalr,
     weecology/LDATS,
     ha0ye/rEDM

@@ -128,17 +128,17 @@ compute_simplex <- function(block, E_list, surrogate_method, num_surr, ...)
     simplex_results$surrogate_data <- switch(
         surrogate_method,
         annual_spline =
-            purrr::pmap(select(simplex_results, data),
-                        ~make_surrogate_annual_spline(yday(results$block$censusdate),
+            purrr::pmap(dplyr::select(simplex_results, data),
+                        ~make_surrogate_annual_spline(lubridate::yday(results$block$censusdate),
                                                       ..1,
                                                       num_surr = num_surr)
             )
         ,
         twin =
-            purrr::pmap(select(simplex_results, data, best_E),
-                        ~make_surrogate_twin(ts = ..1, dim = ..2,
-                                             num_surr = num_surr,
-                                             ...)
+            purrr::pmap(dplyr::select(simplex_results, data, best_E),
+                        ~rEDM::make_surrogate_twin(ts = ..1, dim = ..2,
+                                                   num_surr = num_surr,
+                                                   ...)
             )
     )
     return(simplex_results)
@@ -208,7 +208,7 @@ compute_ccm <- function(simplex_results,
         return(ccm_out)
     }, mc.cores = num_cores)
 
-    bind_rows(out) %>%
+    dplyr::bind_rows(out) %>%
         dplyr::select(lib_column, target_column, data_type, dplyr::everything()) %>%
         dplyr::mutate_at(c("lib_column", "target_column", "data_type", "lib_size"), as.factor)
 }
@@ -251,7 +251,7 @@ identify_ccm_links <- function(ccm_results,
                       by = "lib_size") %>%
                 dplyr::mutate(rho_minus_upper_q = rho - upper_q)
         }),
-        rho_minus_upper_q_null = map_dbl(surr_CI, function(df) {
+        rho_minus_upper_q_null = purrr::map_dbl(surr_CI, function(df) {
             dplyr::last(df$rho_minus_upper_q, order_by = df$lib_size)
         })) %>%
         dplyr::arrange(lib_column) %>%
@@ -482,7 +482,7 @@ compute_smap_matrices <- function(smap_coeffs, ccm_links)
         out <- matrix(0, nrow = ts_length, ncol = jacobian_dim)
 
         # find the correct column locations for the s-map coefficients
-        regex_splits <- str_match(colnames(smap_df), "(.+)_(\\d+)|(.+)")
+        regex_splits <- stringr::str_match(colnames(smap_df), "(.+)_(\\d+)|(.+)")
         regex_splits[is.na(regex_splits[,2]), 2] <- ""  # convert NA into ""
         regex_splits[is.na(regex_splits[,3]), 3] <- "0" # convert NA into 0
         regex_splits[is.na(regex_splits[,4]), 4] <- ""  # convert NA into ""

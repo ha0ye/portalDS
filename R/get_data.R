@@ -43,7 +43,7 @@ make_portal_block <- function(filter_q = NULL, output = "abundance",
             dplyr::pull(species)
 
         block <- block %>%
-            dplyr::select(c("newmoonnumber", "censusdate", "ntraps", species_list))
+            dplyr::select(c("newmoonnumber", "censusdate", "ntraps", "nplots", species_list))
     }
 
     # add in NAs for unsampled newmoonnumbers and interpolate

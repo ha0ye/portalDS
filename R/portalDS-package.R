@@ -8,4 +8,8 @@
 NULL
 
 if (getRversion() >= "2.15.1") utils::globalVariables(
-    c(".", "abundance", "BA", "best_E", "censusdate", "coeff_name", "const"))
+    c(".", "abundance", "BA", "best_E", "censusdate", "coeff_name", "const", 
+      "data_type", "delta_rho", "E", "lambda", 
+      "lib_column", "lib_size", "mae", "name", "newmoonnumber", "nplots", 
+      "ntraps", "num_pred", "period", "predictor", "quantile_q", "rho", 
+      "rho_minus_upper_q_null", "rmse"))
