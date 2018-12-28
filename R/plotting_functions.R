@@ -197,7 +197,7 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
     if (highlight_complex)
     {
         complex_df <- data.frame(censusdate = eigenvalue_dist %>%
-                                     dplyr::spread(rank, lambda) %>%
+                                     tidyr::spread(rank, lambda) %>%
                                      dplyr::filter(`1` < `2` + 0.001) %>%
                                      dplyr::select(censusdate),
                                  lambda = min(eigenvalue_dist$lambda, na.rm = TRUE),

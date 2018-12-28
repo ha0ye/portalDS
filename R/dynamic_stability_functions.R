@@ -149,6 +149,7 @@ compute_simplex <- function(block, E_list, surrogate_method, num_surr, ...)
 #'   embedding dimension there, along with the surrogate time series
 
 #' @param simplex_results the output of \code{\link{compute_simplex}}
+#' @param num_cores the number of cores to use for computation
 #' @inheritParams rEDM::ccm
 #' @return A tibble with columns for the variables that we use in CCM, the data
 #'   type (whether it's the "actual" time series or "surrogate"), the library
@@ -243,7 +244,7 @@ identify_ccm_links <- function(ccm_results,
             dplyr::left_join(df %>%
                           dplyr::filter(data == "surrogate") %>%
                           dplyr::group_by(lib_size) %>%
-                          dplyr::summarize(upper_q = dplyr::quantile(rho, null_quantile)),
+                          dplyr::summarize(upper_q = quantile(rho, null_quantile)),
                       df %>%
                           dplyr::filter(data == "actual") %>%
                           dplyr::select(lib_size, rho),

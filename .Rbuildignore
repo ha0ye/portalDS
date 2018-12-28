@@ -3,3 +3,4 @@
 ^LICENSE\.md$
 ^portalDS\.Rproj$
 ^\.Rproj\.user$
+^.travis.yml$
