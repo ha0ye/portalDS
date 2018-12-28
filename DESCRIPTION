@@ -10,9 +10,6 @@ Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Depends:
-    ggplot2, 
-    ggraph
 Imports: 
     rEDM,
     parallel,
@@ -20,6 +17,8 @@ Imports:
     purrr,
     tidyr,
     portalr (>= 0.1.2),
+    ggplot2, 
+    ggraph,
     cowplot,
     viridis,
     reshape2,

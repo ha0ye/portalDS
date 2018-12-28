@@ -208,7 +208,7 @@ compute_ccm <- function(simplex_results,
         return(ccm_out)
     }, mc.cores = num_cores)
 
-    do.call(bind_rows, out) %>%
+    bind_rows(out) %>%
         dplyr::select(lib_column, target_column, data_type, dplyr::everything()) %>%
         dplyr::mutate_at(c("lib_column", "target_column", "data_type", "lib_size"), as.factor)
 }
@@ -361,7 +361,7 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
     #     all causal variables with no lag
     #     populate remainder with lags of predicted variable
     smap_coeffs <- purrr::map(effect_variables, function(effect_var) {
-        links <- ccm_links %>% filter(lib_column == !!effect_var)
+        links <- ccm_links %>% dplyr::filter(lib_column == !!effect_var)
         stopifnot(length(unique(links$E)) == 1) # check for unique best_E
         stopifnot(effect_var %in% links$target_column) # check for self-interaction
 

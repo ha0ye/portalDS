@@ -1,4 +1,5 @@
 library(portalDS)
+library(dplyr)
 data(maizuru_block)
 
 #### run using Maizuru Bay fish community ----
