@@ -52,7 +52,7 @@ make_portal_block <- function(filter_q = NULL, output = "abundance",
         dplyr::mutate_at(dplyr::vars(-newmoonnumber, -ntraps), forecast::na.interp) %>%
         dplyr::mutate_at(dplyr::vars(-newmoonnumber, -ntraps), as.numeric) %>%
         dplyr::mutate(censusdate = as.Date(as.numeric(censusdate), origin = "1970-01-01")) %>%
-        dplyr::select(-newmoonnumber, -ntraps)
+        dplyr::select(-newmoonnumber, -ntraps, -nplots)
 
     return(block)
 }

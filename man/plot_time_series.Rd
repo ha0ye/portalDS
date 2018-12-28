@@ -5,8 +5,7 @@
 \title{plot_time_series}
 \usage{
 plot_time_series(block, time_column = censusdate, scale = "unif",
-  theme = "print", base_size = 11, base_family = "Helvetica",
-  base_line_size = 1)
+  base_size = 11, base_family = "Helvetica", base_line_size = 1)
 }
 \arguments{
 \item{block}{A data.frame containing time series for the community. Each
@@ -19,6 +18,12 @@ which could be a numeric or a date/time type}
 `unif` -- scale each time series to be on [0, 1]
 `norm` -- scale each time series to have mean 0 and variance 1
 (anything else) -- no scaling}
+
+\item{base_size}{base font size}
+
+\item{base_family}{base font family}
+
+\item{base_line_size}{base size for line elements}
 }
 \value{
 A ggplot object of the time series plot

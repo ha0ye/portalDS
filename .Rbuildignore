@@ -1,6 +1,6 @@
 ^README\.Rmd$
-^data$
 ^LICENSE\.md$
 ^portalDS\.Rproj$
 ^\.Rproj\.user$
+^data\*.RDS$
 ^.travis.yml$

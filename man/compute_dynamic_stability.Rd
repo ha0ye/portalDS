@@ -7,7 +7,7 @@
 compute_dynamic_stability(block,
   results_file = "output/portal_ds_results.RDS", max_E = 16,
   E_list = seq(max_E), surrogate_method = "annual_spline",
-  num_surr = 200, lib_vec = c(6, 12, 24, 40, 80, 140, 220, 320,
+  num_surr = 200, lib_sizes = c(6, 12, 24, 40, 80, 140, 220, 320,
   NROW(results$block)), num_cores = 2, rescale = TRUE,
   rolling_forecast = FALSE, ...)
 }
@@ -27,6 +27,8 @@ search over.}
 \item{surrogate_method}{which surrogate method to use}
 
 \item{num_surr}{number of surrogates to compute}
+
+\item{lib_sizes}{the vector of library sizes to try}
 
 \item{num_cores}{the number of cores to use for computation}
 

@@ -14,8 +14,9 @@ test_that("Portal Block is correct", {
     expect_true(exists("portal_block"))
     expect_equal(dim(portal_block), c(440, 22))
     expect_true("censusdate" %in% names(portal_block))
+    attributes(portal_block) <- attributes(portal_block)[sort(names(attributes(portal_block)))]
     expect_equal(digest::digest(portal_block), 
-                 "098292880fbb46a6365a20e9ed257936")
+                 "2efd6a078ea67c7373a0d4ab7e6331b1")
 })
 
 test_that("Portal Block 50 is correct", {
@@ -23,6 +24,7 @@ test_that("Portal Block 50 is correct", {
     expect_true(exists("portal_block_50"))
     expect_equal(dim(portal_block_50), c(440, 8))
     expect_true("censusdate" %in% names(portal_block_50))
+    attributes(portal_block_50) <- attributes(portal_block_50)[sort(names(attributes(portal_block_50)))]
     expect_equal(digest::digest(portal_block_50), 
-                 "3d1dc7cc82df66e14cd8956b00022f1e")
+                 "07a411a2f03dd1eacfbad7366550596b")
 })
