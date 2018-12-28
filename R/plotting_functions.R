@@ -338,6 +338,7 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
 #'   `unif` -- scale each time series to be on [0, 1]
 #'   `norm` -- scale each time series to have mean 0 and variance 1
 #'   (anything else) -- no scaling
+#' @inheritParams ggplot2::theme_bw
 #'
 #' @return A ggplot object of the time series plot
 #'
@@ -345,7 +346,6 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
 plot_time_series <- function(block,
                              time_column = censusdate,
                              scale = "unif",
-                             theme = "print",
                              base_size = 11,
                              base_family = "Helvetica",
                              base_line_size = 1)
