@@ -23,7 +23,7 @@ contribute to the eigenvector}
 
 \item{line_size}{the line width for the plot}
 
-\item{palette_option}{the color palette to use (see \code{\link{viridis::viridis}}
+\item{palette_option}{the color palette to use (see \code{\link[viridis]{viridis}}
 for more info)}
 
 \item{plot_file}{the filepath to where to save the plot; if `NULL` (the

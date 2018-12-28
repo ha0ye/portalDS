@@ -5,8 +5,8 @@
 #'   it should have a `lib_column` and `target_column` to specify the causal
 #'   links (where directed edges are from `target_column` to `lib_column`)
 #' @param palette a data.frame with the colors for each vertex; if NULL, one
-#'   will be created using \code{\link{viridis::viridis}}
-#' @param palette_option the color palette to use (see \code{\link{viridis::viridis}}
+#'   will be created using \code{\link[viridis]{viridis}}
+#' @param palette_option the color palette to use (see \code{\link[viridis]{viridis}}
 #'   for more info)
 #' @param existing_graph a data.frame specifying the layout of nodes (e.g. from a
 #'   previous call to plot_network); if NULL, one will be created

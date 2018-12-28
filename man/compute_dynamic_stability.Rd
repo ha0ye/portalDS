@@ -28,6 +28,8 @@ search over.}
 
 \item{num_surr}{number of surrogates to compute}
 
+\item{num_cores}{the number of cores to use for computation}
+
 \item{rescale}{A logical, indicating whether to rescale each time series}
 
 \item{rolling_forecast}{A logical, indicating whether to make individual

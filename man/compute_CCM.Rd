@@ -24,6 +24,8 @@ parameter is ignored if random_libs is FALSE)}
 reproducible runs of ccm with randomly generated libraries}
 
 \item{silent}{prevents warning messages from being printed to the R console}
+
+\item{num_cores}{the number of cores to use for computation}
 }
 \value{
 A tibble with columns for the variables that we use in CCM, the data

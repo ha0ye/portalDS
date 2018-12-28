@@ -60,7 +60,7 @@ make_portal_block <- function(filter_q = NULL, output = "abundance",
 #' @title make_surrogate_annual_spline
 #' @description Generate surrogate time series by computing a mean seasonal
 #'   trend for each year, and shuffling the residuals. This differs from
-#'   \code{\link{rEDM::make_surrogate_seasonal}} in that the data are not
+#'   \code{\link[rEDM]{make_surrogate_seasonal}} in that the data are not
 #'   sampled uniformly at the same time each year. Thus, we also ask for the
 #'   `day_of_year` as input, in order to compute the mean seasonal trend.
 #' @param day_of_year a vector of the numerical day of year, e.g. January 1 = 1,
