@@ -4,15 +4,15 @@ author: "Hao Ye"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-%\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Compute Dynamic Stability for the Maizuru Bay Fish Community}
   %\VignetteEngine{knitr::rmarkdown_notangle}
   %\VignetteEncoding{UTF-8}
-  ---
+---
   
-  ```{r setup, include = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-collapse = TRUE,
-comment = "#>"
+  collapse = TRUE,
+  comment = "#>"
 )
 ```
 
@@ -28,8 +28,8 @@ This document demonstrates the dynamic stability analysis for the Maizuru Bay fi
 
 ```{r}
 library(portalDS)
-library(ggplot2)
 library(dplyr)
+library(ggplot2)
 data(maizuru_block)
 
 plot_time_series(maizuru_block) +

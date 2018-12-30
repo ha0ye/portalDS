@@ -266,6 +266,37 @@ identify_ccm_links <- function(ccm_results,
                    lib_column == target_column)
 }
 
+#' @title Compute S-map coefficients for a given target variable
+#' @description This function is meant to be called from within 
+#'   \code{\link{compute_smap_coeffs}}, which also pre-generates the block so 
+#'   that the first variable is to be predicted, and the remaining columns are 
+#'   the causal variables and lags of the predicted variable. This function 
+#'   searches over the values of theta for the best fit (by lowest MAE), and then 
+#'   returns the data.frame with the s-map coefficients
+#' @param block the input data with time delays already generated
+#' @inheritParams rEDM::block_lnlp
+#'
+#' @return the data.frame with the s-map coefficients
+#' @noRd
+get_smap_coefficients <- function(block, 
+                                  lib = c(1, NROW(block)),
+                                  pred = c(1, NROW(block)),
+                                  theta = c(seq(0, 1, by = 0.1), seq(1.5, 10, by = 0.5)))
+{
+    # determine best theta
+    theta_test <- rEDM::block_lnlp(block, lib = lib, pred = pred,
+                                   method = "s-map", tp = 1,
+                                   theta  = theta, silent = TRUE)
+    best_theta <- theta_test$theta[which.min(theta_test$mae)]
+    
+    # re-run to get s-map coefficients
+    smap_out <- rEDM::block_lnlp(block, lib = lib, pred = pred,
+                                 method = "s-map", tp = 1,
+                                 theta  = best_theta, silent = TRUE,
+                                 save_smap_coefficients = TRUE)
+    return(smap_out$smap_coefficients[[1]])
+}
+
 #' @title Compute S-map coefficients for a community
 #' @description Compute S-map models for each time series in the `block` and
 #'   save out the coefficients. The coefficients represent the local linear
@@ -401,24 +432,6 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
     })
     names(smap_coeffs) <- effect_variables
     return(smap_coeffs)
-}
-
-get_smap_coefficients <- function(temp_block, lib = c(1, NROW(block)),
-                                  pred = c(1, NROW(block)),
-                                  theta_list = c(seq(0, 1, by = 0.1), seq(1.5, 10, by = 0.5)))
-{
-    # determine best theta
-    theta_test <- rEDM::block_lnlp(temp_block, lib = lib, pred = pred,
-                                   method = "s-map", tp = 1,
-                                   theta  = theta_list, silent = TRUE)
-    best_theta <- theta_test$theta[which.min(theta_test$mae)]
-    
-    # re-run to get s-map coefficients
-    smap_out <- rEDM::block_lnlp(temp_block, lib = lib, pred = pred,
-                                 method = "s-map", tp = 1,
-                                 theta  = best_theta, silent = TRUE,
-                                 save_smap_coefficients = TRUE)
-    return(smap_out$smap_coefficients[[1]])
 }
 
 #' @title Generate the matrices of S-map coefficients
