@@ -15,7 +15,7 @@ search over.}
 
 \item{surrogate_method}{which surrogate method to use: 
 options are "annual_spline" or methods available in 
-\code\link[rEDM]{make_surrogate_data}}
+\code{\link[rEDM]{make_surrogate_data}}}
 
 \item{num_surr}{number of surrogates to compute}
 

@@ -107,7 +107,7 @@ compute_dynamic_stability <- function(block,
 #'   search over.
 #' @param surrogate_method which surrogate method to use: 
 #'   options are "annual_spline" or methods available in 
-#'   \code\link[rEDM]{make_surrogate_data}
+#'   \code{\link[rEDM]{make_surrogate_data}}
 #' @param num_surr number of surrogates to compute
 #' @param surr_params a list of named optional arguments to be passed into the 
 #'   surrogate data function
