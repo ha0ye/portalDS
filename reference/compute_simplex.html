@@ -121,7 +121,7 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>compute_simplex</span>(<span class='no'>block</span>, <span class='no'>E_list</span>, <span class='no'>surrogate_method</span>, <span class='no'>num_surr</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>compute_simplex</span>(<span class='no'>block</span>, <span class='no'>E_list</span>, <span class='no'>surrogate_method</span>, <span class='no'>num_surr</span>, <span class='no'>surr_params</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -138,15 +138,18 @@ search over.</p></td>
     </tr>
     <tr>
       <th>surrogate_method</th>
-      <td><p>which surrogate method to use</p></td>
+      <td><p>which surrogate method to use: 
+options are "annual_spline" or methods available in 
+<a href='https://www.rdocumentation.org/packages/rEDM/topics/make_surrogate_data'>make_surrogate_data</a></p></td>
     </tr>
     <tr>
       <th>num_surr</th>
       <td><p>number of surrogates to compute</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>remaining arguments are passed into the surrogate data function</p></td>
+      <th>surr_params</th>
+      <td><p>a list of named optional arguments to be passed into the 
+surrogate data function</p></td>
     </tr>
     </table>
     

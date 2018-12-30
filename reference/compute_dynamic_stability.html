@@ -146,9 +146,9 @@
     <pre class="usage"><span class='fu'>compute_dynamic_stability</span>(<span class='no'>block</span>,
   <span class='kw'>results_file</span> <span class='kw'>=</span> <span class='st'>"output/portal_ds_results.RDS"</span>, <span class='kw'>max_E</span> <span class='kw'>=</span> <span class='fl'>16</span>,
   <span class='kw'>E_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='no'>max_E</span>), <span class='kw'>surrogate_method</span> <span class='kw'>=</span> <span class='st'>"annual_spline"</span>,
-  <span class='kw'>num_surr</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>lib_sizes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>6</span>, <span class='fl'>12</span>, <span class='fl'>24</span>, <span class='fl'>40</span>, <span class='fl'>80</span>, <span class='fl'>140</span>, <span class='fl'>220</span>, <span class='fl'>320</span>,
-  <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>results</span>$<span class='no'>block</span>)), <span class='kw'>num_cores</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>rescale</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>rolling_forecast</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
+  <span class='kw'>num_surr</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>surr_params</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>lib_sizes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>6</span>, <span class='fl'>12</span>, <span class='fl'>24</span>, <span class='fl'>40</span>,
+  <span class='fl'>80</span>, <span class='fl'>140</span>, <span class='fl'>220</span>, <span class='fl'>320</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>results</span>$<span class='no'>block</span>)), <span class='kw'>num_cores</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>rescale</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>rolling_forecast</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -175,11 +175,18 @@ search over.</p></td>
     </tr>
     <tr>
       <th>surrogate_method</th>
-      <td><p>which surrogate method to use</p></td>
+      <td><p>which surrogate method to use: 
+options are "annual_spline" or methods available in 
+<a href='https://www.rdocumentation.org/packages/rEDM/topics/make_surrogate_data'>make_surrogate_data</a></p></td>
     </tr>
     <tr>
       <th>num_surr</th>
       <td><p>number of surrogates to compute</p></td>
+    </tr>
+    <tr>
+      <th>surr_params</th>
+      <td><p>a list of named optional arguments to be passed into the 
+surrogate data function</p></td>
     </tr>
     <tr>
       <th>lib_sizes</th>
@@ -197,10 +204,6 @@ search over.</p></td>
       <th>rolling_forecast</th>
       <td><p>A logical, indicating whether to make individual
 rolling forecasts for the second half of the time series.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>remaining arguments are passed into the surrogate data function</p></td>
     </tr>
     </table>
     
