@@ -5,11 +5,11 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title> • portalDS</title>
+<title>Compute Dynamic Stability for the Maizuru Bay Fish Community • portalDS</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Compute Dynamic Stability for the Maizuru Bay Fish Community">
 <meta property="og:description" content="">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -53,7 +53,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/maizuru-dynamic-stability.html">UNKNOWN TITLE</a>
+      <a href="../articles/maizuru-dynamic-stability.html">Compute Dynamic Stability for the Maizuru Bay Fish Community</a>
     </li>
   </ul>
 </li>
@@ -70,8 +70,10 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1></h1>
+      <h1>Compute Dynamic Stability for the Maizuru Bay Fish Community</h1>
+                        <h4 class="author">Hao Ye</h4>
             
+            <h4 class="date">2018-12-30</h4>
       
       
       <div class="hidden name"><code>maizuru-dynamic-stability.Rmd</code></div>
@@ -80,59 +82,28 @@
 
     
     
-<table class="table"><tbody>
-<tr class="odd">
-<td>title: “Compute Dynamic Stability for the Maizuru Bay Fish Community”</td>
-</tr>
-<tr class="even">
-<td>author: “Hao Ye”</td>
-</tr>
-<tr class="odd">
-<td>date: “2018-12-30”</td>
-</tr>
-<tr class="even">
-<td>output: rmarkdown::html_vignette</td>
-</tr>
-<tr class="odd">
-<td>vignette: &gt;</td>
-</tr>
-<tr class="even">
-<td>%</td>
-</tr>
-<tr class="odd">
-<td>%</td>
-</tr>
-<tr class="even">
-<td>%</td>
-</tr>
-</tbody></table>
 <div id="intro-look-at-the-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#intro-look-at-the-data" class="anchor"></a>Intro Look at the Data</h2>
 <p>This document demonstrates the dynamic stability analysis for the Maizuru Bay fish community. First, we load in the data and take a look at the time series for the fish populations.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(portalDS)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="co">#&gt; Registered S3 methods overwritten by 'ggplot2':</span></a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co">#&gt;   method         from </span></a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co">#&gt;   [.quosures     rlang</span></a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co">#&gt;   c.quosures     rlang</span></a>
-<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="co">#&gt;   print.quosures rlang</span></a>
-<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ggplot2)</a>
-<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dplyr)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dplyr)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co">#&gt; Attaching package: 'dplyr'</span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co">#&gt; The following objects are masked from 'package:stats':</span></a>
+<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="co">#&gt;     filter, lag</span></a>
+<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co">#&gt; The following objects are masked from 'package:base':</span></a>
 <a class="sourceLine" id="cb1-9" data-line-number="9"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co">#&gt; Attaching package: 'dplyr'</span></a>
-<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="co">#&gt; The following objects are masked from 'package:stats':</span></a>
-<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="co">#&gt;     filter, lag</span></a>
-<a class="sourceLine" id="cb1-14" data-line-number="14"><span class="co">#&gt; The following objects are masked from 'package:base':</span></a>
-<a class="sourceLine" id="cb1-15" data-line-number="15"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb1-16" data-line-number="16"><span class="co">#&gt;     intersect, setdiff, setequal, union</span></a>
-<a class="sourceLine" id="cb1-17" data-line-number="17"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(maizuru_block)</a>
-<a class="sourceLine" id="cb1-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb1-19" data-line-number="19"><span class="kw"><a href="../reference/plot_time_series.html">plot_time_series</a></span>(maizuru_block) <span class="op">+</span></a>
-<a class="sourceLine" id="cb1-20" data-line-number="20"><span class="st">    </span><span class="co"># scale_x_date(limits = as.Date(c("2005-03-01", "2011-01-01")),</span></a>
-<a class="sourceLine" id="cb1-21" data-line-number="21"><span class="st">    </span><span class="co">#              date_breaks = "1 year", date_labels = "%Y", expand = c(0.01, 0)) +</span></a>
-<a class="sourceLine" id="cb1-22" data-line-number="22"><span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html">scale_color_viridis_d</a></span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb1-23" data-line-number="23"><span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span>(<span class="dt">color =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co">#&gt;     intersect, setdiff, setequal, union</span></a>
+<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ggplot2)</a>
+<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(maizuru_block)</a>
+<a class="sourceLine" id="cb1-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb1-14" data-line-number="14"><span class="kw"><a href="../reference/plot_time_series.html">plot_time_series</a></span>(maizuru_block) <span class="op">+</span></a>
+<a class="sourceLine" id="cb1-15" data-line-number="15"><span class="st">    </span><span class="co"># scale_x_date(limits = as.Date(c("2005-03-01", "2011-01-01")),</span></a>
+<a class="sourceLine" id="cb1-16" data-line-number="16"><span class="st">    </span><span class="co">#              date_breaks = "1 year", date_labels = "%Y", expand = c(0.01, 0)) +</span></a>
+<a class="sourceLine" id="cb1-17" data-line-number="17"><span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html">scale_color_viridis_d</a></span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb1-18" data-line-number="18"><span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span>(<span class="dt">color =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <p><img src="maizuru-dynamic-stability_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
 </div>
 <div id="dynamic-stability-calculations" class="section level2">
