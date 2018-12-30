@@ -7,9 +7,9 @@
 compute_dynamic_stability(block,
   results_file = "output/portal_ds_results.RDS", max_E = 16,
   E_list = seq(max_E), surrogate_method = "annual_spline",
-  num_surr = 200, lib_sizes = c(6, 12, 24, 40, 80, 140, 220, 320,
-  NROW(results$block)), num_cores = 2, rescale = TRUE,
-  rolling_forecast = FALSE, ...)
+  num_surr = 200, surr_params = list(), lib_sizes = c(6, 12, 24, 40,
+  80, 140, 220, 320, NROW(results$block)), num_cores = 2,
+  rescale = TRUE, rolling_forecast = FALSE)
 }
 \arguments{
 \item{block}{a data.frame containing time series for the community. Each
@@ -24,9 +24,14 @@ value for `max_E`}
 \item{E_list}{the embedding dimension or range of embedding dimensions to
 search over.}
 
-\item{surrogate_method}{which surrogate method to use}
+\item{surrogate_method}{which surrogate method to use: 
+options are "annual_spline" or methods available in 
+\code\link[rEDM]{make_surrogate_data}}
 
 \item{num_surr}{number of surrogates to compute}
+
+\item{surr_params}{a list of named optional arguments to be passed into the 
+surrogate data function}
 
 \item{lib_sizes}{the vector of library sizes to try}
 
@@ -36,8 +41,6 @@ search over.}
 
 \item{rolling_forecast}{A logical, indicating whether to make individual
 rolling forecasts for the second half of the time series.}
-
-\item{...}{remaining arguments are passed into the surrogate data function}
 }
 \value{
 none
