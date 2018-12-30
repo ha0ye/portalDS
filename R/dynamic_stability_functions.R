@@ -28,13 +28,12 @@
 #' @export
 compute_dynamic_stability <- function(block,
                                       results_file = "output/portal_ds_results.RDS",
-                                      max_E = 16, E_list = seq(max_E),
-                                      surrogate_method = "annual_spline", num_surr = 200,
+                                      max_E = 16, E_list = seq(max_E), 
+                                      surrogate_method = "annual_spline", num_surr = 200, surr_params = list(), 
                                       lib_sizes = c(6, 12, 24, 40, 80, 140, 220, 320, NROW(results$block)),
                                       num_cores = 2,
                                       rescale = TRUE,
-                                      rolling_forecast = FALSE,
-                                      ...)
+                                      rolling_forecast = FALSE)
 {
     if (!file.exists(results_file))
     {
@@ -55,7 +54,8 @@ compute_dynamic_stability <- function(block,
         results$simplex_results <- compute_simplex(block,
                                                    E_list,
                                                    surrogate_method,
-                                                   num_surr)
+                                                   num_surr, 
+                                                   surr_params)
     }
 
     # check for ccm results, compute if missing
@@ -76,7 +76,8 @@ compute_dynamic_stability <- function(block,
     # check for smap matrices, compute if missing
     if (is.null(results$smap_matrices))
     {
-        smap_coeffs <- compute_smap_coeffs(results$block, results$ccm_links, ...)
+        smap_coeffs <- compute_smap_coeffs(results$block, results$ccm_links, 
+                                           rescale, rolling_forecast)
         results$smap_matrices <- compute_smap_matrices(smap_coeffs,
                                                        results$ccm_links)
 
@@ -104,17 +105,21 @@ compute_dynamic_stability <- function(block,
 #'   column is a time series of abundances.
 #' @param E_list the embedding dimension or range of embedding dimensions to
 #'   search over.
-#' @param surrogate_method which surrogate method to use
+#' @param surrogate_method which surrogate method to use: 
+#'   options are "annual_spline" or methods available in 
+#'   \code\link[rEDM]{make_surrogate_data}
 #' @param num_surr number of surrogates to compute
-#' @param ... remaining arguments are passed into the surrogate data function
+#' @param surr_params a list of named optional arguments to be passed into the 
+#'   surrogate data function
 #' @return A tibble with columns for the species name (taken from the original
 #'   column names), the abundance time series for each species, the output from
 #'   `rEDM::simplex()`, the best embedding dimension, as determined by the E
 #'   that minimizes MAE, and surrogate time series
 #'
 #' @export
-compute_simplex <- function(block, E_list, surrogate_method, num_surr, ...)
+compute_simplex <- function(block, E_list, surrogate_method, num_surr, surr_params)
 {
+    browser()
     simplex_results <- block %>%
         dplyr::select(-censusdate) %>%
         tidyr::gather(species, abundance) %>%
@@ -124,23 +129,35 @@ compute_simplex <- function(block, E_list, surrogate_method, num_surr, ...)
                           purrr::map(data, ~ rEDM::simplex(.$abundance, E = E_list, silent = TRUE))) %>%
         dplyr::mutate(best_E = purrr::map_int(simplex_out, ~ dplyr::filter(., mae == min(mae)) %>%
                                                   dplyr::pull(E)))
-
-    simplex_results$surrogate_data <- switch(
-        surrogate_method,
-        annual_spline =
-            purrr::pmap(dplyr::select(simplex_results, data),
-                        ~make_surrogate_annual_spline(lubridate::yday(results$block$censusdate),
-                                                      ..1,
-                                                      num_surr = num_surr)
-            )
-        ,
-        twin =
+    
+    surrogate_method <- tolower(surrogate_method)
+    if (surrogate_method == "twin")
+    {
+        simplex_results$surrogate_data <- 
             purrr::pmap(dplyr::select(simplex_results, data, best_E),
-                        ~rEDM::make_surrogate_twin(ts = ..1, dim = ..2,
-                                                   num_surr = num_surr,
-                                                   ...)
+                        ~do.call(rEDM::make_surrogate_twin, 
+                                 c(list(ts = ..1, dim = ..2, num_surr = num_surr), 
+                                   surr_params)
+                        )
             )
-    )
+    } else if (surrogate_method == "annual_spline") {
+        simplex_results$surrogate_data <- 
+            purrr::pmap(dplyr::select(simplex_results, data),
+                        ~do.call(make_surrogate_annual_spline, 
+                                 list(ts = ..1, num_surr = num_surr, 
+                                      day_of_year = lubridate::yday(results$block$censusdate))
+                        )
+            )
+    } else {
+        simplex_results$surrogate_data <- 
+            purrr::pmap(dplyr::select(simplex_results, data),
+                        ~do.call(rEDM::make_surrogate_data, 
+                                 c(list(ts = ..1, num_surr = num_surr, 
+                                        method = surrogate_method), 
+                                   surr_params)
+                        )
+            )
+    }
     return(simplex_results)
 }
 

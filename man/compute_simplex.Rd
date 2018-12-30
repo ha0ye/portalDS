@@ -4,7 +4,7 @@
 \alias{compute_simplex}
 \title{compute_simplex}
 \usage{
-compute_simplex(block, E_list, surrogate_method, num_surr, ...)
+compute_simplex(block, E_list, surrogate_method, num_surr, surr_params)
 }
 \arguments{
 \item{block}{a data.frame containing time series for the community. Each
@@ -13,11 +13,14 @@ column is a time series of abundances.}
 \item{E_list}{the embedding dimension or range of embedding dimensions to
 search over.}
 
-\item{surrogate_method}{which surrogate method to use}
+\item{surrogate_method}{which surrogate method to use: 
+options are "annual_spline" or methods available in 
+\code\link[rEDM]{make_surrogate_data}}
 
 \item{num_surr}{number of surrogates to compute}
 
-\item{...}{remaining arguments are passed into the surrogate data function}
+\item{surr_params}{a list of named optional arguments to be passed into the 
+surrogate data function}
 }
 \value{
 A tibble with columns for the species name (taken from the original
