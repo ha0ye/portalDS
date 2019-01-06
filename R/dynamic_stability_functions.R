@@ -119,7 +119,6 @@ compute_dynamic_stability <- function(block,
 #' @export
 compute_simplex <- function(block, E_list, surrogate_method, num_surr, surr_params)
 {
-    browser()
     simplex_results <- block %>%
         dplyr::select(-censusdate) %>%
         tidyr::gather(species, abundance) %>%
