@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>plot_network — plot_network • portalDS</title>
+<title>identify_ccm_links — identify_ccm_links • portalDS</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,10 +30,15 @@
 
 
 
-<meta property="og:title" content="plot_network — plot_network" />
+<meta property="og:title" content="identify_ccm_links — identify_ccm_links" />
 
-<meta property="og:description" content="Visualize the network of interactions, created from running CCM
-  on community time series as part of the dynamic stability analysis" />
+<meta property="og:description" content="Using the output of compute_ccm, determine which 
+  links are significant. Significant links (`x`` &quot;causes&quot; `y``) are where:
+ccm rho for the actual time series `x` and `y`` is greater than the 
+      `null_quantile` level of the surrogate data (at the largest library size)
+the increase in rho for the actual time series `x`` and `y`` between the 
+      smallest and largest library sizes is greater than `delta_rho_threshold`
+" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -107,66 +112,48 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>plot_network</h1>
+    <h1>identify_ccm_links</h1>
     
-    <div class="hidden name"><code>plot_network.Rd</code></div>
+    <div class="hidden name"><code>identify_ccm_links.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Visualize the network of interactions, created from running CCM
-  on community time series as part of the dynamic stability analysis</p>
+    <p>Using the output of <code><a href='compute_ccm.html'>compute_ccm</a></code>, determine which 
+  links are significant. Significant links (`x`` "causes" `y``) are where:</p><ul>
+<li><p>ccm rho for the actual time series `x` and `y`` is greater than the 
+      `null_quantile` level of the surrogate data (at the largest library size)</p></li>
+<li><p>the increase in rho for the actual time series `x`` and `y`` between the 
+      smallest and largest library sizes is greater than `delta_rho_threshold`</p></li>
+</ul>
     
     </div>
 
-    <pre class="usage"><span class='fu'>plot_network</span>(<span class='no'>ccm_links</span>, <span class='kw'>layout</span> <span class='kw'>=</span> <span class='st'>"circle"</span>, <span class='kw'>palette</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>palette_option</span> <span class='kw'>=</span> <span class='st'>"plasma"</span>, <span class='kw'>existing_graph</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>identify_ccm_links</span>(<span class='no'>ccm_results</span>, <span class='kw'>null_quantile</span> <span class='kw'>=</span> <span class='fl'>0.975</span>,
+  <span class='kw'>delta_rho_threshold</span> <span class='kw'>=</span> <span class='fl'>0.1</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>ccm_links</th>
-      <td><p>a data.frame containing the inferred interactions from CCM,
-it should have a `lib_column` and `target_column` to specify the causal
-links (where directed edges are from `target_column` to `lib_column`)</p></td>
+      <th>null_quantile</th>
+      <td><p>the quantile of the surrogate which we desire the actual 
+ccm rho to exceed (the default value of `0.975` corresponds to the upper 
+cutoff of a 95% CI)</p></td>
     </tr>
     <tr>
-      <th>layout</th>
-      <td><p>The type of layout to create. Either a valid string, a
-function, a matrix, or a data.frame (see Details)</p></td>
-    </tr>
-    <tr>
-      <th>palette</th>
-      <td><p>a data.frame with the colors for each vertex; if NULL, one
-will be created using <code><a href='https://www.rdocumentation.org/packages/viridis/topics/reexports'>viridis</a></code></p></td>
-    </tr>
-    <tr>
-      <th>palette_option</th>
-      <td><p>the color palette to use (see <code><a href='https://www.rdocumentation.org/packages/viridis/topics/reexports'>viridis</a></code>
-for more info)</p></td>
-    </tr>
-    <tr>
-      <th>existing_graph</th>
-      <td><p>a data.frame specifying the layout of nodes (e.g. from a
-previous call to plot_network); if NULL, one will be created</p></td>
+      <th>delta_rho_threshold</th>
+      <td><p>the absolute increase which we desire the actual 
+ccm rho values to exceed, when comparing the smallest and largest library 
+sizes</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a list with three elements:</p><table class='table'>
-<tr><td></td><td></td></tr>
-<tr><td><code>plot</code></td><td></td></tr>
-<tr><td>the ggraph object to plot or save</td><td></td></tr>
-<tr><td></td><td><code>palette</code></td></tr>
-<tr><td></td><td>the palette (for a future `plot_network` call)</td></tr>
-<tr><td></td><td></td></tr>
-<tr><td><code>graph</code></td><td></td></tr>
-<tr><td>the graph (for a future `plot_network` call)</td><td></td></tr>
-</table>
-
-
+    <p>A tibble with the filtered significant links, along with the values 
+  of the test statistics that were computed (`delta_rho` and 
+  `rho_minus_upper_q_null`)</p>
     
 
   </div>
