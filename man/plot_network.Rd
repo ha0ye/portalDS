@@ -12,7 +12,8 @@ plot_network(ccm_links, layout = "circle", palette = NULL,
 it should have a `lib_column` and `target_column` to specify the causal
 links (where directed edges are from `target_column` to `lib_column`)}
 
-\item{layout}{The type of layout to create.}
+\item{layout}{The type of layout to create. Either a valid string, a
+function, a matrix, or a data.frame (see Details)}
 
 \item{palette}{a data.frame with the colors for each vertex; if NULL, one
 will be created using \code{\link[viridis]{viridis}}}

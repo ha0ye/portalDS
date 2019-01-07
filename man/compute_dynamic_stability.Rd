@@ -8,8 +8,8 @@ compute_dynamic_stability(block,
   results_file = "output/portal_ds_results.RDS", max_E = 16,
   E_list = seq(max_E), surrogate_method = "annual_spline",
   num_surr = 200, surr_params = list(), lib_sizes = c(6, 12, 24, 40,
-  80, 140, 220, 320, NROW(results$block)), num_cores = 2,
-  rescale = TRUE, rolling_forecast = FALSE)
+  80, 140, 220, 320, NROW(results$block)), num_samples = 200,
+  num_cores = 2, rescale = TRUE, rolling_forecast = FALSE)
 }
 \arguments{
 \item{block}{a data.frame containing time series for the community. Each
@@ -34,6 +34,9 @@ options are "annual_spline" or methods available in
 surrogate data function}
 
 \item{lib_sizes}{the vector of library sizes to try}
+
+\item{num_samples}{is the number of random samples at each lib size (this 
+parameter is ignored if random_libs is FALSE)}
 
 \item{num_cores}{the number of cores to use for computation}
 

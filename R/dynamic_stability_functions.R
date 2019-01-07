@@ -30,10 +30,9 @@ compute_dynamic_stability <- function(block,
                                       results_file = "output/portal_ds_results.RDS",
                                       max_E = 16, E_list = seq(max_E), 
                                       surrogate_method = "annual_spline", num_surr = 200, surr_params = list(), 
-                                      lib_sizes = c(6, 12, 24, 40, 80, 140, 220, 320, NROW(results$block)),
-                                      num_cores = 2,
-                                      rescale = TRUE,
-                                      rolling_forecast = FALSE)
+                                      lib_sizes = c(6, 12, 24, 40, 80, 140, 220, 320, NROW(results$block)), 
+                                      num_samples = 200, num_cores = 2,
+                                      rescale = TRUE, rolling_forecast = FALSE)
 {
     if (!file.exists(results_file))
     {
@@ -63,7 +62,7 @@ compute_dynamic_stability <- function(block,
     {
         results$ccm_results <- compute_ccm(results$simplex_results,
                                            lib_sizes = lib_sizes,
-                                           num_samples = 200,
+                                           num_samples = num_samples,
                                            num_cores = num_cores)
     }
 
@@ -127,7 +126,8 @@ compute_simplex <- function(block, E_list, surrogate_method, num_surr, surr_para
         dplyr::mutate(simplex_out =
                           purrr::map(data, ~ rEDM::simplex(.$abundance, E = E_list, silent = TRUE))) %>%
         dplyr::mutate(best_E = purrr::map_int(simplex_out, ~ dplyr::filter(., mae == min(mae)) %>%
-                                                  dplyr::pull(E)))
+                                                  dplyr::pull(E) %>%
+                                                  as.integer))
     
     surrogate_method <- tolower(surrogate_method)
     if (surrogate_method == "twin")
@@ -229,57 +229,64 @@ compute_ccm <- function(simplex_results,
         dplyr::mutate_at(c("lib_column", "target_column", "data_type", "lib_size"), as.factor)
 }
 
-# Define causal links as those for which:
-# - the difference between actual rho and top of 95% CI (quantile = 0.975) for
-#   null surrogates at the largest library size is > 0 (indicates significance)
-# - the difference between actual rho at the largest library size and that at
-#   the smallest library size is > 0.1
+#' @title identify_ccm_links
+#' @description Using the output of \code{\link{compute_ccm}}, determine which 
+#'   links are significant. Significant links (`x`` "causes" `y``) are where:
+#'   \itemize{
+#'     \item ccm rho for the actual time series `x` and `y`` is greater than the 
+#'       `null_quantile` level of the surrogate data (at the largest library size)
+#'     \item the increase in rho for the actual time series `x`` and `y`` between the 
+#'       smallest and largest library sizes is greater than `delta_rho_threshold`
+#'   }
+#' @param null_quantile the quantile of the surrogate which we desire the actual 
+#'   ccm rho to exceed (the default value of `0.975` corresponds to the upper 
+#'   cutoff of a 95\% CI)
+#' @param delta_rho_threshold the absolute increase which we desire the actual 
+#'   ccm rho values to exceed, when comparing the smallest and largest library 
+#'   sizes
+#' @return A tibble with the filtered significant links, along with the values 
+#'   of the test statistics that were computed (`delta_rho` and 
+#'   `rho_minus_upper_q_null`)
+#'
+#' @export
+#' 
 identify_ccm_links <- function(ccm_results,
-                               delta_rho_threshold = 0.1,
-                               null_quantile = 0.975)
+                               null_quantile = 0.975, 
+                               delta_rho_threshold = 0.1)
 {
     # process the compiled ccm results and summarize by each link:
     #   delta_rho is the rho for actual data at largest library size -
     #                    rho at smallest library size
-    #   surr_CI contains the upper quantile rho for the surrogate time series
-    #     and the difference between that value and the actual rho at that
+    #   rho_minus_upper_q_null computes the upper quantile rho for the surrogate 
+    #     time series, then takes the difference between that value and the rho 
+    #     for the actual data, then selects only the value at the largest 
     #     library size
-    #   rho_minus_upper_q_null takes the rho_minus_upper_q value at the
-    #     largest library size
     ccm_out <- ccm_results %>%
         dplyr::group_by(lib_column, target_column, E) %>%
         tidyr::nest() %>%
-        dplyr::mutate(delta_rho = purrr::map_dbl(data, function(df) { # compute delta_rho
-            df %>%
-                dplyr::filter(data == "actual") %>%
-                dplyr::summarize(dplyr::last(rho, order_by = lib_size) -
-                              dplyr::first(rho, order_by = lib_size)) %>%
-                as.numeric()
-        }),
-        surr_CI = purrr::map(data, function(df) { # compute upper_q
-            dplyr::left_join(df %>%
-                          dplyr::filter(data == "surrogate") %>%
-                          dplyr::group_by(lib_size) %>%
-                          dplyr::summarize(upper_q = quantile(rho, null_quantile)),
-                      df %>%
-                          dplyr::filter(data == "actual") %>%
-                          dplyr::select(lib_size, rho),
-                      by = "lib_size") %>%
-                dplyr::mutate(rho_minus_upper_q = rho - upper_q)
-        }),
-        rho_minus_upper_q_null = purrr::map_dbl(surr_CI, function(df) {
-            dplyr::last(df$rho_minus_upper_q, order_by = df$lib_size)
-        })) %>%
+        dplyr::mutate(delta_rho = purrr::map_dbl(data, ~ 
+                        dplyr::filter(., data_type == "actual") %>%
+                        dplyr::summarize(dplyr::last(rho, order_by = lib_size) -
+                                         dplyr::first(rho, order_by = lib_size)) %>%
+                        as.numeric), 
+                      rho_minus_upper_q_null = purrr::map_dbl(data, ~
+                        dplyr::group_by(., lib_size, data_type) %>%
+                        dplyr::summarize(upper_q = quantile(rho, null_quantile, na.rm = TRUE)) %>%
+                        tidyr::spread(data_type, upper_q) %>%
+                        dplyr::ungroup() %>% 
+                        dplyr::summarize(last(actual - surrogate, order_by = lib_size)) %>%
+                        as.numeric)
+                      ) %>% 
         dplyr::arrange(lib_column) %>%
-        dplyr::select(-data, -surr_CI)
-
+        dplyr::select(-data)
+    
     # Filter links
     #   - must either be significant (passing thresholds)
     #   - or be from self to self (keeps univariate E for later analysis)
-
-    ccm_out %>%
-        dplyr::filter((delta_rho > delta_rho_threshold & rho_minus_upper_q_null > 0) |
-                   lib_column == target_column)
+    
+    dplyr::filter(ccm_out, 
+                  (delta_rho > delta_rho_threshold & rho_minus_upper_q_null > 0) |
+                      lib_column == target_column)
 }
 
 #' @title Compute S-map coefficients for a given target variable
