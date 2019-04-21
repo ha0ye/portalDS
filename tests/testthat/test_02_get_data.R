@@ -1,4 +1,4 @@
-context("Check get_data produces identical results")
+context("Check data obtaining functions work")
 
 portal_data_path <- tempdir()
 
