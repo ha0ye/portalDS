@@ -1,13 +1,13 @@
 Package: portalDS
 Title: Compute Dynamic Stability for Rodents at Portal
-Version: 0.0.1
+Version: 0.1.0
 Authors@R: 
     person(given = "Hao",
            family = "Ye",
            role = c("aut", "cre"),
            email = "hao.ye@weecology.org")
-Description: What the package does (one paragraph).
-Depends: R (>= 3.1.0)
+Description: R Package Compendium for Dynamic Stability Analysis. Functions for computing dynamic stability for arbitrary community time series data (bundled into an R package), and analysis scripts applying the method to the Portal rodent community.
+Depends: R (>= 3.4.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -17,7 +17,7 @@ Imports:
     dplyr,
     purrr,
     tidyr,
-    portalr (>= 0.1.2),
+    portalr (>= 0.2.4),
     ggplot2,
     ggraph,
     cowplot,
@@ -31,16 +31,17 @@ Imports:
     forecast,
     stringr, 
     lubridate
-RoxygenNote: 6.1.1
-Remotes: 
-    weecology/portalr,
-    weecology/LDATS,
-    ha0ye/rEDM
 Suggests: 
     knitr,
     rmarkdown,
     testthat,
     pkgdown, 
     here, 
-    LDATS (>= 0.0.5),
+    covr, 
+    LDATS (>= 0.0.5)
+RoxygenNote: 6.1.1
+Remotes: 
+    weecology/portalr,
+    weecology/LDATS,
+    ha0ye/rEDM
 VignetteBuilder: knitr
