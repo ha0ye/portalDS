@@ -1,9 +1,6 @@
 #' @import ggraph
 #' @import ggplot2
-#' @importFrom stats predict
-#' @importFrom stats quantile
-#' @importFrom stats sd
-#' @importFrom stats smooth.spline
+#' @importFrom stats predict, quantile, sd, smooth.spline
 #' @importFrom utils data
 NULL
 

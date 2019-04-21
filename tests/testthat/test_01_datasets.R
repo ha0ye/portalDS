@@ -10,7 +10,9 @@ test_that("Maizuru Block is correct", {
 })
 
 test_that("Portal Block is correct", {
-    expect_error(portal_block <- readRDS(here::here("data/portal_block.RDS")), NA)
+    data_path <- system.file("extdata", "portal_block.RDS",
+                             package = "portalDS", mustWork = TRUE)
+    expect_error(portal_block <- readRDS(data_path), NA)
     expect_true(exists("portal_block"))
     expect_equal(dim(portal_block), c(440, 22))
     expect_true("censusdate" %in% names(portal_block))
@@ -20,7 +22,9 @@ test_that("Portal Block is correct", {
 })
 
 test_that("Portal Block 50 is correct", {
-    expect_error(portal_block_50 <- readRDS(here::here("data/portal_block_50.RDS")), NA)
+    data_path <- system.file("extdata", "portal_block_50.RDS",
+                             package = "portalDS", mustWork = TRUE)
+    expect_error(portal_block_50 <- readRDS(data_path), NA)
     expect_true(exists("portal_block_50"))
     expect_equal(dim(portal_block_50), c(440, 8))
     expect_true("censusdate" %in% names(portal_block_50))
