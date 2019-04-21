@@ -5,6 +5,7 @@
 
 [![Build
 Status](https://travis-ci.org/ha0ye/portalDS.svg?branch=master)](https://travis-ci.org/ha0ye/portalDS)
+[![codecov](https://codecov.io/gh/ha0ye/portalDS/branch/master/graph/badge.svg)](https://codecov.io/gh/ha0ye/portalDS)
 
 The goal of portalDS is to apply “dynamic stability” (Ushio et al. 2018)
 to the long-term rodent time series at Portal, to test whether this
@@ -30,6 +31,6 @@ You can install the current version of portalDS from
 [GitHub](https://github.com/ha0ye/portalDS) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("ha0ye/portalDS")
+# install.packages("remotes")
+remotes::install_github("ha0ye/portalDS")
 ```
