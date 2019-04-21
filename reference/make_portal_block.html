@@ -65,7 +65,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">portalDS</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -121,12 +121,18 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>make_portal_block</span>(<span class='kw'>filter_q</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>output</span> <span class='kw'>=</span> <span class='st'>"abundance"</span>, <span class='kw'>plots</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>2</span>,
-  <span class='fl'>4</span>, <span class='fl'>8</span>, <span class='fl'>11</span>, <span class='fl'>12</span>, <span class='fl'>14</span>, <span class='fl'>17</span>, <span class='fl'>22</span>), <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>make_portal_block</span>(<span class='kw'>path</span> <span class='kw'>=</span> <span class='kw pkg'>portalr</span><span class='kw ns'>::</span><span class='fu'><a href='https://weecology.github.io/portalr/reference/use_default_data_path.html'>get_default_data_path</a></span>(),
+  <span class='kw'>filter_q</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>output</span> <span class='kw'>=</span> <span class='st'>"abundance"</span>, <span class='kw'>plots</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>2</span>, <span class='fl'>4</span>, <span class='fl'>8</span>, <span class='fl'>11</span>, <span class='fl'>12</span>,
+  <span class='fl'>14</span>, <span class='fl'>17</span>, <span class='fl'>22</span>), <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>path</th>
+      <td><p>either the file path that contains the PortalData folder or
+"repo", which then pulls data from the PortalData GitHub repository</p></td>
+    </tr>
     <tr>
       <th>filter_q</th>
       <td><p>the numerical quantile by which to filter species. Only
@@ -146,7 +152,7 @@ treatment for the entire time series)</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>arguments passed to <code>get_rodent_data</code></p></td>
+      <td><p>arguments passed to <code>summarize_rodent_data</code></p></td>
     </tr>
     </table>
     
