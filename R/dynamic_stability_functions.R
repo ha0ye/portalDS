@@ -116,7 +116,10 @@ compute_dynamic_stability <- function(block,
 #'   that minimizes MAE, and surrogate time series
 #'
 #' @export
-compute_simplex <- function(block, E_list, surrogate_method, num_surr, surr_params)
+compute_simplex <- function(block, E_list = 1:10, 
+                            surrogate_method = "annual_spline", 
+                            num_surr = 100, 
+                            surr_params = NULL)
 {
     simplex_results <- block %>%
         dplyr::select(-censusdate) %>%
@@ -140,11 +143,12 @@ compute_simplex <- function(block, E_list, surrogate_method, num_surr, surr_para
                         )
             )
     } else if (surrogate_method == "annual_spline") {
+        day_of_year <- lubridate::yday(block$censusdate)
         simplex_results$surrogate_data <- 
             purrr::pmap(dplyr::select(simplex_results, data),
-                        ~do.call(make_surrogate_annual_spline, 
-                                 list(ts = ..1, num_surr = num_surr, 
-                                      day_of_year = lubridate::yday(results$block$censusdate))
+                        ~do.call(rEDM::make_surrogate_annual_spline, 
+                                 c(list(ts = ..1, num_surr = num_surr), 
+                                   surr_params)
                         )
             )
     } else {

@@ -24,8 +24,17 @@ norm_rescale <- function(x, na.rm = TRUE) {(x - mean(x, na.rm = na.rm)) / sd(x, 
 #'   length as `ts`.
 #'
 #' @export
-make_surrogate_annual_spline <- function(day_of_year, ts, num_surr = 100)
+make_surrogate_annual_spline <- function(ts, num_surr = 100, day_of_year = NULL)
 {
+    if (is.data.frame(ts))
+    {
+        ts <- ts[[1]]
+    }
+    if (is.null(day_of_year))
+    {
+        day_of_year <- seq_along(ts)
+    }
+    
     # filter out NA first
     n <- length(day_of_year)
     idx <- which(is.finite(day_of_year) & is.finite(ts))
