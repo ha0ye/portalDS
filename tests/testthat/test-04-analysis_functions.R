@@ -1,15 +1,14 @@
 context("Check dynamic stability analysis functions work")
 
-data_path <- system.file("extdata", "portal_block.RDS",
-                         package = "portalDS", mustWork = TRUE)
-portal_block <- readRDS(data_path)
+data(maizuru_block)
+var_names <- setdiff(names(maizuru_block), "censusdate")
 
 test_that("compute_simplex works as expected", {
-    var_names <- setdiff(names(portal_block), "censusdate")
     E_list <- 3:5
-    expect_error(simplex_out <- compute_simplex(portal_block, 
+    num_surr <- 4
+    expect_error(simplex_out <- compute_simplex(maizuru_block, 
                                                 E_list = E_list, 
-                                                num_surr = 4), NA)
+                                                num_surr = num_surr), NA)
     # check columns
     expect_setequal(c("species", "data", "simplex_out", "best_E", "surrogate_data"), names(simplex_out))
     
@@ -19,14 +18,14 @@ test_that("compute_simplex works as expected", {
     # check random data value
     idx <- sample(NROW(simplex_out), 1)
     simplex_out_data <- simplex_out[[idx, "data"]][[1]]
-    original_portal_data <- portal_block[[simplex_out$species[idx]]]
-    expect_equal(simplex_out_data, original_portal_data)
+    original_data <- maizuru_block[[simplex_out$species[idx]]]
+    expect_equal(simplex_out_data, original_data)
     
     # check simplex_out
     simplex_result <- simplex_out[[idx, "simplex_out"]]
     expect_equal(simplex_result$E, E_list)
     simplex_results <- simplex_out$simplex_out
-    expect_known_hash(lapply(simplex_results, round, 4), "cbd599464a")
+    expect_known_hash(lapply(simplex_results, round, 4), "5073eb853f")
     
     # check best_E
     best_E <- simplex_out[["best_E"]]
@@ -35,13 +34,10 @@ test_that("compute_simplex works as expected", {
     
     # check surrogate_data
     expect_error(surr_data <- simplex_out[[idx, "surrogate_data"]], NA)
-    expect_equal(dim(surr_data), c(NROW(portal_block), 4))
+    expect_equal(dim(surr_data), c(NROW(maizuru_block), num_surr))
     expect_equal(vapply(simplex_out$surrogate_data, dim, c(0, 0)), 
-                 matrix(c(NROW(portal_block), 4), ncol = length(var_names), nrow = 2))
+                 matrix(c(NROW(maizuru_block), num_surr), ncol = length(var_names), nrow = 2))
 })
-
-data(maizuru_block)
-var_names <- setdiff(names(maizuru_block), "censusdate")
 
 test_that("identify_ccm_links works as expected", {
     data_path <- system.file("extdata", "maizuru_ccm_results.RDS",
