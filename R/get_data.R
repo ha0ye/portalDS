@@ -8,7 +8,7 @@
 #' @inheritParams portalr::summarize_rodent_data
 #'
 #' @return a data.frame with columns for `censusdate`, and each species
-#'
+#' 
 #' @export
 make_portal_block <- function(path = portalr::get_default_data_path(), 
                               filter_q = NULL, output = "abundance",

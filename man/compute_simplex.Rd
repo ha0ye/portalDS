@@ -4,7 +4,9 @@
 \alias{compute_simplex}
 \title{compute_simplex}
 \usage{
-compute_simplex(block, E_list, surrogate_method, num_surr, surr_params)
+compute_simplex(block, E_list = 1:10,
+  surrogate_method = "annual_spline", num_surr = 100,
+  surr_params = NULL)
 }
 \arguments{
 \item{block}{a data.frame containing time series for the community. Each

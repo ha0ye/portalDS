@@ -23,6 +23,7 @@ norm_rescale <- function(x, na.rm = TRUE) {(x - mean(x, na.rm = na.rm)) / sd(x, 
 #' @return A matrix where each column is a separate surrogate with the same
 #'   length as `ts`.
 #'
+#' @importFrom stats smooth.spline predict
 #' @export
 make_surrogate_annual_spline <- function(ts, num_surr = 100, day_of_year = NULL)
 {

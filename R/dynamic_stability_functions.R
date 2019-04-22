@@ -146,7 +146,7 @@ compute_simplex <- function(block, E_list = 1:10,
         day_of_year <- lubridate::yday(block$censusdate)
         simplex_results$surrogate_data <- 
             purrr::pmap(dplyr::select(simplex_results, data),
-                        ~do.call(rEDM::make_surrogate_annual_spline, 
+                        ~do.call(make_surrogate_annual_spline, 
                                  c(list(ts = ..1, num_surr = num_surr), 
                                    surr_params)
                         )
@@ -253,7 +253,6 @@ compute_ccm <- function(simplex_results,
 #'   `rho_minus_upper_q_null`)
 #'
 #' @export
-#' 
 identify_ccm_links <- function(ccm_results,
                                null_quantile = 0.975, 
                                delta_rho_threshold = 0.1)
@@ -278,7 +277,7 @@ identify_ccm_links <- function(ccm_results,
                         dplyr::summarize(upper_q = quantile(rho, null_quantile, na.rm = TRUE)) %>%
                         tidyr::spread(data_type, upper_q) %>%
                         dplyr::ungroup() %>% 
-                        dplyr::summarize(last(actual - surrogate, order_by = lib_size)) %>%
+                        dplyr::summarize(dplyr::last(actual - surrogate, order_by = lib_size)) %>%
                         as.numeric)
                       ) %>% 
         dplyr::arrange(lib_column) %>%
