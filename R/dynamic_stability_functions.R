@@ -589,7 +589,7 @@ compute_eigen_decomp <- function(smap_matrices)
 {
     eigen_decomp <- purrr::map(smap_matrices, function(J) {
         if (any(is.na(J)))
-            return(NA)
+            return(c("values" = NA, "vectors" = NA))
         out <- eigen(J)
         rownames(out$vectors) <- rownames(J)
         return(out)

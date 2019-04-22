@@ -61,9 +61,19 @@ test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
     maizuru_ccm_links <- readRDS(data_path)
     
     expect_error(smap_coeffs <- compute_smap_coeffs(maizuru_block, maizuru_ccm_links), NA)
+    expect_equal(length(smap_coeffs), length(var_names))
+    best_E <- maizuru_ccm_links %>% 
+        dplyr::select(lib_column, E) %>% 
+        dplyr::distinct() %>% 
+        dplyr::pull(E)
+    expect_equal(vapply(smap_coeffs, dim, c(0, 0)), 
+                 matrix(c(rep.int(NROW(maizuru_block), length(var_names)), 
+                          best_E + 1), 
+                        byrow = TRUE, nrow = 2, 
+                        dimnames = list(NULL, sort(var_names))))
     smap_coeffs <- lapply(smap_coeffs, round, 4)
-    expect_known_hash(smap_coeffs, "1c7a16172f")
-
+    expect_known_hash(smap_coeffs, "4f48e52412")
+    
     expect_error(smap_matrices <- compute_smap_matrices(smap_coeffs, maizuru_ccm_links), NA)
     expect_is(smap_matrices, "list")
     expect_equal(length(smap_matrices), NROW(maizuru_block))
@@ -71,7 +81,7 @@ test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
     expect_error(idx <- vapply(matrix_sizes, is.null, TRUE), NA)
     expect_equal(do.call(rbind, matrix_sizes[!idx]), 
                  matrix(312, nrow = sum(!idx), ncol = 2))
-    expect_known_hash(smap_matrices, "ca491bb58d")
+    expect_known_hash(smap_matrices, "51e878ba99")
 })
 
 test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
