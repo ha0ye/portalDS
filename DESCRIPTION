@@ -38,7 +38,8 @@ Suggests:
     pkgdown, 
     here, 
     covr, 
-    LDATS (>= 0.0.5)
+    LDATS (>= 0.0.5), 
+    vdiffr
 RoxygenNote: 6.1.1
 Remotes: 
     weecology/portalr,

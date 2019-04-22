@@ -13,7 +13,8 @@ test_that("make_surrogate_annual_spline works without errors", {
     yday <- sample(seq(365), 50)
     ts <- rnorm(50)
     expect_error(out <- make_surrogate_annual_spline(ts, day_of_year = yday), NA)
-    expect_is(out, "matrix")
+    expect_true(is.matrix(out))
+    expect_type(out, "double")
     expect_equal(dim(out), c(50, 100))    
 })
 
@@ -22,7 +23,8 @@ test_that("make_surrogate_annual_spline works without errors on data.frames", {
     yday <- sample(seq(365), 50)
     df <- data.frame(ts = rnorm(50))
     expect_error(out <- make_surrogate_annual_spline(df, day_of_year = yday), NA)
-    expect_is(out, "matrix")
+    expect_true(is.matrix(out))
+    expect_type(out, "double")
     expect_equal(dim(out), c(50, 100))    
 })
 
@@ -36,7 +38,8 @@ test_that("make_surrogate_annual_spline works performs correct calculations", {
     }
     ts <- f(yday) + rnorm(50)
     expect_error(out <- make_surrogate_annual_spline(ts, day_of_year = yday), NA)
-    expect_is(out, "matrix")
+    expect_true(is.matrix(out))
+    expect_type(out, "double")
     expect_equal(dim(out), c(50, 100))
     err <- out - matrix(f(yday), ncol = 100, nrow = 50)
     expect_true(all(abs(err) < 3))

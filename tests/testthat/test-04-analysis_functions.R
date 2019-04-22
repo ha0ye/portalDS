@@ -71,7 +71,7 @@ test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
     expect_known_hash(smap_coeffs, "1c7a16172f")
     
     expect_error(smap_matrices <- compute_smap_matrices(smap_coeffs, maizuru_ccm_links), NA)
-    expect_is(smap_matrices, "list")
+    expect_type(smap_matrices, "list")
     expect_equal(length(smap_matrices), NROW(maizuru_block))
     expect_error(matrix_sizes <- lapply(smap_matrices, dim), NA)
     expect_error(idx <- vapply(matrix_sizes, is.null, TRUE), NA)
@@ -86,11 +86,11 @@ test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
     maizuru_smap_matrices <- readRDS(data_path)
     
     expect_error(eigen_decomp <- compute_eigen_decomp(maizuru_smap_matrices), NA)
-    expect_is(eigen_decomp, "list")
+    expect_type(eigen_decomp, "list")
     expect_equal(names(eigen_decomp), c("values", "vectors"))
     
     expect_error(maizuru_eigenvalues <- eigen_decomp$values, NA)
-    expect_is(maizuru_eigenvalues, "list")
+    expect_type(maizuru_eigenvalues, "list")
     expect_equal(length(maizuru_eigenvalues), NROW(maizuru_block))
     expect_error(idx <- vapply(maizuru_eigenvalues, anyNA, TRUE), NA)
     expect_error(eigenvalue_matrix <- do.call(rbind, maizuru_eigenvalues[!idx]), NA)
@@ -98,7 +98,7 @@ test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
     expect_known_hash(eigenvalue_matrix, "cbf145998b")
     
     expect_error(maizuru_eigenvectors <- eigen_decomp$vectors, NA)
-    expect_is(maizuru_eigenvectors, "list")
+    expect_type(maizuru_eigenvectors, "list")
     expect_equal(length(maizuru_eigenvectors), NROW(maizuru_block))
     expect_error(idx <- vapply(maizuru_eigenvectors, anyNA, TRUE), NA)
     expect_equal(vapply(maizuru_eigenvectors[!idx], dim, c(0, 0)), 
