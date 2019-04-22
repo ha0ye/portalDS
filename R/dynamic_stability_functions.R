@@ -230,7 +230,7 @@ compute_ccm <- function(simplex_results,
 
     dplyr::bind_rows(out) %>%
         dplyr::select(lib_column, target_column, data_type, dplyr::everything()) %>%
-        dplyr::mutate_at(c("lib_column", "target_column", "data_type", "lib_size"), as.factor)
+        dplyr::mutate_at(c("lib_column", "target_column", "data_type"), as.factor)
 }
 
 #' @title identify_ccm_links
