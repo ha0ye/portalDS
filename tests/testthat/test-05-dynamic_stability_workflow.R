@@ -37,14 +37,15 @@ test_that("check dynamic stability using block_3sp example data", {
     
     # s-map coefficients
     expect_error(smap_coeffs <- compute_smap_coeffs(block, ccm_links), NA)
-    expect_known_hash(smap_coeffs, "3f88e8ddf9")
+    expect_known_hash(lapply(smap_coeffs, round, 4), "3f88e8ddf9")
     
     expect_error(smap_matrices <- compute_smap_matrices(smap_coeffs, ccm_links), NA)
-    expect_known_hash(smap_matrices, "61f001d992")
+    smap_matrices <- lapply(smap_matrices, round, 4)
+    expect_known_hash(smap_matrices, "5393993b55")
     
     expect_error(eigen_decomp <- compute_eigen_decomp(smap_matrices), NA)
     expect_error(eigenvalues <- eigen_decomp$values, NA)
-    expect_known_hash(eigenvalues, "cbf145998b")
+    expect_known_hash(lapply(eigenvalues, round, 4), "05cbcc56e3")
     expect_error(eigenvectors <- eigen_decomp$vectors, NA)
-    expect_known_hash(eigenvectors, "8d49244739")
+    expect_known_hash(lapply(eigenvectors, round, 4), "43805666f4")
 })
