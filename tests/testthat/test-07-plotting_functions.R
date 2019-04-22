@@ -21,3 +21,12 @@ test_that("check plotting of the interaction network", {
     
     vdiffr::expect_doppelganger("Maizuru Interaction Network", maizuru_network$plot)
 })
+
+test_that("check plotting of the smap coefficients", {
+    data_path <- system.file("extdata", "maizuru_smap_matrices.RDS",
+                             package = "portalDS", mustWork = TRUE)
+    maizuru_smap_matrices <- readRDS(data_path)
+    
+    expect_error(maizuru_smap_coeffs <- plot_smap_coeffs(maizuru_smap_matrices), NA)
+    vdiffr::expect_doppelganger("Maizuru S-map Coefficients", maizuru_smap_coeffs)
+})
