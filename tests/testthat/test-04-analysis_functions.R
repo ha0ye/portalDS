@@ -63,8 +63,9 @@ test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
                              package = "portalDS", mustWork = TRUE)
     maizuru_ccm_links <- readRDS(data_path)
     expect_error(smap_coeffs <- compute_smap_coeffs(maizuru_block, maizuru_ccm_links), NA)
-    expect_known_hash(smap_coeffs, "3a8be5a6ff")
-    
+    smap_coeffs <- lapply(smap_coeffs, round, 4)
+    expect_known_hash(smap_coeffs, "1c7a16172f")
+
     expect_error(smap_matrices <- compute_smap_matrices(smap_coeffs, maizuru_ccm_links), NA)
     expect_is(smap_matrices, "list")
     expect_equal(length(smap_matrices), NROW(maizuru_block))
@@ -72,6 +73,7 @@ test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
     expect_error(idx <- vapply(matrix_sizes, is.null, TRUE), NA)
     expect_equal(do.call(rbind, matrix_sizes[!idx]), 
                  matrix(312, nrow = sum(!idx), ncol = 2))
+    expect_known_hash(smap_matrices, "ca491bb58d")
 })
 
 
