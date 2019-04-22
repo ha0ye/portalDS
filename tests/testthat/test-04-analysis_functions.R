@@ -55,4 +55,22 @@ test_that("identify_ccm_links works as expected", {
     expect_known_hash(ccm_links, "dd99bafb30")
 })
 
+test_that("identify_ccm_links works as expected", {
+    data(maizuru_block)
+    var_names <- setdiff(names(maizuru_block), "censusdate")
+    
+    data_path <- system.file("extdata", "maizuru_ccm_links.RDS",
+                             package = "portalDS", mustWork = TRUE)
+    maizuru_ccm_links <- readRDS(data_path)
+    expect_error(smap_coeffs <- compute_smap_coeffs(maizuru_block, maizuru_ccm_links), NA)
+
+    
+    
+        expect_error(ccm_links <- identify_ccm_links(maizuru_ccm_results), NA)
+    expect_equal(dim(ccm_links), c(32, 5))
+    expect_setequal(var_names, as.character(ccm_links$lib_column))
+    expect_setequal(var_names,  as.character(ccm_links$target_column))
+    expect_known_hash(ccm_links, "dd99bafb30")
+})
+
 ## check remaining dynamic stability workflow functions
