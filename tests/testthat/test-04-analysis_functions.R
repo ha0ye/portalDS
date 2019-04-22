@@ -55,7 +55,7 @@ test_that("identify_ccm_links works as expected", {
     expect_known_hash(ccm_links, "dd99bafb30")
 })
 
-test_that("compute_smap_coeffs works as expected", {
+test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
     data(maizuru_block)
     var_names <- setdiff(names(maizuru_block), "censusdate")
     
@@ -64,6 +64,18 @@ test_that("compute_smap_coeffs works as expected", {
     maizuru_ccm_links <- readRDS(data_path)
     expect_error(smap_coeffs <- compute_smap_coeffs(maizuru_block, maizuru_ccm_links), NA)
     expect_known_hash(smap_coeffs, "3a8be5a6ff")
+    
+    expect_error(smap_matrices <- compute_smap_matrices(smap_coeffs, maizuru_ccm_links), NA)
+    expect_is(smap_matrices, "list")
+    expect_equal(length(smap_matrices), NROW(maizuru_block))
+    expect_error(matrix_sizes <- lapply(smap_matrices, dim), NA)
+    expect_error(idx <- vapply(matrix_sizes, is.null, TRUE), NA)
+    expect_equal(do.call(rbind, matrix_sizes[!idx]), 
+                 matrix(312, nrow = sum(!idx), ncol = 2))
 })
 
+
 ## check remaining dynamic stability workflow functions
+# data_path <- system.file("extdata", "maizuru_smap_matrices.RDS",
+#                          package = "portalDS", mustWork = TRUE)
+# maizuru_smap_matrices <- readRDS(data_path)
