@@ -240,7 +240,7 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
                               plot_file = NULL, width = 6, height = NULL)
 {
     # extract vars
-    non_null_idx <- dplyr::first(which(!sapply(eigenvectors, is.null)))
+    non_null_idx <- dplyr::first(which(!sapply(eigenvectors, anyNA)))
     var_names <- rownames(eigenvectors[[non_null_idx]])
     var_idx <- grep("_0", var_names)
     var_names <- gsub("_0", "", var_names[var_idx])
@@ -255,9 +255,9 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
     # make data.frame of eigenvector components
     v_df <- purrr::map_dfr(seq(eigenvectors), function(i) {
         v <- eigenvectors[[i]]
-        if (is.null(v))
+        if (anyNA(v))
             return()
-        out <- reshape2::melt(v[var_idx, seq(num_values), drop = FALSE])
+        out <- reshape2::melt(v[var_idx, seq_len(num_values), drop = FALSE])
         out$t <- i
         return(out)
     }) %>%

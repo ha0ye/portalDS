@@ -22,11 +22,24 @@ test_that("check plotting of the interaction network", {
     vdiffr::expect_doppelganger("Maizuru Interaction Network", maizuru_network$plot)
 })
 
+data_path <- system.file("extdata", "maizuru_smap_matrices.RDS",
+                         package = "portalDS", mustWork = TRUE)
+maizuru_smap_matrices <- readRDS(data_path)
+
 test_that("check plotting of the smap coefficients", {
-    data_path <- system.file("extdata", "maizuru_smap_matrices.RDS",
-                             package = "portalDS", mustWork = TRUE)
-    maizuru_smap_matrices <- readRDS(data_path)
-    
     expect_error(maizuru_smap_coeffs <- plot_smap_coeffs(maizuru_smap_matrices), NA)
     vdiffr::expect_doppelganger("Maizuru S-map Coefficients", maizuru_smap_coeffs)
+})
+
+test_that("check plotting of eigenvalues and eigenvectors", {
+    eigen_decomp <- compute_eigen_decomp(maizuru_smap_matrices)
+    
+    maizuru_eigenvalues <- eigen_decomp$values
+    expect_error(eigenvalue_plot <- plot_eigenvalues(maizuru_eigenvalues), NA)
+    vdiffr::expect_doppelganger("Maizuru Eigenvalues", eigenvalue_plot)
+    
+    maizuru_eigenvectors <- eigen_decomp$vectors
+    expect_error(eigenvector_plot <- plot_eigenvectors(maizuru_eigenvectors, 
+                                                       num_values = 2), NA)
+    vdiffr::expect_doppelganger("Maizuru Eigenvectors", eigenvector_plot)
 })
