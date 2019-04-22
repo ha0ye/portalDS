@@ -125,17 +125,11 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>make_surrogate_annual_spline</span>(<span class='no'>day_of_year</span>, <span class='no'>ts</span>, <span class='kw'>num_surr</span> <span class='kw'>=</span> <span class='fl'>100</span>)</pre>
+    <pre class="usage"><span class='fu'>make_surrogate_annual_spline</span>(<span class='no'>ts</span>, <span class='kw'>num_surr</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>day_of_year</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>day_of_year</th>
-      <td><p>a vector of the numerical day of year, e.g. January 1 = 1,
-January 2 = 2, December 31 = 365 (leap years are a bit funny, but I don't
-think it should have a large effect)</p></td>
-    </tr>
     <tr>
       <th>ts</th>
       <td><p>the original time series</p></td>
@@ -143,6 +137,12 @@ think it should have a large effect)</p></td>
     <tr>
       <th>num_surr</th>
       <td><p>the number of null surrogates to generate</p></td>
+    </tr>
+    <tr>
+      <th>day_of_year</th>
+      <td><p>a vector of the numerical day of year, e.g. January 1 = 1,
+January 2 = 2, December 31 = 365 (leap years are a bit funny, but I don't
+think it should have a large effect)</p></td>
     </tr>
     </table>
     
