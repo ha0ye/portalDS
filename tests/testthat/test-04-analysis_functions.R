@@ -39,12 +39,12 @@ test_that("compute_simplex works as expected", {
                  matrix(c(NROW(maizuru_block), num_surr), ncol = length(var_names), nrow = 2))
 })
 
-test_that("identify_ccm_links works as expected", {
+test_that("compute_ccm_links works as expected", {
     data_path <- system.file("extdata", "maizuru_ccm_results.RDS",
                              package = "portalDS", mustWork = TRUE)
     maizuru_ccm_results <- readRDS(data_path)
     
-    expect_error(ccm_links <- identify_ccm_links(maizuru_ccm_results), NA)
+    expect_error(ccm_links <- compute_ccm_links(maizuru_ccm_results), NA)
     expect_equal(dim(ccm_links), c(32, 5))
     expect_setequal(var_names, as.character(ccm_links$lib_column))
     expect_setequal(var_names,  as.character(ccm_links$target_column))

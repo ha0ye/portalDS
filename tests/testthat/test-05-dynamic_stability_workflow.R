@@ -32,7 +32,7 @@ test_that("check dynamic stability using block_3sp example data", {
                       "4eb478eb8c")
     
     # ccm links
-    expect_error(ccm_links <- identify_ccm_links(ccm_results), NA)
+    expect_error(ccm_links <- compute_ccm_links(ccm_results), NA)
     expect_known_hash(ccm_links, "8450590e4c")
     
     # s-map coefficients
