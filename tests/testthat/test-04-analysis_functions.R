@@ -40,10 +40,10 @@ test_that("compute_simplex works as expected", {
                  matrix(c(NROW(portal_block), 4), ncol = length(var_names), nrow = 2))
 })
 
+data(maizuru_block)
+var_names <- setdiff(names(maizuru_block), "censusdate")
+
 test_that("identify_ccm_links works as expected", {
-    data(maizuru_block)
-    var_names <- setdiff(names(maizuru_block), "censusdate")
-    
     data_path <- system.file("extdata", "maizuru_ccm_results.RDS",
                              package = "portalDS", mustWork = TRUE)
     maizuru_ccm_results <- readRDS(data_path)
@@ -56,12 +56,10 @@ test_that("identify_ccm_links works as expected", {
 })
 
 test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
-    data(maizuru_block)
-    var_names <- setdiff(names(maizuru_block), "censusdate")
-    
     data_path <- system.file("extdata", "maizuru_ccm_links.RDS",
                              package = "portalDS", mustWork = TRUE)
     maizuru_ccm_links <- readRDS(data_path)
+    
     expect_error(smap_coeffs <- compute_smap_coeffs(maizuru_block, maizuru_ccm_links), NA)
     smap_coeffs <- lapply(smap_coeffs, round, 4)
     expect_known_hash(smap_coeffs, "1c7a16172f")
@@ -76,8 +74,32 @@ test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
     expect_known_hash(smap_matrices, "ca491bb58d")
 })
 
-
-## check remaining dynamic stability workflow functions
-# data_path <- system.file("extdata", "maizuru_smap_matrices.RDS",
-#                          package = "portalDS", mustWork = TRUE)
-# maizuru_smap_matrices <- readRDS(data_path)
+test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
+    data_path <- system.file("extdata", "maizuru_smap_matrices.RDS",
+                             package = "portalDS", mustWork = TRUE)
+    maizuru_smap_matrices <- readRDS(data_path)
+    
+    expect_error(eigen_decomp <- compute_eigen_decomp(maizuru_smap_matrices), NA)
+    expect_is(eigen_decomp, "list")
+    expect_equal(names(eigen_decomp), c("values", "vectors"))
+    
+    expect_error(maizuru_eigenvalues <- eigen_decomp$values, NA)
+    expect_is(maizuru_eigenvalues, "list")
+    expect_equal(length(maizuru_eigenvalues), NROW(maizuru_block))
+    expect_error(idx <- vapply(maizuru_eigenvalues, anyNA, TRUE), NA)
+    expect_error(eigenvalue_matrix <- do.call(rbind, maizuru_eigenvalues[!idx]), NA)
+    expect_equal(dim(eigenvalue_matrix), c(sum(!idx), 312))
+    expect_known_hash(eigenvalue_matrix, "cbf145998b")
+    
+    expect_error(maizuru_eigenvectors <- eigen_decomp$vectors, NA)
+    expect_is(maizuru_eigenvectors, "list")
+    expect_equal(length(maizuru_eigenvectors), NROW(maizuru_block))
+    expect_error(idx <- vapply(maizuru_eigenvectors, is.null, TRUE), NA)
+    expect_equal(vapply(maizuru_eigenvectors[!idx], dim, c(0, 0)), 
+                 matrix(312, nrow = 2, ncol = sum(!idx), 
+                        dimnames = list(NULL, names(maizuru_eigenvectors[!idx]))))
+    expect_known_hash(maizuru_eigenvectors[!idx], "8d49244739")
+    
+    expect_equal(names(maizuru_eigenvalues), 
+                 names(maizuru_eigenvectors))
+})
