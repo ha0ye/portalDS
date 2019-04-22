@@ -30,7 +30,8 @@ Imports:
     magrittr,
     forecast,
     stringr, 
-    lubridate
+    lubridate, 
+    drake
 Suggests: 
     knitr,
     rmarkdown,

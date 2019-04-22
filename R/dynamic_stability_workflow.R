@@ -95,3 +95,47 @@ compute_dynamic_stability <- function(block,
     
     saveRDS(results, file = results_file)
 }
+
+
+#' @title Create a drake plan for dynamic stability analysis
+#' @description Create a drake plan to perform dynamic stability analysis on 
+#'   community time series data:
+#'   (1) run simplex projection on each time series to identify the optimal
+#'       embedding dimension
+#'   (2) generate surrogate time series, assumming that the data have just a
+#'       seasonal pattern
+#'   (3) run ccm on each pairwise interaction, including the surrogate data
+#'   (4) identify the significant interactions by comparing the CCM for the real
+#'       time series against the calculations for the surrogate data
+#'   (5) run S-map models for each time series, using the appropriate number of
+#'       lags, and including the important interacting variables
+#'   (6) extract out the s-map coefficients from the models and assemble
+#'       matrices for the system
+#'   (7) perform eigen-decomposition on the s-map coefficient matrices
+#' @param block a data.frame containing time series for the community. Each
+#'   column is a time series of abundances.
+#' @param max_E largest E to examine using simplex projection; this sets the
+#'   default range for `E_list`, but any setting for `E_list` will override the
+#'   value for `max_E`
+#' @inheritParams compute_simplex
+#' @inheritParams compute_ccm
+#' @inheritParams compute_smap_coeffs
+#' @export
+build_dynamic_stability_plan <- function(block,
+                                         max_E = 16, E_list = seq(max_E), 
+                                         surrogate_method = "annual_spline", num_surr = 200, surr_params = list(), 
+                                         lib_sizes = c(6, 12, 24, 40, 80, 140, 220, 320, NROW(block)), 
+                                         num_samples = 200, num_cores = 2)
+{
+    drake::drake_plan(
+        simplex_results = compute_simplex(block = !!block,
+                                          E_list = !!E_list,
+                                          surrogate_method = !!surrogate_method,
+                                          num_surr = !!num_surr, 
+                                          surr_params = !!surr_params), 
+        ccm_results = compute_ccm(simplex_results = simplex_results,
+                                  lib_sizes = !!lib_sizes,
+                                  num_samples = !!num_samples,
+                                  num_cores = !!num_cores)
+    )
+}
