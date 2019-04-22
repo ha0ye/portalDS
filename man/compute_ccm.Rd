@@ -2,7 +2,7 @@
 % Please edit documentation in R/dynamic_stability_calculations.R
 \name{compute_ccm}
 \alias{compute_ccm}
-\title{compute_ccm}
+\title{Run CCM on each pair of time series}
 \usage{
 compute_ccm(simplex_results, lib_sizes = seq(10, 100, by = 10),
   random_libs = TRUE, num_samples = 100, replace = TRUE,

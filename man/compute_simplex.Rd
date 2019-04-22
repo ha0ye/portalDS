@@ -2,7 +2,7 @@
 % Please edit documentation in R/dynamic_stability_calculations.R
 \name{compute_simplex}
 \alias{compute_simplex}
-\title{compute_simplex}
+\title{Run univariate analysis on each time series}
 \usage{
 compute_simplex(block, E_list = 1:10,
   surrogate_method = "annual_spline", num_surr = 100,

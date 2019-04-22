@@ -1,4 +1,4 @@
-#' @title compute_simplex
+#' @title Run univariate analysis on each time series
 #' @description Run simplex projection models for each time series in the
 #'   `block` and save the output, to determine the best embedding dimension for
 #'   each column.
@@ -66,7 +66,7 @@ compute_simplex <- function(block, E_list = 1:10,
     return(simplex_results)
 }
 
-#' @title compute_ccm
+#' @title Run CCM on each pair of time series
 #' @description Run pairwise CCM based on the simplex_output - using the best
 #'   embedding dimension there, along with the surrogate time series
 
@@ -135,7 +135,7 @@ compute_ccm <- function(simplex_results,
         dplyr::mutate_at(c("lib_column", "target_column", "data_type"), as.factor)
 }
 
-#' @title compute_ccm_links
+#' @title Identify the significant CCM links
 #' @description Using the output of \code{\link{compute_ccm}}, determine which 
 #'   links are significant. Significant links (`x`` "causes" `y``) are where:
 #'   \itemize{
@@ -474,8 +474,7 @@ compute_smap_matrices <- function(smap_coeffs, ccm_links)
     return(smap_matrices)
 }
 
-#' @title compute_eigen_decomp
-#' @description Compute the eigen-decomposition of the smap matrices
+#' @title Compute the eigen-decomposition of the smap matrices
 
 #' @param smap_matrices A list with the matrix of smap-coefficients at each
 #'   time point \code{\link{compute_smap_matrices}}

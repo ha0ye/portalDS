@@ -2,7 +2,7 @@
 % Please edit documentation in R/dynamic_stability_calculations.R
 \name{compute_ccm_links}
 \alias{compute_ccm_links}
-\title{compute_ccm_links}
+\title{Identify the significant CCM links}
 \usage{
 compute_ccm_links(ccm_results, null_quantile = 0.975,
   delta_rho_threshold = 0.1)

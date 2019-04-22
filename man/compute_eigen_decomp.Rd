@@ -2,7 +2,7 @@
 % Please edit documentation in R/dynamic_stability_calculations.R
 \name{compute_eigen_decomp}
 \alias{compute_eigen_decomp}
-\title{compute_eigen_decomp}
+\title{Compute the eigen-decomposition of the smap matrices}
 \usage{
 compute_eigen_decomp(smap_matrices)
 }
