@@ -43,7 +43,7 @@ test_that("check dynamic stability using block_3sp example data", {
                           simplex_out$best_E + 1), 
                         byrow = TRUE, nrow = 2, 
                         dimnames = list(NULL, var_names)))
-    expect_known_hash(smap_coeffs, "1dfbc48ff3")
+    expect_known_hash(lapply(smap_coeffs, round, 4), "3f88e8ddf9")
     
     expect_error(smap_matrices <- compute_smap_matrices(smap_coeffs, ccm_links), NA)
     
