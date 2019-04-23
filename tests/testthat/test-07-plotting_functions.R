@@ -5,6 +5,11 @@ context("Plotting function")
 data(maizuru_block)
 var_names <- setdiff(names(maizuru_block), "censusdate")
 
+test_that("check plotting of time series", {
+    expect_error(ts_plot <- plot_time_series(maizuru_block), NA)
+    vdiffr::expect_doppelganger("Maizuru Time Series", ts_plot)
+})
+
 test_that("check plotting of the interaction network", {
     data_path <- system.file("extdata", "maizuru_ccm_links.RDS",
                              package = "portalDS", mustWork = TRUE)
@@ -38,8 +43,18 @@ test_that("check plotting of eigenvalues and eigenvectors", {
     expect_error(eigenvalue_plot <- plot_eigenvalues(maizuru_eigenvalues), NA)
     vdiffr::expect_doppelganger("Maizuru Eigenvalues", eigenvalue_plot)
     
+    expect_error(eigenvalue_plot_complex <- plot_eigenvalues(maizuru_eigenvalues, 
+                                                             highlight_complex = TRUE, 
+                                                             num_values = 2), NA)
+    vdiffr::expect_doppelganger("Maizuru Eigenvalues (complex)", eigenvalue_plot_complex)
+    
     maizuru_eigenvectors <- eigen_decomp$vectors
     expect_error(eigenvector_plot <- plot_eigenvectors(maizuru_eigenvectors, 
                                                        num_values = 2), NA)
     vdiffr::expect_doppelganger("Maizuru Eigenvectors", eigenvector_plot)
+    
+    expect_error(eigenvector_plot_IPR <- plot_eigenvectors(maizuru_eigenvectors, 
+                                                       num_values = 2, 
+                                                       add_IPR = TRUE), NA)
+    vdiffr::expect_doppelganger("Maizuru Eigenvectors (IPR)", eigenvector_plot_IPR)
 })

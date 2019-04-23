@@ -193,7 +193,7 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
         theme(panel.grid.minor = element_line(size = 1)) +
         guides(color = FALSE)
 
-    if (highlight_complex)
+    if (highlight_complex && num_values >= 2)
     {
         complex_df <- data.frame(censusdate = eigenvalue_dist %>%
                                      tidyr::spread(rank, lambda) %>%
@@ -345,6 +345,7 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
 plot_time_series <- function(block,
                              time_column = censusdate,
                              scale = "unif",
+                             palette_option = "plasma", 
                              base_size = 11,
                              base_family = "Helvetica",
                              base_line_size = 1)
@@ -352,7 +353,7 @@ plot_time_series <- function(block,
     time_column <- rlang::enquo(time_column)
     time <- dplyr::pull(block, !!time_column)
     block <- dplyr::select(block, -!!time_column)
-
+    
     if (tolower(scale) == "unif")
     {
         block <- block %>%
@@ -361,11 +362,17 @@ plot_time_series <- function(block,
         block <- block %>%
             dplyr::mutate_all(norm_rescale)
     }
-    block %>%
+    timeseries <- block %>%
         dplyr::mutate(time = time) %>%
-        tidyr::gather(species, abundance, -time) %>%
+        tidyr::gather(species, abundance, -time)
+    
+    palette <- viridis::viridis(length(unique(timeseries$species)), 
+                                option = palette_option)
+    
+    timeseries %>%
         ggplot(aes(x = time, y = abundance, color = species)) +
         geom_line(size = 1) +
+        scale_color_manual(values = palette) + 
         labs(x = NULL, y = "relative abundance") +
         theme_bw(base_size = base_size, base_family = base_family,
                  base_line_size = base_line_size) +
