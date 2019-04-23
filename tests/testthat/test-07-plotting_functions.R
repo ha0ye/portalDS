@@ -8,6 +8,11 @@ var_names <- setdiff(names(maizuru_block), "censusdate")
 test_that("check plotting of time series", {
     expect_error(ts_plot <- plot_time_series(maizuru_block), NA)
     vdiffr::expect_doppelganger("Maizuru Time Series", ts_plot)
+
+    lower <- seq.Date(as.Date("2002-12-01"), as.Date("2013-12-01"), "1 year")
+    upper <- seq.Date(as.Date("2003-03-01"), as.Date("2014-03-01"), "1 year")
+    expect_error(ts_plot_winters <- add_regime_shift_highlight(ts_plot, lower, upper), NA)
+    vdiffr::expect_doppelganger("Maizuru Time Series (Winters)", ts_plot_winters)
 })
 
 test_that("check plotting of the interaction network", {
