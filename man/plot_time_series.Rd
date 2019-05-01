@@ -5,7 +5,8 @@
 \title{plot_time_series}
 \usage{
 plot_time_series(block, time_column = censusdate, scale = "unif",
-  base_size = 11, base_family = "Helvetica", base_line_size = 1)
+  palette_option = "plasma", base_size = 11,
+  base_family = "Helvetica", base_line_size = 1)
 }
 \arguments{
 \item{block}{A data.frame containing time series for the community. Each

@@ -19,6 +19,8 @@ default), then the plot is not saved to a file}
 \item{width}{width of the saved plot}
 
 \item{height}{height of the saved plot}
+
+\item{base_size}{the base font size}
 }
 \value{
 A ggplot object of the smap coefficients plot

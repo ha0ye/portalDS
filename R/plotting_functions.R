@@ -73,6 +73,7 @@ plot_network <- function(ccm_links,
 #'   the number of elements in the list corresponds to the time points of the
 #'   s-map model, and each element is a matrix of the s-map coefficients at
 #'   that time step
+#' @param base_size the base font size
 #' @param plot_file the filepath to where to save the plot; if `NULL` (the
 #'   default), then the plot is not saved to a file
 #' @param width width of the saved plot
@@ -81,7 +82,7 @@ plot_network <- function(ccm_links,
 #' @return A ggplot object of the smap coefficients plot
 #'
 #' @export
-plot_smap_coeffs <- function(smap_matrices,
+plot_smap_coeffs <- function(smap_matrices, base_size = 16, 
                              plot_file = NULL, width = 6, height = NULL)
 {
     # make data.frame of smap coefficients
@@ -119,7 +120,8 @@ plot_smap_coeffs <- function(smap_matrices,
                                   by = "5 years"),
                      date_labels = "%Y", expand = c(0.01, 0)) +
         geom_line() +
-        theme_bw() +
+        theme_bw(base_size = base_size, base_family = "Helvetica",
+                 base_line_size = 1) +
         guides(color = FALSE, fill = FALSE)
 
     # density plot
@@ -130,7 +132,8 @@ plot_smap_coeffs <- function(smap_matrices,
         scale_color_viridis_d(option = "E") +
         geom_density(fill = NA, weight = 0.5) +
         coord_flip() +
-        theme_bw() +
+        theme_bw(base_size = base_size, base_family = "Helvetica",
+                 base_line_size = 1) +
         guides(color = FALSE, fill = FALSE)
 
     combined_plot <- cowplot::plot_grid(ts_plot, density_plot, nrow = 1,
@@ -167,6 +170,7 @@ plot_smap_coeffs <- function(smap_matrices,
 #' @export
 plot_eigenvalues <- function(eigenvalues, num_values = 1,
                              highlight_complex = FALSE, line_size = 1,
+                             base_size = 16, 
                              plot_file = NULL, width = 6, height = NULL)
 {
     # generate df for plotting
@@ -188,7 +192,7 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
         scale_color_viridis_d(option = "Magma") +
         geom_hline(yintercept = 1.0, size = 1, linetype = 2) +
         labs(x = NULL, y = "dynamic stability \n(higher is more unstable)", color = "rank") +
-        theme_bw(base_size = 20, base_family = "Helvetica",
+        theme_bw(base_size = base_size, base_family = "Helvetica",
                  base_line_size = 1) +
         theme(panel.grid.minor = element_line(size = 1)) +
         guides(color = FALSE)
@@ -237,6 +241,7 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
 plot_eigenvectors <- function(eigenvectors, num_values = 1,
                               add_IPR = FALSE, line_size = 1,
                               palette_option = "plasma",
+                              base_size = 16, 
                               plot_file = NULL, width = 6, height = NULL)
 {
     # extract vars
@@ -255,7 +260,7 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
     # make data.frame of eigenvector components
     v_df <- purrr::map_dfr(seq(eigenvectors), function(i) {
         v <- eigenvectors[[i]]
-        if (anyNA(v))
+        if (anyNA(v) || is.null(v))
             return()
         out <- reshape2::melt(v[var_idx, seq_len(num_values), drop = FALSE])
         out$t <- i
@@ -304,7 +309,7 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
     my_plot <- my_plot +
         scale_x_date(expand = c(0.01, 0)) +
         geom_line(size = line_size) +
-        theme_bw(base_size = 20, base_family = "Helvetica",
+        theme_bw(base_size = base_size, base_family = "Helvetica",
                  base_line_size = 1) +
         theme(panel.background = element_rect(fill = "#AAAABB", color = NA),
               panel.grid.major = element_line(color = "grey30", size = 1),

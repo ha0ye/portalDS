@@ -5,8 +5,8 @@
 \title{plot_eigenvalues}
 \usage{
 plot_eigenvalues(eigenvalues, num_values = 1,
-  highlight_complex = FALSE, line_size = 1, plot_file = NULL,
-  width = 6, height = NULL)
+  highlight_complex = FALSE, line_size = 1, base_size = 16,
+  plot_file = NULL, width = 6, height = NULL)
 }
 \arguments{
 \item{eigenvalues}{a list of vectors for the eigenvalues:
@@ -20,6 +20,8 @@ from the matrix of the s-map coefficients at that time step}
 dominant eigenvalue is complex}
 
 \item{line_size}{the line width for the plot}
+
+\item{base_size}{the base font size}
 
 \item{plot_file}{the filepath to where to save the plot; if `NULL` (the
 default), then the plot is not saved to a file}

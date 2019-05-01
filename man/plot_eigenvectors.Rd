@@ -5,8 +5,8 @@
 \title{plot_eigenvectors}
 \usage{
 plot_eigenvectors(eigenvectors, num_values = 1, add_IPR = FALSE,
-  line_size = 1, palette_option = "plasma", plot_file = NULL,
-  width = 6, height = NULL)
+  line_size = 1, palette_option = "plasma", base_size = 16,
+  plot_file = NULL, width = 6, height = NULL)
 }
 \arguments{
 \item{eigenvectors}{a list of matrices for the eigenvectors:
@@ -25,6 +25,8 @@ contribute to the eigenvector}
 
 \item{palette_option}{the color palette to use (see \code{\link[viridis]{viridis}}
 for more info)}
+
+\item{base_size}{the base font size}
 
 \item{plot_file}{the filepath to where to save the plot; if `NULL` (the
 default), then the plot is not saved to a file}
