@@ -4,8 +4,8 @@
 \alias{plot_smap_coeffs}
 \title{plot_smap_coeffs}
 \usage{
-plot_smap_coeffs(smap_matrices, plot_file = NULL, width = 6,
-  height = NULL)
+plot_smap_coeffs(smap_matrices, base_size = 16, plot_file = NULL,
+  width = 6, height = NULL)
 }
 \arguments{
 \item{smap_matrices}{a list of matrices for the s-map coefficients:
@@ -13,14 +13,14 @@ the number of elements in the list corresponds to the time points of the
 s-map model, and each element is a matrix of the s-map coefficients at
 that time step}
 
+\item{base_size}{the base font size}
+
 \item{plot_file}{the filepath to where to save the plot; if `NULL` (the
 default), then the plot is not saved to a file}
 
 \item{width}{width of the saved plot}
 
 \item{height}{height of the saved plot}
-
-\item{base_size}{the base font size}
 }
 \value{
 A ggplot object of the smap coefficients plot

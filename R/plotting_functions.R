@@ -189,7 +189,7 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
         ggplot(aes(x = censusdate, y = lambda,
                    color = as.factor(rank), group = rev(rank))) +
         geom_line(size = line_size) +
-        scale_color_viridis_d(option = "Magma") +
+        scale_color_viridis_d(option = "magma") +
         geom_hline(yintercept = 1.0, size = 1, linetype = 2) +
         labs(x = NULL, y = "dynamic stability \n(higher is more unstable)", color = "rank") +
         theme_bw(base_size = base_size, base_family = "Helvetica",
