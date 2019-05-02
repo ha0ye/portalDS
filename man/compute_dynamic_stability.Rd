@@ -38,8 +38,6 @@ surrogate data function}
 \item{num_samples}{is the number of random samples at each lib size (this 
 parameter is ignored if random_libs is FALSE)}
 
-\item{num_cores}{the number of cores to use for computation}
-
 \item{rescale}{A logical, indicating whether to rescale each time series}
 
 \item{rolling_forecast}{A logical, indicating whether to make individual

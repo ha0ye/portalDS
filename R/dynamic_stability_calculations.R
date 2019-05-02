@@ -73,11 +73,10 @@ compute_simplex <- function(block, E_list = 1:10,
 #'   \code{\link[furrr]{future_pmap}}. Thus, parallelization should be set by 
 #'   the user, if desired, using \code{\link[future]{plan}}, prior to running.
 #' @param simplex_results the output of \code{\link{compute_simplex}}
-#' @param num_cores the number of cores to use for computation
 #' @inheritParams rEDM::ccm
-#' @return A tibble with columns for the variables that we use in CCM, the data
-#'   type (whether it's the "actual" time series or "surrogate"), the library
-#'   size, and the results from CCM
+#' @return `compute_ccm` returns a tibble with columns for the variables that we 
+#'   use in CCM, the data type (whether it's the "actual" time series or 
+#'   "surrogate"), the library size, and the results from CCM
 #'
 #' @export
 compute_ccm <- function(simplex_results,
@@ -132,60 +131,6 @@ compute_ccm <- function(simplex_results,
         dplyr::mutate_at(c("lib_column", "target_column", "data_type"), as.factor)
     
 }
-
-# # @rdname compute_ccm
-# # @description `make_ccm_plan` encapsulates the calculations of `compute_ccm`
-# #   in a drake plan
-# # @export
-# make_ccm_plan <- function(simplex_results,
-#                           lib_sizes = seq(10, 100, by = 10),
-#                           random_libs = TRUE, num_samples = 100,
-#                           replace = TRUE, RNGseed = 42,
-#                           silent = TRUE)
-# {
-#     drake::drake_plan(
-#         ccm_func = function(df, E) {
-#             df %>%
-#                 rEDM::ccm(E = E, lib_sizes = !!lib_sizes,
-#                           random_libs = !!random_libs, num_samples = !!num_samples,
-#                           replace = !!replace,
-#                           lib_column = 1, target_column = 2,
-#                           RNGseed = !!RNGseed, silent = !!silent) %>%
-#                 rEDM::ccm_means(na.rm = TRUE) %>%
-#                 dplyr::select(lib_size, num_pred, rho, mae, rmse)},
-#         params = expand.grid(from_idx = seq(NROW(simplex_results)),
-#                              to_idx = seq(NROW(simplex_results))) %>%
-#             dplyr::mutate(E = simplex_results$best_E[from_idx],
-#                           from_var = simplex_results$species[from_idx],
-#                           to_var = simplex_results$species[to_idx]),
-#         out = furrr::future_pmap(params,
-#                                  function(from_idx, to_idx, E, from_var, to_var) {
-#                                      # pull out variables from the original block
-#                                      lib_ts <- simplex_results[[from_idx, "data"]]$abundance
-#                                      pred_ts <- simplex_results[[to_idx, "data"]]$abundance
-# 
-#                                      # compute CCM for actual connection
-#                                      ccm_actual <- ccm_func(cbind(lib_ts, pred_ts), E) %>%
-#                                          dplyr::mutate(data_type = "actual")
-#                                      # generate surrogates and compute CCM
-#                                      surr_ts <- simplex_results[[from_idx, "surrogate_data"]]
-# 
-#                                      ccm_surr <- purrr::map_dfr(seq(NCOL(surr_ts)),
-#                                                                 ~ccm_func(cbind(surr_ts[, .], pred_ts), E)) %>%
-#                                          dplyr::mutate(data_type = "surrogate")
-# 
-#                                      # combine outputs
-#                                      ccm_out <- dplyr::bind_rows(ccm_actual, ccm_surr) %>%
-#                                          dplyr::mutate(lib_column = from_var,
-#                                                        target_column = to_var)
-#                                      ccm_out$E <- E
-#                                      return(ccm_out)
-#                                  }) %>%
-#             dplyr::bind_rows() %>%
-#             dplyr::select(lib_column, target_column, data_type, dplyr::everything()) %>%
-#             dplyr::mutate_at(c("lib_column", "target_column", "data_type"), as.factor)
-#     )
-# }
 
 #' @title Identify the significant CCM links
 #' @description Using the output of \code{\link{compute_ccm}}, determine which 
