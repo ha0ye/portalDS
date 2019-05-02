@@ -46,5 +46,8 @@ test_that("check full dynamic stability plan using block_3sp example data", {
     expect_known_hash(lapply(smap_coeffs, round, 4), "3f88e8ddf9")
     expect_known_hash(lapply(smap_matrices, round, 4), "5393993b55")
     expect_known_hash(lapply(eigenvalues, round, 4), "c5a2f2aaca")
-    expect_known_hash(lapply(eigenvectors, round, 2), "5212bbd253")
+    expect_known_hash(which(is.na(eigenvectors)), "ac6cf5b073")
+    expect_error(ev <- eigenvectors[!is.na(eigenvectors)], NA)
+    expect_known_hash(lapply(ev, function(x) {round(abs(x[, 1] * x[, 2]), 2)}), 
+                      "2b5814f571")    
 })
