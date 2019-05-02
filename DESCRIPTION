@@ -33,7 +33,8 @@ Imports:
     lubridate,
     drake,
     furrr,
-    future
+    future,
+    future.callr
 Suggests: 
     knitr,
     rmarkdown,
