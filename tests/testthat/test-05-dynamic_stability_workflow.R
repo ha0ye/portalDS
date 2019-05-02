@@ -11,16 +11,16 @@ test_that("check dynamic stability using block_3sp example data", {
     
     # simplex results
     E_list <- 3:5
-    expect_error(simplex_out <- compute_simplex(block, 
+    expect_error(simplex_results <- compute_simplex(block, 
                                                 E_list = E_list, 
                                                 num_surr = 4, 
                                                 surrogate_method = "random_shuffle"), NA)
     # round simplex outputs for hash
-    simplex_out$simplex_out <- lapply(simplex_out$simplex_out, round, 4)
-    expect_known_hash(simplex_out, "667a448396")
+    simplex_results$simplex_out <- lapply(simplex_results$simplex_out, round, 4)
+    expect_known_hash(simplex_results, "667a448396")
     
     # ccm results
-    expect_error(ccm_results <- compute_ccm(simplex_out, 
+    expect_error(ccm_results <- compute_ccm(simplex_results, 
                                             num_samples = 10), NA)
     expect_equal(dim(ccm_results), c(450, 9))
     expect_setequal(as.character(ccm_results$lib_column), var_names)

@@ -29,9 +29,11 @@ Imports:
     rlang,
     magrittr,
     forecast,
-    stringr, 
-    lubridate, 
-    drake
+    stringr,
+    lubridate,
+    drake,
+    furrr,
+    future
 Suggests: 
     knitr,
     rmarkdown,

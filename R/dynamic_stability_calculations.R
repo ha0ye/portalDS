@@ -82,8 +82,9 @@ compute_ccm <- function(simplex_results,
                         lib_sizes = seq(10, 100, by = 10),
                         random_libs = TRUE, num_samples = 100,
                         replace = TRUE, RNGseed = 42,
-                        silent = TRUE, num_cores = 1)
+                        silent = TRUE)
 {
+    # calculation function
     ccm_func <- function(block, E)
     {
         cbind(block) %>%
@@ -96,39 +97,37 @@ compute_ccm <- function(simplex_results,
             dplyr::select(lib_size, num_pred, rho, mae, rmse)
     }
 
+    # parameters
     params <- expand.grid(from_idx = seq(NROW(simplex_results)),
                           to_idx = seq(NROW(simplex_results)))
     params$E <- simplex_results$best_E[params$from_idx]
     params$from_var <- simplex_results$species[params$from_idx]
     params$to_var <- simplex_results$species[params$to_idx]
 
-    out <- parallel::mclapply(seq(NROW(params)), function(i) {
-        # get the param variables we want
-        from_idx <- params$from_idx[i]
-        to_idx <- params$to_idx[i]
-        E <- params$E[i]
-
+    future::plan(future::multiprocess)
+    out <- furrr::future_pmap(params, 
+                              function(from_idx, to_idx, E, from_var, to_var) {
         # pull out variables from the original block
         lib_ts <- simplex_results[[from_idx, "data"]]$abundance
         pred_ts <- simplex_results[[to_idx, "data"]]$abundance
-
+        
         # compute CCM for actual connection
         ccm_actual <- ccm_func(cbind(lib_ts, pred_ts), E) %>%
             dplyr::mutate(data_type = "actual")
         # generate surrogates and compute CCM
         surr_ts <- simplex_results[[from_idx, "surrogate_data"]]
-
+        
         ccm_surr <- purrr::map_dfr(seq(NCOL(surr_ts)),
-                            ~ccm_func(cbind(surr_ts[, .], pred_ts), E)) %>%
+                                   ~ccm_func(cbind(surr_ts[, .], pred_ts), E)) %>%
             dplyr::mutate(data_type = "surrogate")
-
+        
         # combine outputs
         ccm_out <- dplyr::bind_rows(ccm_actual, ccm_surr) %>%
-            dplyr::mutate(lib_column = params$from_var[i],
-                          target_column = params$to_var[i])
+            dplyr::mutate(lib_column = from_var,
+                          target_column = to_var)
         ccm_out$E <- E
         return(ccm_out)
-    }, mc.cores = num_cores)
+    })
 
     dplyr::bind_rows(out) %>%
         dplyr::select(lib_column, target_column, data_type, dplyr::everything()) %>%
