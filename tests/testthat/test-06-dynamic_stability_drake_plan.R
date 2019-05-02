@@ -4,7 +4,7 @@ test_that("build_ccm_plan produces a correct plan", {
     expect_error(ccm_plan <- build_ccm_plan(), NA)
     expect_is(ccm_plan, c("drake_plan", "tbl_df"))
     expect_equal(ccm_plan$target, c("ccm_func", "ccm_params", "ccm_results"))
-    expect_known_hash(ccm_plan, "47282f26c5")
+    expect_known_hash(as.character(ccm_plan$command), "31ba99a7e1")
 })
 
 test_that("check full dynamic stability plan using block_3sp example data", {
@@ -25,10 +25,7 @@ test_that("check full dynamic stability plan using block_3sp example data", {
                                                          num_samples = 10), NA)
     expect_is(my_plan, c("drake_plan", "tbl_df"))
     expect_equal(my_plan$target, targets)
-    expect_known_hash(my_plan, "b9457a846b")
-    
-    config <- drake_config(my_plan)
-    vis_drake_graph(config, build_times = "none")
+    expect_known_hash(as.character(my_plan$command), "a5baf6cbe7")
     
     # run plan
     future::plan(future.callr::callr)
