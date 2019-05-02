@@ -67,9 +67,11 @@ compute_simplex <- function(block, E_list = 1:10,
 }
 
 #' @title Run CCM on each pair of time series
-#' @description Run pairwise CCM based on the simplex_output - using the best
-#'   embedding dimension there, along with the surrogate time series
-
+#' @description `compute_ccm` runs pairwise CCM based on the simplex_output - 
+#'   using the best embedding dimension from the simplex results, and computed 
+#'   for both the real data and the surrogate data. The calculations run using 
+#'   \code{\link[furrr]{future_pmap}}. Thus, parallelization should be set by 
+#'   the user, if desired, using \code{\link[future]{plan}}, prior to running.
 #' @param simplex_results the output of \code{\link{compute_simplex}}
 #' @param num_cores the number of cores to use for computation
 #' @inheritParams rEDM::ccm
@@ -84,29 +86,26 @@ compute_ccm <- function(simplex_results,
                         replace = TRUE, RNGseed = 42,
                         silent = TRUE)
 {
-    # calculation function
-    ccm_func <- function(block, E)
+    ccm_func <- function(df, E)
     {
-        cbind(block) %>%
+        df %>%
             rEDM::ccm(E = E, lib_sizes = lib_sizes,
                       random_libs = random_libs, num_samples = num_samples,
-                      replace = TRUE,
+                      replace = replace,
                       lib_column = 1, target_column = 2,
                       RNGseed = RNGseed, silent = silent) %>%
             rEDM::ccm_means(na.rm = TRUE) %>%
             dplyr::select(lib_size, num_pred, rho, mae, rmse)
     }
-
-    # parameters
+    
     params <- expand.grid(from_idx = seq(NROW(simplex_results)),
-                          to_idx = seq(NROW(simplex_results)))
-    params$E <- simplex_results$best_E[params$from_idx]
-    params$from_var <- simplex_results$species[params$from_idx]
-    params$to_var <- simplex_results$species[params$to_idx]
-
-    future::plan(future::multiprocess)
-    out <- furrr::future_pmap(params, 
-                              function(from_idx, to_idx, E, from_var, to_var) {
+                          to_idx = seq(NROW(simplex_results))) %>%
+        dplyr::mutate(E = simplex_results$best_E[from_idx], 
+                      from_var = simplex_results$species[from_idx], 
+                      to_var = simplex_results$species[to_idx])
+    
+    out <- furrr::future_pmap(params, function(from_idx, to_idx, E, from_var, to_var)
+    {
         # pull out variables from the original block
         lib_ts <- simplex_results[[from_idx, "data"]]$abundance
         pred_ts <- simplex_results[[to_idx, "data"]]$abundance
@@ -127,12 +126,66 @@ compute_ccm <- function(simplex_results,
                           target_column = to_var)
         ccm_out$E <- E
         return(ccm_out)
-    })
-
-    dplyr::bind_rows(out) %>%
+    }) %>%
+        dplyr::bind_rows() %>%
         dplyr::select(lib_column, target_column, data_type, dplyr::everything()) %>%
         dplyr::mutate_at(c("lib_column", "target_column", "data_type"), as.factor)
+    
 }
+
+# # @rdname compute_ccm
+# # @description `make_ccm_plan` encapsulates the calculations of `compute_ccm`
+# #   in a drake plan
+# # @export
+# make_ccm_plan <- function(simplex_results,
+#                           lib_sizes = seq(10, 100, by = 10),
+#                           random_libs = TRUE, num_samples = 100,
+#                           replace = TRUE, RNGseed = 42,
+#                           silent = TRUE)
+# {
+#     drake::drake_plan(
+#         ccm_func = function(df, E) {
+#             df %>%
+#                 rEDM::ccm(E = E, lib_sizes = !!lib_sizes,
+#                           random_libs = !!random_libs, num_samples = !!num_samples,
+#                           replace = !!replace,
+#                           lib_column = 1, target_column = 2,
+#                           RNGseed = !!RNGseed, silent = !!silent) %>%
+#                 rEDM::ccm_means(na.rm = TRUE) %>%
+#                 dplyr::select(lib_size, num_pred, rho, mae, rmse)},
+#         params = expand.grid(from_idx = seq(NROW(simplex_results)),
+#                              to_idx = seq(NROW(simplex_results))) %>%
+#             dplyr::mutate(E = simplex_results$best_E[from_idx],
+#                           from_var = simplex_results$species[from_idx],
+#                           to_var = simplex_results$species[to_idx]),
+#         out = furrr::future_pmap(params,
+#                                  function(from_idx, to_idx, E, from_var, to_var) {
+#                                      # pull out variables from the original block
+#                                      lib_ts <- simplex_results[[from_idx, "data"]]$abundance
+#                                      pred_ts <- simplex_results[[to_idx, "data"]]$abundance
+# 
+#                                      # compute CCM for actual connection
+#                                      ccm_actual <- ccm_func(cbind(lib_ts, pred_ts), E) %>%
+#                                          dplyr::mutate(data_type = "actual")
+#                                      # generate surrogates and compute CCM
+#                                      surr_ts <- simplex_results[[from_idx, "surrogate_data"]]
+# 
+#                                      ccm_surr <- purrr::map_dfr(seq(NCOL(surr_ts)),
+#                                                                 ~ccm_func(cbind(surr_ts[, .], pred_ts), E)) %>%
+#                                          dplyr::mutate(data_type = "surrogate")
+# 
+#                                      # combine outputs
+#                                      ccm_out <- dplyr::bind_rows(ccm_actual, ccm_surr) %>%
+#                                          dplyr::mutate(lib_column = from_var,
+#                                                        target_column = to_var)
+#                                      ccm_out$E <- E
+#                                      return(ccm_out)
+#                                  }) %>%
+#             dplyr::bind_rows() %>%
+#             dplyr::select(lib_column, target_column, data_type, dplyr::everything()) %>%
+#             dplyr::mutate_at(c("lib_column", "target_column", "data_type"), as.factor)
+#     )
+# }
 
 #' @title Identify the significant CCM links
 #' @description Using the output of \code{\link{compute_ccm}}, determine which 
@@ -155,8 +208,8 @@ compute_ccm <- function(simplex_results,
 #'
 #' @export
 compute_ccm_links <- function(ccm_results,
-                               null_quantile = 0.975, 
-                               delta_rho_threshold = 0.1)
+                              null_quantile = 0.975, 
+                              delta_rho_threshold = 0.1)
 {
     # process the compiled ccm results and summarize by each link:
     #   delta_rho is the rho for actual data at largest library size -
@@ -169,18 +222,18 @@ compute_ccm_links <- function(ccm_results,
         dplyr::group_by(lib_column, target_column, E) %>%
         tidyr::nest() %>%
         dplyr::mutate(delta_rho = purrr::map_dbl(data, ~ 
-                        dplyr::filter(., data_type == "actual") %>%
-                        dplyr::summarize(dplyr::last(rho, order_by = lib_size) -
-                                         dplyr::first(rho, order_by = lib_size)) %>%
-                        as.numeric), 
+                                                     dplyr::filter(., data_type == "actual") %>%
+                                                     dplyr::summarize(dplyr::last(rho, order_by = lib_size) -
+                                                                          dplyr::first(rho, order_by = lib_size)) %>%
+                                                     as.numeric), 
                       rho_minus_upper_q_null = purrr::map_dbl(data, ~
-                        dplyr::group_by(., lib_size, data_type) %>%
-                        dplyr::summarize(upper_q = quantile(rho, null_quantile, na.rm = TRUE)) %>%
-                        tidyr::spread(data_type, upper_q) %>%
-                        dplyr::ungroup() %>% 
-                        dplyr::summarize(dplyr::last(actual - surrogate, order_by = lib_size)) %>%
-                        as.numeric)
-                      ) %>% 
+                                                                  dplyr::group_by(., lib_size, data_type) %>%
+                                                                  dplyr::summarize(upper_q = quantile(rho, null_quantile, na.rm = TRUE)) %>%
+                                                                  tidyr::spread(data_type, upper_q) %>%
+                                                                  dplyr::ungroup() %>% 
+                                                                  dplyr::summarize(dplyr::last(actual - surrogate, order_by = lib_size)) %>%
+                                                                  as.numeric)
+        ) %>% 
         dplyr::arrange(lib_column) %>%
         dplyr::select(-data)
     
@@ -267,14 +320,14 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
     {
         block <- dplyr::mutate_all(block, norm_rescale)
     }
-
+    
     if (is.factor(ccm_links$lib_column)) {
         ccm_links$lib_column <- as.character(ccm_links$lib_column)
     }
     if (is.factor(ccm_links$target_column)) {
         ccm_links$target_column <- as.character(ccm_links$target_column)
     }
-
+    
     # check if column names are present or are valid indices
     if (is.numeric(ccm_links$lib_column))
     {
@@ -290,7 +343,7 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
     } else {
         stopifnot(ccm_links$target_column %in% colnames(block))
     }
-
+    
     effect_variables <- union(unique(ccm_links$lib_column),
                               unique(ccm_links$target_column))
     # Compute s-map coefficients for each variable
@@ -304,11 +357,11 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
         links <- ccm_links %>% dplyr::filter(lib_column == !!effect_var)
         stopifnot(length(unique(links$E)) == 1) # check for unique best_E
         stopifnot(effect_var %in% links$target_column) # check for self-interaction
-
+        
         E <- links$E[1]
         causal_var <- links$target_column
         causal_var <- c(effect_var, setdiff(causal_var, effect_var)) # reorder so effect_var is first
-
+        
         # create temp_block
         #   how many total lags of effect_var do we need?
         num_effect_lags <- E - length(causal_var) + 1
@@ -320,7 +373,7 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
             E <- length(causal_var)
             num_effect_lags <- 0
         }
-
+        
         #   any causal vars and
         #   pad with lags of effect_var (dropping time and 0 lag columns)
         if (num_effect_lags == 0)
@@ -331,7 +384,7 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
                                 rEDM::make_block(block[, effect_var, drop = FALSE],
                                                  max_lag = num_effect_lags)[, -c(1, 2), drop = FALSE])
         }
-
+        
         if (!rolling_forecast)
         {
             smap_coeff <- get_smap_coefficients(temp_block)
@@ -344,7 +397,7 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
             to_fill <- data.frame(matrix(NA, nrow = n - NROW(smap_coeff), ncol = NCOL(smap_coeff)))
             names(to_fill) <- names(smap_coeff)
             smap_coeff <- rbind(smap_coeff, to_fill)
-
+            
             # loop and generate new smap_coeff at each row
             for (lib_end in seq(floor(n/2) + 1, n))
             {
@@ -395,21 +448,21 @@ compute_smap_matrices <- function(smap_coeffs, ccm_links)
     # identify only connected nodes
     ccm_links$lib_column <- as.factor(ccm_links$lib_column)
     ccm_links$target_column <- as.factor(ccm_links$target_column)
-
+    
     vars <- union(levels(ccm_links$lib_column)[tabulate(ccm_links$lib_column) > 1],
                   levels(ccm_links$target_column)[tabulate(ccm_links$target_column) > 1])
-
+    
     # get maximum E value (so we know size of the Jacobian matrix)
     max_E <- ccm_links %>%
         dplyr::filter(lib_column %in% vars) %>%
         dplyr::pull(E) %>%
         max()
     jacobian_dim <- max_E * length(vars)
-
+    
     # check number of time points
     ts_length <- unique(purrr::map_dbl(smap_coeffs, NROW))
     stopifnot(length(ts_length) == 1)
-
+    
     # for each predicted variable,
     #   convert the time-indexed data.frame of coefficients into the
     #   time-indexed matrix of coefficients
@@ -417,10 +470,10 @@ compute_smap_matrices <- function(smap_coeffs, ccm_links)
         # get s-map coefficients without const column
         smap_df <- smap_coeffs[[var_name]] %>%
             dplyr::select(-const)
-
+        
         # output matrix (each row is 1 time step, each col is a var x lag)
         out <- matrix(0, nrow = ts_length, ncol = jacobian_dim)
-
+        
         # find the correct column locations for the s-map coefficients
         regex_splits <- stringr::str_match(colnames(smap_df), "(.+)_(\\d+)|(.+)")
         regex_splits[is.na(regex_splits[,2]), 2] <- ""  # convert NA into ""
@@ -430,46 +483,46 @@ compute_smap_matrices <- function(smap_coeffs, ccm_links)
                                  lag = as.numeric(regex_splits[, 3]))
         col_lookup$col_idx <- match(col_lookup$var, vars) +
             col_lookup$lag * length(vars)
-
+        
         # check for NAs
         if (any(is.na(col_lookup$col_idx)))
             warning("Computing column locations and found NAs for variable ", colnames(smap_df)[1])
-
+        
         # populate s-map coefficients into output matrix
         smap_mat <- as.matrix(smap_df)
         out[, col_lookup$col_idx] <- smap_mat
-
+        
         colnames(out) <- paste0(rep(vars, max_E), "_", rep(seq(max_E), each = length(vars)) - 1)
         return(out)
     })
-
+    
     # for each time step
     #   create the matrix of smap_coeffs, check for NAs
     #   otherwise, fill the rest of the matrix accordingly, and compute the largest eigenvalue
-
+    
     smap_matrices <- purrr::map(seq(ts_length), function(t) {
         # initialize J
         J <- matrix(0, nrow = jacobian_dim, ncol = jacobian_dim)
-
+        
         # fill in rows for each predicted variable
         for (i in seq(smap_matrix_rows))
             J[i, ] <- (smap_matrix_rows[[i]])[t, ]
-
+        
         # if there are NA values, then return NA
         if (any(is.na(J)))
             return(NA)
-
+        
         # fill in identity matrix for lag relationships
         I_row_idx <- length(vars) + seq(length(vars) * (max_E - 1))
         I_col_idx <- seq(length(vars) * (max_E - 1))
         J[cbind(I_row_idx, I_col_idx)] <- 1
-
+        
         colnames(J) <- colnames(smap_matrix_rows[[1]])
         rownames(J) <- colnames(J)
-
+        
         return(J)
     })
-
+    
     return(smap_matrices)
 }
 

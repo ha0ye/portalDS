@@ -6,7 +6,7 @@
 \usage{
 compute_ccm(simplex_results, lib_sizes = seq(10, 100, by = 10),
   random_libs = TRUE, num_samples = 100, replace = TRUE,
-  RNGseed = 42, silent = TRUE, num_cores = 1)
+  RNGseed = 42, silent = TRUE)
 }
 \arguments{
 \item{simplex_results}{the output of \code{\link{compute_simplex}}}
@@ -33,6 +33,9 @@ A tibble with columns for the variables that we use in CCM, the data
   size, and the results from CCM
 }
 \description{
-Run pairwise CCM based on the simplex_output - using the best
-  embedding dimension there, along with the surrogate time series
+`compute_ccm` runs pairwise CCM based on the simplex_output - 
+  using the best embedding dimension from the simplex results, and computed 
+  for both the real data and the surrogate data. The calculations run using 
+  \code{\link[furrr]{future_pmap}}. Thus, parallelization should be set by 
+  the user, if desired, using \code{\link[future]{plan}}, prior to running.
 }

@@ -7,7 +7,7 @@
 build_dynamic_stability_plan(block, max_E = 16, E_list = seq(max_E),
   surrogate_method = "annual_spline", num_surr = 200,
   surr_params = list(), lib_sizes = c(6, 12, 24, 40, 80, 140, 220, 320,
-  NROW(block)), num_samples = 200, num_cores = 2)
+  NROW(block)), num_samples = 200)
 }
 \arguments{
 \item{block}{a data.frame containing time series for the community. Each
@@ -33,8 +33,6 @@ surrogate data function}
 
 \item{num_samples}{is the number of random samples at each lib size (this 
 parameter is ignored if random_libs is FALSE)}
-
-\item{num_cores}{the number of cores to use for computation}
 }
 \description{
 Create a drake plan to perform dynamic stability analysis on 

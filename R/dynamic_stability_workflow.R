@@ -125,7 +125,7 @@ build_dynamic_stability_plan <- function(block,
                                          max_E = 16, E_list = seq(max_E), 
                                          surrogate_method = "annual_spline", num_surr = 200, surr_params = list(), 
                                          lib_sizes = c(6, 12, 24, 40, 80, 140, 220, 320, NROW(block)), 
-                                         num_samples = 200, num_cores = 2)
+                                         num_samples = 200)
 {
     drake::drake_plan(
         simplex_results = compute_simplex(block = !!block,
@@ -135,7 +135,6 @@ build_dynamic_stability_plan <- function(block,
                                           surr_params = !!surr_params), 
         ccm_results = compute_ccm(simplex_results = simplex_results,
                                   lib_sizes = !!lib_sizes,
-                                  num_samples = !!num_samples,
-                                  num_cores = !!num_cores)
+                                  num_samples = !!num_samples)
     )
 }

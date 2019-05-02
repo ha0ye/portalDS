@@ -12,9 +12,9 @@ test_that("check dynamic stability using block_3sp example data", {
     # simplex results
     E_list <- 3:5
     expect_error(simplex_results <- compute_simplex(block, 
-                                                E_list = E_list, 
-                                                num_surr = 4, 
-                                                surrogate_method = "random_shuffle"), NA)
+                                                    E_list = E_list, 
+                                                    num_surr = 4, 
+                                                    surrogate_method = "random_shuffle"), NA)
     # round simplex outputs for hash
     simplex_results$simplex_out <- lapply(simplex_results$simplex_out, round, 4)
     expect_known_hash(simplex_results, "667a448396")
