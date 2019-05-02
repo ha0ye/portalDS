@@ -5,14 +5,13 @@ test_that("check dynamic stability using block_3sp example data", {
     
     # setup data
     data("block_3sp", package = "rEDM")
-    block <- block_3sp[, c("time", "x_t", "y_t", "z_t")]
     var_names <- c("x", "y", "z")
-    names(block) <- c("censusdate", var_names)
+    block <- setNames(block_3sp[, c("time", "x_t", "y_t", "z_t")], 
+                      c("censusdate", var_names))
     
     # simplex results
-    E_list <- 3:5
     expect_error(simplex_results <- compute_simplex(block, 
-                                                    E_list = E_list, 
+                                                    E_list = 3:5, 
                                                     num_surr = 4, 
                                                     surrogate_method = "random_shuffle"), NA)
     # round simplex outputs for hash
