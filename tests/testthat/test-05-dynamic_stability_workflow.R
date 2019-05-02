@@ -5,22 +5,21 @@ test_that("check dynamic stability using block_3sp example data", {
     
     # setup data
     data("block_3sp", package = "rEDM")
-    block <- block_3sp[, c("time", "x_t", "y_t", "z_t")]
     var_names <- c("x", "y", "z")
-    names(block) <- c("censusdate", var_names)
+    block <- setNames(block_3sp[, c("time", "x_t", "y_t", "z_t")], 
+                      c("censusdate", var_names))
     
     # simplex results
-    E_list <- 3:5
-    expect_error(simplex_out <- compute_simplex(block, 
-                                                E_list = E_list, 
-                                                num_surr = 4, 
-                                                surrogate_method = "random_shuffle"), NA)
+    expect_error(simplex_results <- compute_simplex(block, 
+                                                    E_list = 3:5, 
+                                                    num_surr = 4, 
+                                                    surrogate_method = "random_shuffle"), NA)
     # round simplex outputs for hash
-    simplex_out$simplex_out <- lapply(simplex_out$simplex_out, round, 4)
-    expect_known_hash(simplex_out, "667a448396")
+    simplex_results$simplex_out <- lapply(simplex_results$simplex_out, round, 4)
+    expect_known_hash(simplex_results, "667a448396")
     
     # ccm results
-    expect_error(ccm_results <- compute_ccm(simplex_out, 
+    expect_error(ccm_results <- compute_ccm(simplex_results, 
                                             num_samples = 10), NA)
     expect_equal(dim(ccm_results), c(450, 9))
     expect_setequal(as.character(ccm_results$lib_column), var_names)
