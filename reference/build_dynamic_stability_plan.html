@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Run CCM on each pair of time series — compute_ccm • portalDS</title>
+<title>Create a drake plan for dynamic stability analysis — build_dynamic_stability_plan • portalDS</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,16 +30,22 @@
 
 
 
-<meta property="og:title" content="Run CCM on each pair of time series — compute_ccm" />
+<meta property="og:title" content="Create a drake plan for dynamic stability analysis — build_dynamic_stability_plan" />
 
-<meta property="og:description" content="`compute_ccm` runs pairwise CCM based on the simplex_output - 
-  using the best embedding dimension from the simplex results, and computed 
-  for both the real data and the surrogate data. The calculations run using 
-  future_pmap. Thus, parallelization should be set by 
-  the user, if desired, using plan, prior to running.
-`build_ccm_plan` encapsulates the calculations of `compute_ccm`
-  in a drake plan. This seems to run a bit faster than 
-  the `compute_ccm` function." />
+<meta property="og:description" content="Create a drake plan to perform dynamic stability analysis on 
+  community time series data:
+  (1) run simplex projection on each time series to identify the optimal
+      embedding dimension
+  (2) generate surrogate time series, assumming that the data have just a
+      seasonal pattern
+  (3) run ccm on each pairwise interaction, including the surrogate data
+  (4) identify the significant interactions by comparing the CCM for the real
+      time series against the calculations for the surrogate data
+  (5) run S-map models for each time series, using the appropriate number of
+      lags, and including the important interacting variables
+  (6) extract out the s-map coefficients from the models and assemble
+      matrices for the system
+  (7) perform eigen-decomposition on the s-map coefficient matrices" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -113,37 +119,69 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Run CCM on each pair of time series</h1>
+    <h1>Create a drake plan for dynamic stability analysis</h1>
     
-    <div class="hidden name"><code>compute_ccm.Rd</code></div>
+    <div class="hidden name"><code>build_dynamic_stability_plan.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>`compute_ccm` runs pairwise CCM based on the simplex_output - 
-  using the best embedding dimension from the simplex results, and computed 
-  for both the real data and the surrogate data. The calculations run using 
-  <code><a href='https://www.rdocumentation.org/packages/furrr/topics/future_map2'>future_pmap</a></code>. Thus, parallelization should be set by 
-  the user, if desired, using <code><a href='https://www.rdocumentation.org/packages/future/topics/plan'>plan</a></code>, prior to running.</p>
-<p>`build_ccm_plan` encapsulates the calculations of `compute_ccm`
-  in a <code><a href='https://www.rdocumentation.org/packages/drake/topics/drake-package'>drake</a></code> plan. This seems to run a bit faster than 
-  the `compute_ccm` function.</p>
+    <p>Create a drake plan to perform dynamic stability analysis on 
+  community time series data:
+  (1) run simplex projection on each time series to identify the optimal
+      embedding dimension
+  (2) generate surrogate time series, assumming that the data have just a
+      seasonal pattern
+  (3) run ccm on each pairwise interaction, including the surrogate data
+  (4) identify the significant interactions by comparing the CCM for the real
+      time series against the calculations for the surrogate data
+  (5) run S-map models for each time series, using the appropriate number of
+      lags, and including the important interacting variables
+  (6) extract out the s-map coefficients from the models and assemble
+      matrices for the system
+  (7) perform eigen-decomposition on the s-map coefficient matrices</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>compute_ccm</span>(<span class='no'>simplex_results</span>, <span class='kw'>lib_sizes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>10</span>, <span class='fl'>100</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fl'>10</span>),
+    <pre class="usage"><span class='fu'>build_dynamic_stability_plan</span>(<span class='no'>block</span>, <span class='kw'>max_E</span> <span class='kw'>=</span> <span class='fl'>16</span>, <span class='kw'>E_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='no'>max_E</span>),
+  <span class='kw'>surrogate_method</span> <span class='kw'>=</span> <span class='st'>"annual_spline"</span>, <span class='kw'>num_surr</span> <span class='kw'>=</span> <span class='fl'>200</span>,
+  <span class='kw'>surr_params</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>lib_sizes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>10</span>, <span class='fl'>100</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fl'>10</span>),
   <span class='kw'>random_libs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>num_samples</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>replace</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>RNGseed</span> <span class='kw'>=</span> <span class='fl'>42</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-
-<span class='fu'>build_ccm_plan</span>(<span class='kw'>lib_sizes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>10</span>, <span class='fl'>100</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fl'>10</span>), <span class='kw'>random_libs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>num_samples</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>replace</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>RNGseed</span> <span class='kw'>=</span> <span class='fl'>42</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+  <span class='kw'>RNGseed</span> <span class='kw'>=</span> <span class='fl'>42</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>simplex_results</th>
-      <td><p>the output of <code><a href='compute_simplex.html'>compute_simplex</a></code></p></td>
+      <th>block</th>
+      <td><p>a data.frame containing time series for the community. Each
+column is a time series of abundances.</p></td>
+    </tr>
+    <tr>
+      <th>max_E</th>
+      <td><p>largest E to examine using simplex projection; this sets the
+default range for `E_list`, but any setting for `E_list` will override the
+value for `max_E`</p></td>
+    </tr>
+    <tr>
+      <th>E_list</th>
+      <td><p>the embedding dimension or range of embedding dimensions to
+search over.</p></td>
+    </tr>
+    <tr>
+      <th>surrogate_method</th>
+      <td><p>which surrogate method to use: 
+options are "annual_spline" or methods available in 
+<code><a href='https://www.rdocumentation.org/packages/rEDM/topics/make_surrogate_data'>make_surrogate_data</a></code></p></td>
+    </tr>
+    <tr>
+      <th>num_surr</th>
+      <td><p>number of surrogates to compute</p></td>
+    </tr>
+    <tr>
+      <th>surr_params</th>
+      <td><p>a list of named optional arguments to be passed into the 
+surrogate data function</p></td>
     </tr>
     <tr>
       <th>lib_sizes</th>
@@ -173,24 +211,13 @@ reproducible runs of ccm with randomly generated libraries</p></td>
     </tr>
     </table>
     
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>`compute_ccm` returns a tibble with columns for the variables that we 
-  use in CCM, the data type (whether it's the "actual" time series or 
-  "surrogate"), the library size, and the results from CCM</p>
-<p>`build_ccm_plan` returns a <code><a href='https://www.rdocumentation.org/packages/drake/topics/drake-package'>drake</a></code> plan with 
-  targets for the helper function, the params to be used for ccm, and the 
-  ccm_results (as from <code>compute_ccm</code>).</p>
-    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#value">Value</a></li>
-          </ul>
+                </ul>
 
   </div>
 </div>
