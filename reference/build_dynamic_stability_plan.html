@@ -148,7 +148,7 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>build_dynamic_stability_plan</span>(<span class='no'>block</span>, <span class='kw'>max_E</span> <span class='kw'>=</span> <span class='fl'>16</span>, <span class='kw'>E_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='no'>max_E</span>),
+    <pre class="usage"><span class='fu'>build_dynamic_stability_plan</span>(<span class='kw'>max_E</span> <span class='kw'>=</span> <span class='fl'>16</span>, <span class='kw'>E_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='no'>max_E</span>),
   <span class='kw'>surrogate_method</span> <span class='kw'>=</span> <span class='st'>"annual_spline"</span>, <span class='kw'>num_surr</span> <span class='kw'>=</span> <span class='fl'>200</span>,
   <span class='kw'>surr_params</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>lib_sizes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>10</span>, <span class='fl'>100</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fl'>10</span>),
   <span class='kw'>random_libs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>num_samples</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>replace</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
@@ -157,11 +157,6 @@
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>block</th>
-      <td><p>a data.frame containing time series for the community. Each
-column is a time series of abundances.</p></td>
-    </tr>
     <tr>
       <th>max_E</th>
       <td><p>largest E to examine using simplex projection; this sets the
@@ -213,6 +208,11 @@ reproducible runs of ccm with randomly generated libraries</p></td>
     <tr>
       <th>silent</th>
       <td><p>prevents warning messages from being printed to the R console</p></td>
+    </tr>
+    <tr>
+      <th>block</th>
+      <td><p>a data.frame containing time series for the community. Each
+column is a time series of abundances.</p></td>
     </tr>
     </table>
     

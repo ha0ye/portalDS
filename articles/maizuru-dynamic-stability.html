@@ -139,10 +139,10 @@
 <ol start="2" style="list-style-type: decimal">
 <li>Run ccm on each pairwise interaction, including the surrogate data, and using the embedding dimension identified previously. Since this takes a while to run, we’ve commented out the actual code, and instead load a pre-generated results file.</li>
 </ol>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># ccm_results &lt;- compute_ccm(simplex_results,</span></a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#                            lib_sizes = c(6, 12, 24, 40, 80, 140, 220, 320, NROW(maizuru_block)), </span></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#                            num_samples = 200,</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#                            num_cores = 2)</span></a>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># future::plan(future.callr::callr)</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co"># ccm_results &lt;- compute_ccm(simplex_results,</span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#                            lib_sizes = c(6, 12, 24, 40, 80, 140, 220, 320, NROW(maizuru_block)), </span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#                            num_samples = 200)</span></a>
 <a class="sourceLine" id="cb4-5" data-line-number="5"></a>
 <a class="sourceLine" id="cb4-6" data-line-number="6">data_path &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"maizuru_ccm_results.RDS"</span>,</a>
 <a class="sourceLine" id="cb4-7" data-line-number="7">                         <span class="dt">package =</span> <span class="st">"portalDS"</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>)</a>
