@@ -2,18 +2,27 @@
 % Please edit documentation in R/build_plans.R
 \name{compute_dynamic_stability}
 \alias{compute_dynamic_stability}
+\alias{build_dynamic_stability_plan}
 \title{compute_dynamic_stability}
 \usage{
-compute_dynamic_stability(block,
-  results_file = "output/portal_ds_results.RDS", max_E = 16,
+compute_dynamic_stability(block, results_file = NULL, max_E = 16,
   E_list = seq(max_E), surrogate_method = "annual_spline",
-  num_surr = 200, surr_params = list(), lib_sizes = c(6, 12, 24, 40,
-  80, 140, 220, 320, NROW(block)), num_samples = 200, rescale = TRUE,
+  num_surr = 200, surr_params = list(), lib_sizes = seq(10, 100, by =
+  10), random_libs = TRUE, num_samples = 100, replace = TRUE,
+  RNGseed = 42, silent = TRUE, rescale = TRUE,
+  rolling_forecast = FALSE)
+
+build_dynamic_stability_plan(max_E = 16, E_list = seq(max_E),
+  surrogate_method = "annual_spline", num_surr = 200,
+  surr_params = list(), lib_sizes = seq(10, 100, by = 10),
+  random_libs = TRUE, num_samples = 100, replace = TRUE,
+  RNGseed = 42, silent = TRUE, rescale = TRUE,
   rolling_forecast = FALSE)
 }
 \arguments{
 \item{block}{a data.frame containing time series for the community. Each
-column is a time series of abundances.}
+column is a time series of abundances, and a `censusdate` column is used 
+as the column containing the time value.}
 
 \item{results_file}{the location of the results to be stored on disk.}
 
@@ -35,8 +44,17 @@ surrogate data function}
 
 \item{lib_sizes}{the vector of library sizes to try}
 
+\item{random_libs}{indicates whether to use randomly sampled libs}
+
 \item{num_samples}{is the number of random samples at each lib size (this 
 parameter is ignored if random_libs is FALSE)}
+
+\item{replace}{indicates whether to sample vectors with replacement}
+
+\item{RNGseed}{will set a seed for the random number generator, enabling 
+reproducible runs of ccm with randomly generated libraries}
+
+\item{silent}{prevents warning messages from being printed to the R console}
 
 \item{rescale}{A logical, indicating whether to rescale each time series}
 
@@ -44,21 +62,27 @@ parameter is ignored if random_libs is FALSE)}
 rolling forecasts for the second half of the time series.}
 }
 \value{
-none
+a list with named components for the individual output objects
+XXX
 }
 \description{
-Full dynamic stability analysis for community time series. The
-  analysis has multiple components:
-  (1) run simplex projection on each time series to identify the optimal
-      embedding dimension
-  (2) generate surrogate time series, assumming that the data have just a
-      seasonal pattern
-  (3) run ccm on each pairwise interaction, including the surrogate data
-  (4) identify the significant interactions by comparing the CCM for the real
-      time series against the calculations for the surrogate data
-  (5) run S-map models for each time series, using the appropriate number of
-      lags, and including the important interacting variables
-  (6) extract out the s-map coefficients from the models and assemble
-      matrices for the system
-  (7) perform eigen-decomposition on the s-map coefficient matrices
+`compute_dynamic_stability` runs the full dynamic stability 
+  analysis for community time series. The analysis has multiple steps:
+  \enumerate{
+    \item{run simplex projection on each time series to identify the optimal
+      embedding dimension}
+    \item{generate surrogate time series, assumming that the data have just a
+      seasonal pattern}
+    \item{run ccm on each pairwise interaction, including the surrogate data}
+    \item{identify the significant interactions by comparing the CCM for the 
+      real time series against the calculations for the surrogate data}
+    \item{run S-map models for each time series, using the appropriate number of
+      lags, and including the important interacting variables}
+    \item{extract out the s-map coefficients from the models and assemble
+      matrices for the system}
+    \item{perform eigen-decomposition on the s-map coefficient matrices}
+  }
+
+`build_dynamic_stability_plan` creates a drake plan for the 
+  dynamic stability analysis.
 }
