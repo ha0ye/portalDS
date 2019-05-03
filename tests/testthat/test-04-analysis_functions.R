@@ -33,10 +33,26 @@ test_that("compute_simplex works as expected", {
     expect_true(all(best_E <= max(E_list)))
     
     # check surrogate_data
-    expect_error(surr_data <- simplex_out[[idx, "surrogate_data"]], NA)
-    expect_equal(dim(surr_data), c(NROW(maizuru_block), num_surr))
     expect_equal(vapply(simplex_out$surrogate_data, dim, c(0, 0)), 
                  matrix(c(NROW(maizuru_block), num_surr), ncol = length(var_names), nrow = 2))
+})
+
+test_that("twin surrogate option for compute_simplex works as expected", {
+    data(maizuru_block)
+    num_surr <- 4
+    num_vars <- NCOL(maizuru_block) - 1
+    
+    expect_error(simplex_out <- compute_simplex(maizuru_block,
+                                                E_list = 1:24,
+                                                surrogate_method = "twin", 
+                                                num_surr = num_surr, 
+                                                surr_params = list(T_period = 24, 
+                                                                   quantile_vec = c(0.875, 0.88, 0.89, 0.90, 0.91, 0.92, 
+                                                                                    0.93, 0.94, 0.95, 0.85, 0.84, 0.83, 
+                                                                                    0.82, 0.81, 0.80, 0.96))), 
+                 NA)
+    expect_equal(vapply(simplex_out$surrogate_data, dim, c(0, 0)), 
+                 matrix(c(285, 4), nrow = 2, ncol = num_vars))
 })
 
 test_that("compute_ccm_links works as expected", {
