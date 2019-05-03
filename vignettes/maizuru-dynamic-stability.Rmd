@@ -75,10 +75,10 @@ simplex_results <- compute_simplex(maizuru_block,
 2. Run ccm on each pairwise interaction, including the surrogate data, and using the embedding dimension identified previously. Since this takes a while to run, we've commented out the actual code, and instead load a pre-generated results file.
 
 ```{r compute ccm}
+# future::plan(future.callr::callr)
 # ccm_results <- compute_ccm(simplex_results,
 #                            lib_sizes = c(6, 12, 24, 40, 80, 140, 220, 320, NROW(maizuru_block)), 
-#                            num_samples = 200,
-#                            num_cores = 2)
+#                            num_samples = 200)
 
 data_path <- system.file("extdata", "maizuru_ccm_results.RDS",
                          package = "portalDS", mustWork = TRUE)

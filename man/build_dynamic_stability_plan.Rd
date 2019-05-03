@@ -4,16 +4,13 @@
 \alias{build_dynamic_stability_plan}
 \title{Create a drake plan for dynamic stability analysis}
 \usage{
-build_dynamic_stability_plan(block, max_E = 16, E_list = seq(max_E),
+build_dynamic_stability_plan(max_E = 16, E_list = seq(max_E),
   surrogate_method = "annual_spline", num_surr = 200,
   surr_params = list(), lib_sizes = seq(10, 100, by = 10),
   random_libs = TRUE, num_samples = 100, replace = TRUE,
   RNGseed = 42, silent = TRUE)
 }
 \arguments{
-\item{block}{a data.frame containing time series for the community. Each
-column is a time series of abundances.}
-
 \item{max_E}{largest E to examine using simplex projection; this sets the
 default range for `E_list`, but any setting for `E_list` will override the
 value for `max_E`}
@@ -43,6 +40,9 @@ parameter is ignored if random_libs is FALSE)}
 reproducible runs of ccm with randomly generated libraries}
 
 \item{silent}{prevents warning messages from being printed to the R console}
+
+\item{block}{a data.frame containing time series for the community. Each
+column is a time series of abundances.}
 }
 \description{
 Create a drake plan to perform dynamic stability analysis on 

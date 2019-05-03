@@ -31,7 +31,7 @@ compute_dynamic_stability <- function(block,
                                       max_E = 16, E_list = seq(max_E), 
                                       surrogate_method = "annual_spline", num_surr = 200, surr_params = list(), 
                                       lib_sizes = c(6, 12, 24, 40, 80, 140, 220, 320, NROW(block)), 
-                                      num_samples = 200, num_cores = 2,
+                                      num_samples = 200,
                                       rescale = TRUE, rolling_forecast = FALSE)
 {
     if (!file.exists(results_file))
@@ -62,8 +62,7 @@ compute_dynamic_stability <- function(block,
     {
         results$ccm_results <- compute_ccm(results$simplex_results,
                                            lib_sizes = lib_sizes,
-                                           num_samples = num_samples,
-                                           num_cores = num_cores)
+                                           num_samples = num_samples)
     }
     
     # check for ccm links, comput if missing
