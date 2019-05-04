@@ -32,20 +32,24 @@
 
 <meta property="og:title" content="compute_dynamic_stability — compute_dynamic_stability" />
 
-<meta property="og:description" content="Full dynamic stability analysis for community time series. The
-  analysis has multiple components:
-  (1) run simplex projection on each time series to identify the optimal
+<meta property="og:description" content="`compute_dynamic_stability` runs the full dynamic stability 
+  analysis for community time series. The analysis has multiple steps:
+run simplex projection on each time series to identify the optimal
       embedding dimension
-  (2) generate surrogate time series, assumming that the data have just a
+generate surrogate time series, assumming that the data have just a
       seasonal pattern
-  (3) run ccm on each pairwise interaction, including the surrogate data
-  (4) identify the significant interactions by comparing the CCM for the real
-      time series against the calculations for the surrogate data
-  (5) run S-map models for each time series, using the appropriate number of
+run ccm on each pairwise interaction, including the surrogate data
+identify the significant interactions by comparing the CCM for the 
+      real time series against the calculations for the surrogate data
+run S-map models for each time series, using the appropriate number of
       lags, and including the important interacting variables
-  (6) extract out the s-map coefficients from the models and assemble
+extract out the s-map coefficients from the models and assemble
       matrices for the system
-  (7) perform eigen-decomposition on the s-map coefficient matrices" />
+perform eigen-decomposition on the s-map coefficient matrices
+" />
+
+<meta property="og:description" content="`build_dynamic_stability_plan` creates a drake plan for the 
+  dynamic stability analysis." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -131,28 +135,39 @@
 
     <div class="ref-description">
     
-    <p>Full dynamic stability analysis for community time series. The
-  analysis has multiple components:
-  (1) run simplex projection on each time series to identify the optimal
-      embedding dimension
-  (2) generate surrogate time series, assumming that the data have just a
-      seasonal pattern
-  (3) run ccm on each pairwise interaction, including the surrogate data
-  (4) identify the significant interactions by comparing the CCM for the real
-      time series against the calculations for the surrogate data
-  (5) run S-map models for each time series, using the appropriate number of
-      lags, and including the important interacting variables
-  (6) extract out the s-map coefficients from the models and assemble
-      matrices for the system
-  (7) perform eigen-decomposition on the s-map coefficient matrices</p>
+    <p>`compute_dynamic_stability` runs the full dynamic stability 
+  analysis for community time series. The analysis has multiple steps:</p><ol>
+<li><p>run simplex projection on each time series to identify the optimal
+      embedding dimension</p></li>
+<li><p>generate surrogate time series, assumming that the data have just a
+      seasonal pattern</p></li>
+<li><p>run ccm on each pairwise interaction, including the surrogate data</p></li>
+<li><p>identify the significant interactions by comparing the CCM for the 
+      real time series against the calculations for the surrogate data</p></li>
+<li><p>run S-map models for each time series, using the appropriate number of
+      lags, and including the important interacting variables</p></li>
+<li><p>extract out the s-map coefficients from the models and assemble
+      matrices for the system</p></li>
+<li><p>perform eigen-decomposition on the s-map coefficient matrices</p></li>
+</ol>
+
+    <p>`build_dynamic_stability_plan` creates a drake plan for the 
+  dynamic stability analysis.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>compute_dynamic_stability</span>(<span class='no'>block</span>,
-  <span class='kw'>results_file</span> <span class='kw'>=</span> <span class='st'>"output/portal_ds_results.RDS"</span>, <span class='kw'>max_E</span> <span class='kw'>=</span> <span class='fl'>16</span>,
+    <pre class="usage"><span class='fu'>compute_dynamic_stability</span>(<span class='no'>block</span>, <span class='kw'>results_file</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>max_E</span> <span class='kw'>=</span> <span class='fl'>16</span>,
   <span class='kw'>E_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='no'>max_E</span>), <span class='kw'>surrogate_method</span> <span class='kw'>=</span> <span class='st'>"annual_spline"</span>,
-  <span class='kw'>num_surr</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>surr_params</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>lib_sizes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>6</span>, <span class='fl'>12</span>, <span class='fl'>24</span>, <span class='fl'>40</span>,
-  <span class='fl'>80</span>, <span class='fl'>140</span>, <span class='fl'>220</span>, <span class='fl'>320</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>block</span>)), <span class='kw'>num_samples</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>rescale</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>num_surr</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>surr_params</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>lib_sizes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>10</span>, <span class='fl'>100</span>, <span class='kw'>by</span> <span class='kw'>=</span>
+  <span class='fl'>10</span>), <span class='kw'>random_libs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>num_samples</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>replace</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>RNGseed</span> <span class='kw'>=</span> <span class='fl'>42</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>rescale</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>rolling_forecast</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+
+<span class='fu'>build_dynamic_stability_plan</span>(<span class='kw'>max_E</span> <span class='kw'>=</span> <span class='fl'>16</span>, <span class='kw'>E_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='no'>max_E</span>),
+  <span class='kw'>surrogate_method</span> <span class='kw'>=</span> <span class='st'>"annual_spline"</span>, <span class='kw'>num_surr</span> <span class='kw'>=</span> <span class='fl'>200</span>,
+  <span class='kw'>surr_params</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>lib_sizes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>10</span>, <span class='fl'>100</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fl'>10</span>),
+  <span class='kw'>random_libs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>num_samples</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>replace</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>RNGseed</span> <span class='kw'>=</span> <span class='fl'>42</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>rescale</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>rolling_forecast</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -161,7 +176,8 @@
     <tr>
       <th>block</th>
       <td><p>a data.frame containing time series for the community. Each
-column is a time series of abundances.</p></td>
+column is a time series of abundances, and a `censusdate` column is used 
+as the column containing the time value.</p></td>
     </tr>
     <tr>
       <th>results_file</th>
@@ -198,9 +214,26 @@ surrogate data function</p></td>
       <td><p>the vector of library sizes to try</p></td>
     </tr>
     <tr>
+      <th>random_libs</th>
+      <td><p>indicates whether to use randomly sampled libs</p></td>
+    </tr>
+    <tr>
       <th>num_samples</th>
       <td><p>is the number of random samples at each lib size (this 
 parameter is ignored if random_libs is FALSE)</p></td>
+    </tr>
+    <tr>
+      <th>replace</th>
+      <td><p>indicates whether to sample vectors with replacement</p></td>
+    </tr>
+    <tr>
+      <th>RNGseed</th>
+      <td><p>will set a seed for the random number generator, enabling 
+reproducible runs of ccm with randomly generated libraries</p></td>
+    </tr>
+    <tr>
+      <th>silent</th>
+      <td><p>prevents warning messages from being printed to the R console</p></td>
     </tr>
     <tr>
       <th>rescale</th>
@@ -215,7 +248,8 @@ rolling forecasts for the second half of the time series.</p></td>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>none</p>
+    <p>a list with named components for the individual output objects
+XXX</p>
     
 
   </div>
