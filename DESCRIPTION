@@ -35,7 +35,8 @@ Imports:
     drake,
     furrr,
     future,
-    future.callr
+    future.callr, 
+    deSolve
 Suggests: 
     knitr,
     rmarkdown,

@@ -1,4 +1,4 @@
-#' @title make_portal_block
+#' @title Get a data.frame of Portal rodent abundances
 #' @description Create a data.frame from the Portal rodent data with specified
 #'   arguments, each row corresponds to a newmmoonnumber, and missing data are
 #'   interpolated.
