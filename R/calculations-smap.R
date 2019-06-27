@@ -9,7 +9,7 @@
 #' @inheritParams rEDM::block_lnlp
 #'
 #' @return the data.frame with the s-map coefficients
-#' @noRd
+#' @export
 get_smap_coefficients <- function(block, 
                                   lib = c(1, NROW(block)),
                                   pred = c(1, NROW(block)),

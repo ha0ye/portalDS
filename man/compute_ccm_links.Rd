@@ -8,6 +8,9 @@ compute_ccm_links(ccm_results, null_quantile = 0.975,
   delta_rho_threshold = 0.1)
 }
 \arguments{
+\item{ccm_results}{the output from `compute_ccm` that we generate the links 
+for}
+
 \item{null_quantile}{the quantile of the surrogate which we desire the actual 
 ccm rho to exceed (the default value of `0.975` corresponds to the upper 
 cutoff of a 95\% CI)}

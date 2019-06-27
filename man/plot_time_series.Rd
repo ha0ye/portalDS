@@ -20,6 +20,9 @@ which could be a numeric or a date/time type}
 `norm` -- scale each time series to have mean 0 and variance 1
 (anything else) -- no scaling}
 
+\item{palette_option}{the color palette to use (see \code{\link[viridis]{viridis}}
+for more info)}
+
 \item{base_size}{base font size}
 
 \item{base_family}{base font family}

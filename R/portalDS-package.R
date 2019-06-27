@@ -11,7 +11,10 @@ if (getRversion() >= "2.15.1") utils::globalVariables(
       "ntraps", "num_pred", "period", "predictor", "quantile_q", "rho", 
       "rho_minus_upper_q_null", "rmse", "simplex_out", "SO", "species", 
       "surr_CI", "target", "target_column", "upper_q", "value", 
-      "Var1", "Var2", "variable", "xmax", "xmin", "y", "ymax", "ymin"))
+      "Var1", "Var2", "variable", "xmax", "xmin", "y", "ymax", "ymin", 
+      "block", "ccm_func", "ccm_links", "ccm_params", "ccm_results", 
+      "eigen_decomp", "from_idx", "get_smap_coefficients", "simplex_results", 
+      "smap_coeffs", "smap_matrices", "to_idx"))
 
 #' @title Time series for the Maizuru Bay fish community
 #' @author Reiji Masuda

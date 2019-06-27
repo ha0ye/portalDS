@@ -2,5 +2,9 @@
 ^LICENSE\.md$
 ^portalDS\.Rproj$
 ^\.Rproj\.user$
-^data\*.RDS$
+^data/*.RDS$
 ^.travis.yml$
+^figures$
+^codecov.yml$
+^output$
+^analysis$

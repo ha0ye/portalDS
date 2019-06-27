@@ -33,13 +33,13 @@ simulate_resource_competition <- function(params = list(r = rep.int(1, 5),
 {
     num_species <- length(grep("N[0-9]+", names(initial_state)))
     num_resources <- length(grep("R[0-9]+", names(initial_state)))
-    S <- head(initial_state, num_resources)
+    S <- utils::head(initial_state, num_resources)
     
     model_equations <- function(t, state, parameters)
     {
         with(as.list(c(state, parameters)), {
-            R <- head(state, num_resources)
-            N <- tail(state, num_species)
+            R <- utils::head(state, num_resources)
+            N <- utils::tail(state, num_species)
             mu <- r * apply(R / (K + R), 2, min)
             list(c(D * (S - R) - C %*% (mu * N), 
                    N * (mu - m)))

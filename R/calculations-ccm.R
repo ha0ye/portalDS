@@ -130,6 +130,8 @@ build_ccm_plan <- function(lib_sizes = seq(10, 100, by = 10),
 #'     \item the increase in rho for the actual time series `x`` and `y`` between the 
 #'       smallest and largest library sizes is greater than `delta_rho_threshold`
 #'   }
+#' @param ccm_results the output from `compute_ccm` that we generate the links 
+#'   for
 #' @param null_quantile the quantile of the surrogate which we desire the actual 
 #'   ccm rho to exceed (the default value of `0.975` corresponds to the upper 
 #'   cutoff of a 95\% CI)

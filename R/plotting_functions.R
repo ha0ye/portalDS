@@ -343,6 +343,7 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
 #'   `norm` -- scale each time series to have mean 0 and variance 1
 #'   (anything else) -- no scaling
 #' @inheritParams ggplot2::theme_bw
+#' @inheritParams plot_network
 #'
 #' @return A ggplot object of the time series plot
 #'
