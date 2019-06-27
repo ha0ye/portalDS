@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>plot_time_series — plot_time_series • portalDS</title>
+<title>Get a data.frame of simulated abundances (3-species food chain) — simulate_3sp_food_chain • portalDS</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,10 +30,12 @@
 
 
 
-<meta property="og:title" content="plot_time_series — plot_time_series" />
+<meta property="og:title" content="Get a data.frame of simulated abundances (3-species food chain) — simulate_3sp_food_chain" />
 
-<meta property="og:description" content="plot the time series in `block`, using the appropriate rescaling
-  of the data" />
+<meta property="og:description" content="Simulate time series from the 3-species food chain model of 
+  Hastings &amp;amp; Powell (1991) &amp;lt;https://doi.org/10.2307/1940591&amp;gt;. The 
+  chosen initial state and parameters should give chaotic dynamics that 
+  produce a &quot;teacup&quot; attractor." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -112,64 +114,48 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>plot_time_series</h1>
-    <small class="dont-index">Source: <a href='https://github.com/ha0ye/portalDS/blob/master/R/plotting_functions.R'><code>R/plotting_functions.R</code></a></small>
-    <div class="hidden name"><code>plot_time_series.Rd</code></div>
+    <h1>Get a data.frame of simulated abundances (3-species food chain)</h1>
+    <small class="dont-index">Source: <a href='https://github.com/ha0ye/portalDS/blob/master/R/data-sim-3sp-food-chain.R'><code>R/data-sim-3sp-food-chain.R</code></a></small>
+    <div class="hidden name"><code>simulate_3sp_food_chain.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>plot the time series in `block`, using the appropriate rescaling
-  of the data</p>
+    <p>Simulate time series from the 3-species food chain model of 
+  Hastings &amp; Powell (1991) &lt;<a href='https://doi.org/10.2307/1940591'>https://doi.org/10.2307/1940591</a>&gt;. The 
+  chosen initial state and parameters should give chaotic dynamics that 
+  produce a "teacup" attractor.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>plot_time_series</span>(<span class='no'>block</span>, <span class='kw'>time_column</span> <span class='kw'>=</span> <span class='no'>censusdate</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='st'>"unif"</span>,
-  <span class='kw'>palette_option</span> <span class='kw'>=</span> <span class='st'>"plasma"</span>, <span class='kw'>base_size</span> <span class='kw'>=</span> <span class='fl'>11</span>,
-  <span class='kw'>base_family</span> <span class='kw'>=</span> <span class='st'>"Helvetica"</span>, <span class='kw'>base_line_size</span> <span class='kw'>=</span> <span class='fl'>1</span>)</pre>
+    <pre class="usage"><span class='fu'>simulate_3sp_food_chain</span>(<span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='kw'>a_1</span> <span class='kw'>=</span> <span class='fl'>2.5</span>, <span class='kw'>b_1</span> <span class='kw'>=</span> <span class='fl'>3.2</span>, <span class='kw'>a_2</span> <span class='kw'>=</span> <span class='fl'>0.1</span>, <span class='kw'>b_2</span> <span class='kw'>=</span>
+  <span class='fl'>2</span>, <span class='kw'>d_1</span> <span class='kw'>=</span> <span class='fl'>0.2</span>, <span class='kw'>d_2</span> <span class='kw'>=</span> <span class='fl'>0.015</span>), <span class='kw'>initial_state</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fl'>0.8</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='fl'>0.2</span>, <span class='kw'>z</span> <span class='kw'>=</span> <span class='fl'>8</span>),
+  <span class='kw'>sample_times</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>0</span>, <span class='fl'>5000</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fl'>5</span>), <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>block</th>
-      <td><p>A data.frame containing time series for the community. Each
-column is a time series of abundances.</p></td>
+      <th>params</th>
+      <td><p>model parameters</p></td>
     </tr>
     <tr>
-      <th>time_column</th>
-      <td><p>The name of the column in the block that has the time,
-which could be a numeric or a date/time type</p></td>
+      <th>initial_state</th>
+      <td><p>initial conditions</p></td>
     </tr>
     <tr>
-      <th>scale</th>
-      <td><p>How to scale the time series:
-`unif` -- scale each time series to be on [0, 1]
-`norm` -- scale each time series to have mean 0 and variance 1
-(anything else) -- no scaling</p></td>
+      <th>sample_times</th>
+      <td><p>the time values at which to make observations</p></td>
     </tr>
     <tr>
-      <th>palette_option</th>
-      <td><p>the color palette to use (see <code><a href='https://www.rdocumentation.org/packages/viridis/topics/reexports'>viridis</a></code>
-for more info)</p></td>
-    </tr>
-    <tr>
-      <th>base_size</th>
-      <td><p>base font size</p></td>
-    </tr>
-    <tr>
-      <th>base_family</th>
-      <td><p>base font family</p></td>
-    </tr>
-    <tr>
-      <th>base_line_size</th>
-      <td><p>base size for line elements</p></td>
+      <th>...</th>
+      <td><p>remaining arguments to be passed to <code><a href='https://www.rdocumentation.org/packages/deSolve/topics/ode'>ode</a></code></p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A ggplot object of the time series plot</p>
+    <p>a matrix (and `deSolve`) object with the observations (and times)</p>
     
 
   </div>
