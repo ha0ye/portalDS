@@ -1,3 +1,5 @@
+#' @importFrom rlang .data
+
 #' @title plot_network
 #' @description Visualize the network of interactions, created from running CCM
 #'   on community time series as part of the dynamic stability analysis
@@ -52,7 +54,7 @@ plot_network <- function(ccm_links,
         geom_edge_link(edge_width = 0.5, start_cap = circle(0.3, "inches"),
                        end_cap = circle(0.3, "inches"),
                        arrow = arrow(angle = 20, type = "closed")) +
-        geom_node_circle(aes(r = 0.08, fill = name)) +
+        geom_node_circle(aes(r = 0.08, fill = .data$name)) +
         theme_graph(foreground = "black", fg_text_colour = "white",
                     background = "transparent") +
         coord_fixed() +
@@ -111,7 +113,7 @@ plot_smap_coeffs <- function(smap_matrices, base_size = 16,
 
     # time series plot
     ts_plot <- ggplot(smap_coeff_df,
-                      aes(x = censusdate, y = abs(value), color = predictor)) +
+                      aes(x = .data$censusdate, y = abs(.data$value), color = .data$predictor)) +
         facet_grid(target ~ ., scales = "free_y", switch = "y") +
         geom_hline(yintercept = 1, size = 1, linetype = 2) +
         scale_color_viridis_d(option = "E") +
@@ -120,18 +122,20 @@ plot_smap_coeffs <- function(smap_matrices, base_size = 16,
                                   by = "5 years"),
                      date_labels = "%Y", expand = c(0.01, 0)) +
         geom_line() +
+        labs(x = "censusdate", y = "abs(value)", color = "predictor") + 
         theme_bw(base_size = base_size, base_family = "Helvetica",
                  base_line_size = 1) +
         guides(color = FALSE, fill = FALSE)
 
     # density plot
     density_plot <- ggplot(smap_coeff_df,
-                           aes(x = abs(value), color = predictor)) +
+                           aes(x = abs(.data$value), color = .data$predictor)) +
         facet_grid(target ~ ., switch = "y") +
         geom_vline(xintercept = 1, size = 1, linetype = 2) +
         scale_color_viridis_d(option = "E") +
         geom_density(fill = NA, weight = 0.5) +
         coord_flip() +
+        labs(x = "abs(value)", y = "density", color = "predictor") + 
         theme_bw(base_size = base_size, base_family = "Helvetica",
                  base_line_size = 1) +
         guides(color = FALSE, fill = FALSE)
@@ -186,8 +190,8 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
         dplyr::mutate(censusdate = as.Date(censusdate))
 
     my_plot <- eigenvalue_dist %>%
-        ggplot(aes(x = censusdate, y = lambda,
-                   color = as.factor(rank), group = rev(rank))) +
+        ggplot(aes(x = .data$censusdate, y = .data$lambda,
+                   color = as.factor(.data$rank), group = rev(.data$rank))) +
         geom_line(size = line_size) +
         scale_color_viridis_d(option = "inferno") +
         geom_hline(yintercept = 1.0, size = 1, linetype = 2) +
@@ -296,13 +300,13 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
         dat$variable <- forcats::fct_relevel(dat$variable, c(var_names, "IPR"))
 
         my_plot <- dat %>%
-            ggplot(aes(x = censusdate, y = value, color = variable)) +
+            ggplot(aes(x = .data$censusdate, y = .data$value, color = .data$variable)) +
             facet_grid(component + rank ~ ., switch = "y") +
             scale_y_continuous(limits = c(0, 1)) +
             scale_color_viridis_d(option = palette_option)
     } else {
         my_plot <- v_df %>%
-            ggplot(aes(x = censusdate, y = value, color = variable)) +
+            ggplot(aes(x = .data$censusdate, y = .data$value, color = .data$variable)) +
             facet_grid(rank ~ ., scales = "free", switch = "y") +
             scale_color_viridis(discrete = TRUE, option = "plasma")
     }
@@ -310,7 +314,8 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
         scale_x_date(expand = c(0.01, 0)) +
         geom_line(size = line_size) +
         theme_bw(base_size = base_size, base_family = "Helvetica",
-                 base_line_size = 1) +
+                 base_line_size = 1) + 
+        labs(x = "censusdate", y = "value", color = "variable") + 
         theme(panel.background = element_rect(fill = "#AAAABB", color = NA),
               panel.grid.major = element_line(color = "grey30", size = 1),
               panel.grid.minor = element_line(color = "grey30", size = 1),
@@ -376,10 +381,10 @@ plot_time_series <- function(block,
                                 option = palette_option)
     
     timeseries %>%
-        ggplot(aes(x = time, y = abundance, color = species)) +
+        ggplot(aes(x = .data$time, y = .data$abundance, color = .data$species)) +
         geom_line(size = 1) +
         scale_color_manual(values = palette) + 
-        labs(x = NULL, y = "relative abundance") +
+        labs(x = NULL, y = "relative abundance", color = "species") +
         theme_bw(base_size = base_size, base_family = base_family,
                  base_line_size = base_line_size) +
         theme(panel.grid.minor = element_line(size = 1))
@@ -408,6 +413,7 @@ add_regime_shift_highlight <- function(my_plot,
 
     my_plot + geom_rect(data = data.frame(xmin = lower_date, xmax = upper_date,
                                           ymin = -Inf, ymax = Inf),
-                        mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+                        mapping = aes(xmin = .data$xmin, xmax = .data$xmax, 
+                                      ymin = .data$ymin, ymax = .data$ymax),
                         alpha = alpha, inherit.aes = FALSE, fill = fill)
 }
