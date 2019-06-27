@@ -3,7 +3,10 @@ context("Check functions to build plans for dynamic stability workflow")
 test_that("build_ccm_plan produces a correct plan", {
     expect_error(ccm_plan <- build_ccm_plan(), NA)
     expect_is(ccm_plan, c("drake_plan", "tbl_df"))
-    expect_equal(ccm_plan$target, c("ccm_func", "ccm_params", "ccm_results"))
+    
+    targets <- c("ccm_func", "ccm_params", "ccm_results")
+    expect_equal(vapply(targets, function(patt) {grep(patt, ccm_plan$target)}, 0), 
+                 seq_along(targets), check.names = FALSE) 
 #    expect_known_hash(as.character(ccm_plan$command), "31ba99a7e1")
 })
 
@@ -24,7 +27,8 @@ test_that("check full dynamic stability plan using block_3sp example data", {
                                                          lib_sizes = seq(10, 100, 10), 
                                                          num_samples = 10), NA)
     expect_is(my_plan, c("drake_plan", "tbl_df"))
-    expect_equal(my_plan$target, targets)
+    expect_equal(vapply(targets, function(patt) {grep(patt, my_plan$target)}, 0), 
+                 seq_along(targets), check.names = FALSE)
 #    expect_known_hash(as.character(my_plan$command), "a5baf6cbe7")
     
     # run plan
