@@ -17,7 +17,8 @@ Imports:
     dplyr,
     purrr,
     tidyr,
-    portalr (>= 0.2.4)
+    portalr (>= 0.2.4),
+    magrittr
 Suggests: 
     knitr,
     rmarkdown,
