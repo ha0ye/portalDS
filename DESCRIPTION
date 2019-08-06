@@ -20,20 +20,7 @@ Imports:
     portalr (>= 0.2.4),
     ggplot2,
     ggraph,
-    cowplot,
-    viridis,
-    reshape2,
-    forcats,
-    scales,
-    igraph,
-    rlang,
-    magrittr,
-    forecast,
-    stringr,
-    lubridate,
-    drake,
-    furrr,
-    deSolve
+    cowplot
 Suggests: 
     knitr,
     rmarkdown,
