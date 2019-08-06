@@ -17,21 +17,14 @@ Imports:
     dplyr,
     purrr,
     tidyr,
-    portalr (>= 0.2.4),
-    ggplot2,
-    ggraph,
-    cowplot
+    portalr (>= 0.2.4)
 Suggests: 
     knitr,
     rmarkdown,
     testthat,
     pkgdown, 
     here, 
-    covr, 
-    LDATS (>= 0.0.5), 
-    vdiffr, 
-    future,
-    future.callr
+    covr
 RoxygenNote: 6.1.1
 Remotes: 
     weecology/portalr,
