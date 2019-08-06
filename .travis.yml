@@ -13,7 +13,6 @@ addons:
     packages:
       - libgsl0-dbg
       - libgsl0-dev
-      - libgsl0ldbl
     update: true
 
 matrix:
