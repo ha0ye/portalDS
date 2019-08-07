@@ -29,8 +29,8 @@ make_portal_block <- function(path = portalr::get_default_data_path(),
     
     # summarize by each newmmonnumber, and for only the control plots we want
     block <- raw_rodent_data %>%
-        dplyr::filter(censusdate < "2015-04-18") %>%
-        dplyr::select(-period)
+        dplyr::filter(.data$censusdate < "2015-04-18") %>%
+        dplyr::select(-data$period)
     
     # check that effort is equal across samples
     stopifnot(length(unique(block$ntraps)) == 1)
@@ -38,11 +38,11 @@ make_portal_block <- function(path = portalr::get_default_data_path(),
     if (!is.null(filter_q))
     {
         species_list <- block %>%
-            tidyr::gather(species, abundance, BA:SO) %>%
-            dplyr::group_by(species) %>%
-            dplyr::summarize(quantile_q = quantile(abundance, 1 - filter_q)) %>%
-            dplyr::filter(quantile_q > 0) %>%
-            dplyr::pull(species)
+            tidyr::gather("species", "abundance", dplyr::matches("^[A-Z]{2}$")) %>%
+            dplyr::group_by(.data$species) %>%
+            dplyr::summarize(quantile_q = stats::quantile(.data$abundance, 1 - filter_q)) %>%
+            dplyr::filter(.data$quantile_q > 0) %>%
+            dplyr::pull(.data$species)
         
         block <- block %>%
             dplyr::select(c("newmoonnumber", "censusdate", "ntraps", "nplots", species_list))
@@ -50,11 +50,11 @@ make_portal_block <- function(path = portalr::get_default_data_path(),
     
     # add in NAs for unsampled newmoonnumbers and interpolate
     block <- block %>%
-        tidyr::complete(newmoonnumber = tidyr::full_seq(newmoonnumber, 1), fill = list(NA)) %>%
-        dplyr::mutate_at(dplyr::vars(-newmoonnumber, -ntraps), forecast::na.interp) %>%
-        dplyr::mutate_at(dplyr::vars(-newmoonnumber, -ntraps), as.numeric) %>%
-        dplyr::mutate(censusdate = as.Date(as.numeric(censusdate), origin = "1970-01-01")) %>%
-        dplyr::select(-newmoonnumber, -ntraps, -nplots)
+        tidyr::complete(newmoonnumber = tidyr::full_seq(.data$newmoonnumber, 1), fill = list(NA)) %>%
+        dplyr::mutate_at(dplyr::vars(-.data$newmoonnumber, -.data$ntraps), forecast::na.interp) %>%
+        dplyr::mutate_at(dplyr::vars(-.data$newmoonnumber, -.data$ntraps), as.numeric) %>%
+        dplyr::mutate(censusdate = as.Date(as.numeric(.data$censusdate), origin = "1970-01-01")) %>%
+        dplyr::select(-.data$newmoonnumber, -.data$ntraps, -.data$nplots)
     
     return(block)
 }

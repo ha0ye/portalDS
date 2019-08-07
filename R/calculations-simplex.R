@@ -24,21 +24,22 @@ compute_simplex <- function(block, E_list = 1:10,
                             surr_params = NULL)
 {
     simplex_results <- block %>%
-        dplyr::select(-censusdate) %>%
-        tidyr::gather(species, abundance) %>%
-        dplyr::group_by(species) %>%
+        dplyr::select(-.data$censusdate) %>%
+        tidyr::gather("species", "abundance") %>%
+        dplyr::group_by(.data$species) %>%
         tidyr::nest() %>%
         dplyr::mutate(simplex_out =
                           purrr::map(data, ~ rEDM::simplex(.$abundance, E = E_list, silent = TRUE))) %>%
-        dplyr::mutate(best_E = purrr::map_int(simplex_out, ~ dplyr::filter(., mae == min(mae)) %>%
-                                                  dplyr::pull(E) %>%
+        dplyr::mutate(best_E = purrr::map_int(.data$simplex_out, 
+                                              ~ dplyr::filter(., .data$mae == min(.data$mae)) %>%
+                                                  dplyr::pull(.data$E) %>%
                                                   as.integer))
     
     surrogate_method <- tolower(surrogate_method)
     if (surrogate_method == "twin")
     {
         simplex_results$surrogate_data <- 
-            purrr::pmap(dplyr::select(simplex_results, data, best_E),
+            purrr::pmap(dplyr::select(simplex_results, c("data", "best_E")),
                         ~do.call(rEDM::make_surrogate_twin, 
                                  c(list(ts = ..1, dim = ..2, num_surr = num_surr), 
                                    surr_params)
@@ -47,7 +48,7 @@ compute_simplex <- function(block, E_list = 1:10,
     } else if (surrogate_method == "annual_spline") {
         day_of_year <- lubridate::yday(block$censusdate)
         simplex_results$surrogate_data <- 
-            purrr::pmap(dplyr::select(simplex_results, data),
+            purrr::pmap(dplyr::select(simplex_results, "data"),
                         ~do.call(make_surrogate_annual_spline, 
                                  c(list(ts = ..1, num_surr = num_surr), 
                                    surr_params)
@@ -55,7 +56,7 @@ compute_simplex <- function(block, E_list = 1:10,
             )
     } else {
         simplex_results$surrogate_data <- 
-            purrr::pmap(dplyr::select(simplex_results, data),
+            purrr::pmap(dplyr::select(simplex_results, "data"),
                         ~do.call(rEDM::make_surrogate_data, 
                                  c(list(ts = ..1, num_surr = num_surr, 
                                         method = surrogate_method), 

@@ -67,7 +67,7 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
 {
     # rescale all the variables
     block <- block %>%
-        dplyr::select(-censusdate)
+        dplyr::select(-.data$censusdate)
     if (rescale)
     {
         block <- dplyr::mutate_all(block, norm_rescale)
@@ -106,7 +106,7 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
     #     all causal variables with no lag
     #     populate remainder with lags of predicted variable
     smap_coeffs <- purrr::map(effect_variables, function(effect_var) {
-        links <- ccm_links %>% dplyr::filter(lib_column == !!effect_var)
+        links <- ccm_links %>% dplyr::filter(.data$lib_column == !!effect_var)
         stopifnot(length(unique(links$E)) == 1) # check for unique best_E
         stopifnot(effect_var %in% links$target_column) # check for self-interaction
         
@@ -154,7 +154,7 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
             for (lib_end in seq(floor(n/2) + 1, n))
             {
                 lib <- c(1, lib_end)
-                temp_smap_coeff <- get_smap_ceofficients(temp_block,
+                temp_smap_coeff <- get_smap_coefficients(temp_block,
                                                          lib = lib, pred = lib)
                 smap_coeff[lib_end - 1, ] <- temp_smap_coeff[lib_end - 1, ]
             }
@@ -206,8 +206,8 @@ compute_smap_matrices <- function(smap_coeffs, ccm_links)
     
     # get maximum E value (so we know size of the Jacobian matrix)
     max_E <- ccm_links %>%
-        dplyr::filter(lib_column %in% vars) %>%
-        dplyr::pull(E) %>%
+        dplyr::filter(.data$lib_column %in% vars) %>%
+        dplyr::pull(.data$E) %>%
         max()
     jacobian_dim <- max_E * length(vars)
     
@@ -221,7 +221,7 @@ compute_smap_matrices <- function(smap_coeffs, ccm_links)
     smap_matrix_rows <- purrr::map(vars, function(var_name) {
         # get s-map coefficients without const column
         smap_df <- smap_coeffs[[var_name]] %>%
-            dplyr::select(-const)
+            dplyr::select(-.data$const)
         
         # output matrix (each row is 1 time step, each col is a var x lag)
         out <- matrix(0, nrow = ts_length, ncol = jacobian_dim)

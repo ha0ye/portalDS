@@ -25,7 +25,7 @@ compute_ccm <- function(simplex_results,
                       lib_column = 1, target_column = 2,
                       RNGseed = RNGseed, silent = silent) %>%
                 rEDM::ccm_means(na.rm = TRUE) %>%
-                dplyr::select(lib_size, num_pred, rho, mae, rmse)}
+                dplyr::select(.data$lib_size, .data$num_pred, .data$rho, .data$mae, .data$rmse)}
         # pull out variables from the original block
         lib_ts <- simplex_results[[from_idx, "data"]]$abundance
         pred_ts <- simplex_results[[to_idx, "data"]]$abundance
@@ -42,21 +42,21 @@ compute_ccm <- function(simplex_results,
         
         # combine outputs
         ccm_out <- dplyr::bind_rows(ccm_actual, ccm_surr) %>%
-            dplyr::mutate(lib_column = from_var,
-                          target_column = to_var)
+            dplyr::mutate(lib_column = .data$from_var,
+                          target_column = .data$to_var)
         ccm_out$E <- E
         return(ccm_out)
     }
     
     params <- expand.grid(from_idx = seq(NROW(simplex_results)),
                           to_idx = seq(NROW(simplex_results))) %>%
-        dplyr::mutate(E = simplex_results$best_E[from_idx], 
-                      from_var = simplex_results$species[from_idx], 
-                      to_var = simplex_results$species[to_idx])
+        dplyr::mutate(E = simplex_results$best_E[.data$from_idx], 
+                      from_var = simplex_results$species[.data$from_idx], 
+                      to_var = simplex_results$species[.data$to_idx])
     
     out <- furrr::future_pmap(params, ccm_func) %>%
         dplyr::bind_rows() %>%
-        dplyr::select(lib_column, target_column, data_type, dplyr::everything()) %>%
+        dplyr::select(.data$lib_column, .data$target_column, .data$data_type, dplyr::everything()) %>%
         dplyr::mutate_at(c("lib_column", "target_column", "data_type"), as.factor)
     
 }
@@ -84,7 +84,7 @@ build_ccm_plan <- function(lib_sizes = seq(10, 100, by = 10),
                           lib_column = 1, target_column = 2,
                           RNGseed = !!RNGseed, silent = !!silent) %>%
                     rEDM::ccm_means(na.rm = TRUE) %>%
-                    dplyr::select(lib_size, num_pred, rho, mae, rmse)}
+                    dplyr::select(.data$lib_size, .data$num_pred, .data$rho, .data$mae, .data$rmse)}
             # pull out variables from the original block
             lib_ts <- simplex_results[[from_idx, "data"]]$abundance
             pred_ts <- simplex_results[[to_idx, "data"]]$abundance
@@ -101,8 +101,8 @@ build_ccm_plan <- function(lib_sizes = seq(10, 100, by = 10),
             
             # combine outputs
             ccm_out <- dplyr::bind_rows(ccm_actual, ccm_surr) %>%
-                dplyr::mutate(lib_column = from_var,
-                              target_column = to_var)
+                dplyr::mutate(lib_column = .data$from_var,
+                              target_column = .data$to_var)
             ccm_out$E <- E
             return(ccm_out)
         }, 
@@ -113,7 +113,7 @@ build_ccm_plan <- function(lib_sizes = seq(10, 100, by = 10),
                           to_var = simplex_results$species[to_idx]),
         ccm_results = furrr::future_pmap(ccm_params, ccm_func) %>%
             dplyr::bind_rows() %>%
-            dplyr::select(lib_column, target_column, data_type, dplyr::everything()) %>%
+            dplyr::select(.data$lib_column, .data$target_column, .data$data_type, dplyr::everything()) %>%
             dplyr::mutate_at(c("lib_column", "target_column", "data_type"), as.factor)
     )
 }
@@ -152,29 +152,28 @@ compute_ccm_links <- function(ccm_results,
     #     for the actual data, then selects only the value at the largest 
     #     library size
     ccm_out <- ccm_results %>%
-        dplyr::group_by(lib_column, target_column, E) %>%
+        dplyr::group_by(.data$lib_column, .data$target_column, .data$E) %>%
         tidyr::nest() %>%
         dplyr::mutate(delta_rho = purrr::map_dbl(data, ~ 
-                                                     dplyr::filter(., data_type == "actual") %>%
-                                                     dplyr::summarize(dplyr::last(rho, order_by = lib_size) -
-                                                                          dplyr::first(rho, order_by = lib_size)) %>%
+                                                     dplyr::filter(., .data$data_type == "actual") %>%
+                                                     dplyr::summarize(dplyr::last(.data$rho, order_by = .data$lib_size) -
+                                                                        dplyr::first(.data$rho, order_by = .data$lib_size)) %>%
                                                      as.numeric), 
                       rho_minus_upper_q_null = purrr::map_dbl(data, ~
-                                                                  dplyr::group_by(., lib_size, data_type) %>%
-                                                                  dplyr::summarize(upper_q = quantile(rho, null_quantile, na.rm = TRUE)) %>%
-                                                                  tidyr::spread(data_type, upper_q) %>%
+                                                                  dplyr::group_by(., .data$lib_size, .data$data_type) %>%
+                                                                  dplyr::summarize(upper_q = quantile(.data$rho, null_quantile, na.rm = TRUE)) %>%
+                                                                  tidyr::spread(.data$data_type, .data$upper_q) %>%
                                                                   dplyr::ungroup() %>% 
-                                                                  dplyr::summarize(dplyr::last(actual - surrogate, order_by = lib_size)) %>%
+                                                                  dplyr::summarize(dplyr::last(.data$actual - .data$surrogate, order_by = .data$lib_size)) %>%
                                                                   as.numeric)
         ) %>% 
-        dplyr::arrange(lib_column) %>%
-        dplyr::select(-data)
+        dplyr::arrange(.data$lib_column) %>%
+        dplyr::select(-.data$data)
     
     # Filter links
     #   - must either be significant (passing thresholds)
     #   - or be from self to self (keeps univariate E for later analysis)
-    
-    dplyr::filter(ccm_out, 
-                  (delta_rho > delta_rho_threshold & rho_minus_upper_q_null > 0) |
-                      lib_column == target_column)
+    ccm_out %>%
+        dplyr::filter((.data$delta_rho > delta_rho_threshold & .data$rho_minus_upper_q_null > 0) |
+                          .data$lib_column == .data$target_column)
 }

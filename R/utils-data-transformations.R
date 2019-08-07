@@ -7,7 +7,7 @@
 #' @return A rescaled vector the same length as `x`
 #'
 #' @export
-norm_rescale <- function(x, na.rm = TRUE) {(x - mean(x, na.rm = na.rm)) / sd(x, na.rm = na.rm)}
+norm_rescale <- function(x, na.rm = TRUE) {(x - mean(x, na.rm = na.rm)) / stats::sd(x, na.rm = na.rm)}
 
 #' @title make_surrogate_annual_spline
 #' @description Generate surrogate time series by computing a mean seasonal

@@ -29,10 +29,10 @@ plot_network <- function(ccm_links,
                          existing_graph = NULL)
 {
     my_graph <- ccm_links %>%
-        dplyr::filter(lib_column != target_column) %>%
-        dplyr::arrange(target_column) %>%
-        dplyr::select(target_column, lib_column) %>%
-        igraph::graph_from_data_frame(vertices = levels(.$target_column))
+        dplyr::filter(.data$lib_column != .data$target_column) %>%
+        dplyr::arrange(.data$target_column) %>%
+        dplyr::select(c("target_column", "lib_column")) %>%
+        igraph::graph_from_data_frame(vertices = levels(.data$target_column))
 
     if (is.null(palette))
     {
@@ -97,16 +97,16 @@ plot_smap_coeffs <- function(smap_matrices, base_size = 16,
         out$t <- i
         return(out)
     }) %>%
-        dplyr::rename(target = Var1, predictor = Var2)
+        dplyr::rename(target = .data$Var1, predictor = .data$Var2)
 
     # identify coefficients that matter
     to_keep <- smap_coeff_df %>%
-        dplyr::group_by(target, predictor) %>%
-        dplyr::filter(max(abs(value)) > 0) %>%
-        dplyr::mutate(coeff_name = paste0(target, predictor))
+        dplyr::group_by(.data$target, .data$predictor) %>%
+        dplyr::filter(max(abs(.data$value)) > 0) %>%
+        dplyr::mutate(coeff_name = paste0(.data$target, .data$predictor))
     smap_coeff_df <- smap_coeff_df %>%
-        dplyr::mutate(coeff_name = paste0(target, predictor)) %>%
-        dplyr::filter(coeff_name %in% to_keep$coeff_name)
+        dplyr::mutate(coeff_name = paste0(.data$target, .data$predictor)) %>%
+        dplyr::filter(.data$coeff_name %in% to_keep$coeff_name)
 
     # convert time index into dates
     smap_coeff_df$censusdate <- as.Date(names(smap_matrices)[smap_coeff_df$t])
@@ -186,8 +186,8 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
         data.frame(lambda = lambda, censusdate = names(eigenvalues)[i],
                    rank = seq(lambda), stringsAsFactors = FALSE)
     }) %>%
-        dplyr::filter(rank <= num_values) %>%
-        dplyr::mutate(censusdate = as.Date(censusdate))
+        dplyr::filter(.data$rank <= num_values) %>%
+        dplyr::mutate(censusdate = as.Date(.data$censusdate))
 
     my_plot <- eigenvalue_dist %>%
         ggplot(aes(x = .data$censusdate, y = .data$lambda,
@@ -204,9 +204,9 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
     if (highlight_complex && num_values >= 2)
     {
         complex_df <- data.frame(censusdate = eigenvalue_dist %>%
-                                     tidyr::spread(rank, lambda) %>%
-                                     dplyr::filter(`1` < `2` + 0.001) %>%
-                                     dplyr::select(censusdate),
+                                     tidyr::spread(.data$rank, .data$lambda) %>%
+                                     dplyr::filter(.data$`1` < .data$`2` + 0.001) %>%
+                                     dplyr::select(.data$censusdate),
                                  lambda = min(eigenvalue_dist$lambda, na.rm = TRUE),
                                  rank = 1) %>%
             tidyr::complete(censusdate = eigenvalue_dist$censusdate, fill = list(lambda = NA, rank = 1))
@@ -270,12 +270,12 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
         out$t <- i
         return(out)
     }) %>%
-        dplyr::rename(variable = Var1, rank = Var2) %>%
+        dplyr::rename(variable = .data$Var1, rank = .data$Var2) %>%
         dplyr::mutate(censusdate = as.Date(names(eigenvectors)[t]),
-                      variable = as.factor(var_names[variable]),
-                      value = abs(Re(value))) %>%
-        dplyr::group_by(t, rank) %>%
-        dplyr::mutate(value = vector_scale(value)) %>%
+                      variable = as.factor(var_names[.data$variable]),
+                      value = abs(Re(.data$value))) %>%
+        dplyr::group_by(.data$t, .data$rank) %>%
+        dplyr::mutate(value = vector_scale(.data$value)) %>%
         dplyr::ungroup()
 
     if (add_IPR)
@@ -286,8 +286,8 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
         #     IPR = sum([v_i]^4)
         #     ranges from 1/N (N = length of eigenvector) to 1
         ipr_df <- v_df %>%
-            dplyr::group_by(t, rank) %>%
-            dplyr::summarize(value = sum(abs(value)^4)) %>%
+            dplyr::group_by(.data$t, .data$rank) %>%
+            dplyr::summarize(value = sum(abs(.data$value)^4)) %>%
             dplyr::ungroup() %>%
             dplyr::mutate(censusdate = as.Date(names(eigenvectors)[t]),
                           variable = "IPR")
@@ -354,16 +354,15 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
 #'
 #' @export
 plot_time_series <- function(block,
-                             time_column = censusdate,
+                             time_column = "censusdate",
                              scale = "unif",
                              palette_option = "plasma",
                              base_size = 11,
                              base_family = "Helvetica",
                              base_line_size = 1)
 {
-    time_column <- rlang::enquo(time_column)
-    time <- dplyr::pull(block, !!time_column)
-    block <- dplyr::select(block, -!!time_column)
+    time <- dplyr::pull(block, time_column)
+    block <- dplyr::select(block, -time_column)
 
     if (tolower(scale) == "unif")
     {
@@ -375,7 +374,7 @@ plot_time_series <- function(block,
     }
     timeseries <- block %>%
         dplyr::mutate(time = time) %>%
-        tidyr::gather(species, abundance, -time)
+        tidyr::gather("species", "abundance", -.data$time)
 
     palette <- viridis::viridis(length(unique(timeseries$species)),
                                 option = palette_option)

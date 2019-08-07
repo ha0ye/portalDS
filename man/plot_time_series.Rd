@@ -4,7 +4,7 @@
 \alias{plot_time_series}
 \title{plot_time_series}
 \usage{
-plot_time_series(block, time_column = censusdate, scale = "unif",
+plot_time_series(block, time_column = "censusdate", scale = "unif",
   palette_option = "plasma", base_size = 11,
   base_family = "Helvetica", base_line_size = 1)
 }
