@@ -113,10 +113,14 @@
 <a class="sourceLine" id="cb2-7" data-line-number="7">                            <span class="dt">date_breaks =</span> <span class="st">"1 year"</span>, <span class="dt">date_labels =</span> <span class="st">"%Y"</span>, <span class="dt">expand =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="fl">0.01</span>, <span class="dv">0</span>))</a>
 <a class="sourceLine" id="cb2-8" data-line-number="8"></a>
 <a class="sourceLine" id="cb2-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="kw">plot_time_series</span>(maizuru_block) <span class="op">+</span></a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="kw"><a href="../reference/plot_time_series.html">plot_time_series</a></span>(maizuru_block) <span class="op">+</span></a>
 <a class="sourceLine" id="cb2-11" data-line-number="11"><span class="st">  </span>x_axis_time <span class="op">+</span></a>
 <a class="sourceLine" id="cb2-12" data-line-number="12"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="dt">values =</span> maizuru_palette) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span>(<span class="dt">color =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span>(<span class="dt">color =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb2-14" data-line-number="14"><span class="co">#&gt; Scale for 'colour' is already present. Adding another scale for</span></a>
+<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="co">#&gt; 'colour', which will replace the existing scale.</span></a>
+<a class="sourceLine" id="cb2-16" data-line-number="16"><span class="co">#&gt; Warning: Removed 2175 rows containing missing values (geom_path).</span></a></code></pre></div>
+<p><img src="maizuru-dynamic-stability_files/figure-html/time%20series-1.png" width="576"></p>
 </div>
 <div id="dynamic-stability-calculations" class="section level1">
 <h1 class="hasAnchor">
@@ -175,40 +179,53 @@
 <h2 class="hasAnchor">
 <a href="#interaction-network" class="anchor"></a>Interaction Network</h2>
 <p>First, we look at the interaction network. <code>plot_network</code> has a default layout and palette, but we can specify both. Here, we re-use the viridis color scheme used to plot the time series.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">maizuru_network &lt;-<span class="st"> </span><span class="kw">plot_network</span>(ccm_links, <span class="dt">palette =</span> maizuru_palette)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">maizuru_network &lt;-<span class="st"> </span><span class="kw"><a href="../reference/plot_network.html">plot_network</a></span>(ccm_links, <span class="dt">palette =</span> maizuru_palette)</a></code></pre></div>
 <p>Note that the output of <code>plot_network</code> is a list. The <code>plot</code> element is the ggraph object, which we can plot:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(maizuru_network<span class="op">$</span>plot)</a></code></pre></div>
+<p><img src="maizuru-dynamic-stability_files/figure-html/view%20interaction%20network-1.png" width="576"></p>
 <p>The remaining components allow us to plot a subset of the network, while keeping the same layout of nodes and the associated colors.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">halichoeres_links &lt;-<span class="st"> </span>ccm_links <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb11-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(stringr<span class="op">::</span><span class="kw"><a href="https://stringr.tidyverse.org/reference/str_detect.html">str_detect</a></span>(lib_column, <span class="st">"Halichoeres"</span>) <span class="op">|</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb11-3" data-line-number="3"><span class="st">           </span>stringr<span class="op">::</span><span class="kw"><a href="https://stringr.tidyverse.org/reference/str_detect.html">str_detect</a></span>(target_column, <span class="st">"Halichoeres"</span>))</a>
 <a class="sourceLine" id="cb11-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb11-5" data-line-number="5">halichoeres_network &lt;-<span class="st"> </span><span class="kw">plot_network</span>(halichoeres_links, </a>
+<a class="sourceLine" id="cb11-5" data-line-number="5">halichoeres_network &lt;-<span class="st"> </span><span class="kw"><a href="../reference/plot_network.html">plot_network</a></span>(halichoeres_links, </a>
 <a class="sourceLine" id="cb11-6" data-line-number="6">                                    <span class="dt">palette =</span> maizuru_palette, </a>
 <a class="sourceLine" id="cb11-7" data-line-number="7">                                    <span class="dt">existing_graph =</span> maizuru_network<span class="op">$</span>graph)</a>
 <a class="sourceLine" id="cb11-8" data-line-number="8"></a>
 <a class="sourceLine" id="cb11-9" data-line-number="9"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(halichoeres_network<span class="op">$</span>plot)</a></code></pre></div>
+<p><img src="maizuru-dynamic-stability_files/figure-html/interaction%20subnetwork-1.png" width="576"></p>
 </div>
 <div id="eigenvalues" class="section level2">
 <h2 class="hasAnchor">
 <a href="#eigenvalues" class="anchor"></a>Eigenvalues</h2>
 <p>Dynamic stability <span class="citation">(Ushio et al. 2018)</span> is defined as the time-varying property that is the largest (absolute value) eigenvalue. With the results of our analysis, we can plot this as a time series, applying the same x-axis transformation as for the population time series earlier:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">eigenvalues <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb12-2" data-line-number="2"><span class="st">  </span><span class="kw">plot_eigenvalues</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="st">  </span>x_axis_time</a></code></pre></div>
+<a class="sourceLine" id="cb12-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/plot_eigenvalues.html">plot_eigenvalues</a></span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="st">  </span>x_axis_time</a>
+<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co">#&gt; Warning: Removed 121 rows containing missing values (geom_path).</span></a></code></pre></div>
+<p><img src="maizuru-dynamic-stability_files/figure-html/unnamed-chunk-2-1.png" width="576"></p>
 <p>Note that <code>plot_eigenvalues</code> has a number of additional parameters, which allow us to plot multiple eigenvalues simultaneously, or identify when the dominant eigenvalue is complex (red points):</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">eigenvalues <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="st">  </span><span class="kw">plot_eigenvalues</span>(<span class="dt">num_values =</span> <span class="dv">2</span>, <span class="dt">highlight_complex =</span> <span class="ot">TRUE</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="st">  </span>x_axis_time</a></code></pre></div>
+<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/plot_eigenvalues.html">plot_eigenvalues</a></span>(<span class="dt">num_values =</span> <span class="dv">2</span>, <span class="dt">highlight_complex =</span> <span class="ot">TRUE</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="st">  </span>x_axis_time</a>
+<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="co">#&gt; Warning: Removed 242 rows containing missing values (geom_path).</span></a>
+<a class="sourceLine" id="cb13-5" data-line-number="5"><span class="co">#&gt; Warning: Removed 221 rows containing missing values (geom_point).</span></a></code></pre></div>
+<p><img src="maizuru-dynamic-stability_files/figure-html/unnamed-chunk-3-1.png" width="576"></p>
 </div>
 <div id="eigenvectors" class="section level2">
 <h2 class="hasAnchor">
 <a href="#eigenvectors" class="anchor"></a>Eigenvectors</h2>
 <p>Just as with the eigenvalues, we can plot the dominant eigenvector(s) as it changes in time. Note that there are only 13 dimensions here, because we drop the 2 species that share no links with the others.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">eigenvectors <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="st">  </span><span class="kw">plot_eigenvectors</span>(<span class="dt">num_values =</span> <span class="dv">2</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/plot_eigenvectors.html">plot_eigenvectors</a></span>(<span class="dt">num_values =</span> <span class="dv">2</span>) <span class="op">+</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb14-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="dt">values =</span> maizuru_palette) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-4" data-line-number="4"><span class="st">  </span>x_axis_time</a></code></pre></div>
+<a class="sourceLine" id="cb14-4" data-line-number="4"><span class="st">  </span>x_axis_time</a>
+<a class="sourceLine" id="cb14-5" data-line-number="5"><span class="co">#&gt; Scale for 'colour' is already present. Adding another scale for</span></a>
+<a class="sourceLine" id="cb14-6" data-line-number="6"><span class="co">#&gt; 'colour', which will replace the existing scale.</span></a>
+<a class="sourceLine" id="cb14-7" data-line-number="7"><span class="co">#&gt; Scale for 'x' is already present. Adding another scale for 'x', which</span></a>
+<a class="sourceLine" id="cb14-8" data-line-number="8"><span class="co">#&gt; will replace the existing scale.</span></a>
+<a class="sourceLine" id="cb14-9" data-line-number="9"><span class="co">#&gt; Warning: Removed 1573 rows containing missing values (geom_path).</span></a></code></pre></div>
+<p><img src="maizuru-dynamic-stability_files/figure-html/unnamed-chunk-4-1.png" width="576"></p>
 </div>
 </div>
 <div id="references" class="section level1 unnumbered">

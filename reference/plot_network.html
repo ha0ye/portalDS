@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get a data.frame of simulated abundances (3-stage flour beetles) — simulate_LPA_flour_beetles • portalDS</title>
+<title>plot_network — plot_network • portalDS</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,14 +30,10 @@
 
 
 
-<meta property="og:title" content="Get a data.frame of simulated abundances (3-stage flour beetles) — simulate_LPA_flour_beetles" />
+<meta property="og:title" content="plot_network — plot_network" />
 
-<meta property="og:description" content="Simulate time series from the LPA (larvae-pupae-adults) flour 
-  beetle model of Dennis et al. (2001) &amp;lt;https://doi.org/10.1890/0012-9615(2001)071[0277:ECACDI]2.0.CO;2&amp;gt;
-  . The initial conditions follow the experimental setup of Dennis et al. 
-  (2001) and the parameters are the maximum-likelihood estimates from Table 1
-  of the same, with u_a and c_pa adjusted according to the description so as 
-  to give chaotic behavior." />
+<meta property="og:description" content="Visualize the network of interactions, created from running CCM
+  on community time series as part of the dynamic stability analysis" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -116,50 +112,65 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get a data.frame of simulated abundances (3-stage flour beetles)</h1>
-    <small class="dont-index">Source: <a href='https://github.com/ha0ye/portalDS/blob/master/R/data-sim-flour-beetle.R'><code>R/data-sim-flour-beetle.R</code></a></small>
-    <div class="hidden name"><code>simulate_LPA_flour_beetles.Rd</code></div>
+    <h1>plot_network</h1>
+    <small class="dont-index">Source: <a href='https://github.com/ha0ye/portalDS/blob/master/R/plotting_functions.R'><code>R/plotting_functions.R</code></a></small>
+    <div class="hidden name"><code>plot_network.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Simulate time series from the LPA (larvae-pupae-adults) flour 
-  beetle model of Dennis et al. (2001) &lt;<a href='https://doi.org/10.1890/0012-9615(2001)071[0277:ECACDI]2.0.CO;2'>https://doi.org/10.1890/0012-9615(2001)071[0277:ECACDI]2.0.CO;2</a>&gt;
-  . The initial conditions follow the experimental setup of Dennis et al. 
-  (2001) and the parameters are the maximum-likelihood estimates from Table 1
-  of the same, with u_a and c_pa adjusted according to the description so as 
-  to give chaotic behavior.</p>
+    <p>Visualize the network of interactions, created from running CCM
+  on community time series as part of the dynamic stability analysis</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>simulate_LPA_flour_beetles</span>(<span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='kw'>b</span> <span class='kw'>=</span> <span class='fl'>10.67</span>, <span class='kw'>u_l</span> <span class='kw'>=</span> <span class='fl'>0.1955</span>, <span class='kw'>u_a</span> <span class='kw'>=</span>
-  <span class='fl'>0.96</span>, <span class='kw'>c_el</span> <span class='kw'>=</span> <span class='fl'>0.01647</span>, <span class='kw'>c_ea</span> <span class='kw'>=</span> <span class='fl'>0.01313</span>, <span class='kw'>c_pa</span> <span class='kw'>=</span> <span class='fl'>0.35</span>), <span class='kw'>initial_state</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='kw'>L</span>
-  <span class='kw'>=</span> <span class='fl'>250</span>, <span class='kw'>P</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>A</span> <span class='kw'>=</span> <span class='fl'>100</span>), <span class='kw'>sample_times</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>0</span>, <span class='fl'>1000</span>), <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>plot_network</span>(<span class='no'>ccm_links</span>, <span class='kw'>layout</span> <span class='kw'>=</span> <span class='st'>"circle"</span>, <span class='kw'>palette</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>palette_option</span> <span class='kw'>=</span> <span class='st'>"plasma"</span>, <span class='kw'>existing_graph</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>params</th>
-      <td><p>model parameters</p></td>
+      <th>ccm_links</th>
+      <td><p>a data.frame containing the inferred interactions from CCM,
+it should have a `lib_column` and `target_column` to specify the causal
+links (where directed edges are from `target_column` to `lib_column`)</p></td>
     </tr>
     <tr>
-      <th>initial_state</th>
-      <td><p>initial conditions</p></td>
+      <th>layout</th>
+      <td><p>The type of layout to create.</p></td>
     </tr>
     <tr>
-      <th>sample_times</th>
-      <td><p>the time values at which to make observations</p></td>
+      <th>palette</th>
+      <td><p>a data.frame with the colors for each vertex; if NULL, one
+will be created using <code><a href='https://www.rdocumentation.org/packages/viridis/topics/reexports'>viridis</a></code></p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>remaining arguments to be passed to <code><a href='https://www.rdocumentation.org/packages/deSolve/topics/ode'>ode</a></code></p></td>
+      <th>palette_option</th>
+      <td><p>the color palette to use (see <code><a href='https://www.rdocumentation.org/packages/viridis/topics/reexports'>viridis</a></code>
+for more info)</p></td>
+    </tr>
+    <tr>
+      <th>existing_graph</th>
+      <td><p>a data.frame specifying the layout of nodes (e.g. from a
+previous call to plot_network); if NULL, one will be created</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a matrix (and `deSolve`) object with the observations (and times)</p>
+    <p>a list with three elements:</p><table class='table'>
+<tr><td></td><td></td></tr>
+<tr><td><code>plot</code></td><td></td></tr>
+<tr><td>the ggraph object to plot or save</td><td></td></tr>
+<tr><td></td><td><code>palette</code></td></tr>
+<tr><td></td><td>the palette (for a future `plot_network` call)</td></tr>
+<tr><td></td><td></td></tr>
+<tr><td><code>graph</code></td><td></td></tr>
+<tr><td>the graph (for a future `plot_network` call)</td><td></td></tr>
+</table>
+
+
     
 
   </div>
