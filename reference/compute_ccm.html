@@ -36,10 +36,7 @@
   using the best embedding dimension from the simplex results, and computed 
   for both the real data and the surrogate data. The calculations run using 
   future_pmap. Thus, parallelization should be set by 
-  the user, if desired, using plan, prior to running.
-`build_ccm_plan` encapsulates the calculations of `compute_ccm`
-  in a drake plan. This seems to run a bit faster than 
-  the `compute_ccm` function." />
+  the user, if desired, using plan, prior to running." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -130,18 +127,12 @@
   for both the real data and the surrogate data. The calculations run using 
   <code><a href='https://www.rdocumentation.org/packages/furrr/topics/future_map2'>future_pmap</a></code>. Thus, parallelization should be set by 
   the user, if desired, using <code><a href='https://www.rdocumentation.org/packages/future/topics/plan'>plan</a></code>, prior to running.</p>
-<p>`build_ccm_plan` encapsulates the calculations of `compute_ccm`
-  in a <code><a href='https://www.rdocumentation.org/packages/drake/topics/drake-package'>drake</a></code> plan. This seems to run a bit faster than 
-  the `compute_ccm` function.</p>
     
     </div>
 
     <pre class="usage"><span class='fu'>compute_ccm</span>(<span class='no'>simplex_results</span>, <span class='kw'>lib_sizes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>10</span>, <span class='fl'>100</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fl'>10</span>),
   <span class='kw'>random_libs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>num_samples</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>replace</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>RNGseed</span> <span class='kw'>=</span> <span class='fl'>42</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-
-<span class='fu'>build_ccm_plan</span>(<span class='kw'>lib_sizes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>10</span>, <span class='fl'>100</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fl'>10</span>), <span class='kw'>random_libs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>num_samples</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>replace</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>RNGseed</span> <span class='kw'>=</span> <span class='fl'>42</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+  <span class='kw'>RNGseed</span> <span class='kw'>=</span> <span class='fl'>42</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -183,9 +174,6 @@ reproducible runs of ccm with randomly generated libraries</p></td>
     <p>`compute_ccm` returns a tibble with columns for the variables that we 
   use in CCM, the data type (whether it's the "actual" time series or 
   "surrogate"), the library size, and the results from CCM</p>
-<p>`build_ccm_plan` returns a <code><a href='https://www.rdocumentation.org/packages/drake/topics/drake-package'>drake</a></code> plan with 
-  targets for the helper function, the params to be used for ccm, and the 
-  ccm_results (as from <code>compute_ccm</code>).</p>
     
 
   </div>
