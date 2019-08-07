@@ -5,3 +5,4 @@ inst/doc
 .Ruserdata
 output/*results*.RDS
 tests/testthat/.drake*
+.drake*
