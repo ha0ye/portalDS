@@ -29,7 +29,7 @@ compute_simplex <- function(block, E_list = 1:10,
         dplyr::group_by(.data$species) %>%
         tidyr::nest() %>%
         dplyr::mutate(simplex_out =
-                          purrr::map(data, ~ rEDM::simplex(.$abundance, E = E_list, silent = TRUE))) %>%
+                          purrr::map(.data$data, ~ rEDM::simplex(.$abundance, E = E_list, silent = TRUE))) %>%
         dplyr::mutate(best_E = purrr::map_int(.data$simplex_out, 
                                               ~ dplyr::filter(., .data$mae == min(.data$mae)) %>%
                                                   dplyr::pull(.data$E) %>%

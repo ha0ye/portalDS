@@ -94,12 +94,12 @@ compute_ccm_links <- function(ccm_results,
     ccm_out <- ccm_results %>%
         dplyr::group_by(.data$lib_column, .data$target_column, .data$E) %>%
         tidyr::nest() %>%
-        dplyr::mutate(delta_rho = purrr::map_dbl(data, ~ 
+        dplyr::mutate(delta_rho = purrr::map_dbl(.data$data, ~ 
                                                      dplyr::filter(., .data$data_type == "actual") %>%
                                                      dplyr::summarize(dplyr::last(.data$rho, order_by = .data$lib_size) -
-                                                                        dplyr::first(.data$rho, order_by = .data$lib_size)) %>%
+                                                                          dplyr::first(.data$rho, order_by = .data$lib_size)) %>%
                                                      as.numeric), 
-                      rho_minus_upper_q_null = purrr::map_dbl(data, ~
+                      rho_minus_upper_q_null = purrr::map_dbl(.data$data, ~
                                                                   dplyr::group_by(., .data$lib_size, .data$data_type) %>%
                                                                   dplyr::summarize(upper_q = quantile(.data$rho, null_quantile, na.rm = TRUE)) %>%
                                                                   tidyr::spread(.data$data_type, .data$upper_q) %>%
