@@ -27,14 +27,24 @@ Imports:
     forcats,
     scales,
     igraph,
-    rlang
+    rlang,
+    forecast,
+    stringr,
+    lubridate,
+    drake,
+    furrr,
+    deSolve
 Suggests: 
     knitr,
     rmarkdown,
     testthat,
     pkgdown, 
     here, 
-    covr
+    covr, 
+    LDATS (>= 0.0.5), 
+    vdiffr, 
+    future,
+    future.callr
 RoxygenNote: 6.1.1
 Remotes: 
     weecology/portalr,

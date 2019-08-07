@@ -15,8 +15,7 @@ LOCAL <- identical(Sys.getenv("LOCAL"), "true")
 knitr::opts_chunk$set(purl = LOCAL, 
                       collapse = TRUE,
                       comment = "#>", 
-                      fig.width = 6, 
-                      eval = FALSE)
+                      fig.width = 6)
 ```
 
 # Introduction
