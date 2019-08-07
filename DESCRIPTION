@@ -18,7 +18,15 @@ Imports:
     purrr,
     tidyr,
     portalr (>= 0.2.4),
-    magrittr
+    magrittr,
+    ggplot2,
+    ggraph,
+    cowplot,
+    viridis,
+    reshape2,
+    forcatsscales,
+    igraph,
+    rlang
 Suggests: 
     knitr,
     rmarkdown,
