@@ -128,10 +128,10 @@
     <p>`compute_ccm` runs pairwise CCM based on the simplex_output - 
   using the best embedding dimension from the simplex results, and computed 
   for both the real data and the surrogate data. The calculations run using 
-  <code><a href='https://www.rdocumentation.org/packages/furrr/topics/future_map2'>future_pmap</a></code>. Thus, parallelization should be set by 
-  the user, if desired, using <code><a href='https://www.rdocumentation.org/packages/future/topics/plan'>plan</a></code>, prior to running.</p>
+  <code>future_pmap</code>. Thus, parallelization should be set by 
+  the user, if desired, using <code>plan</code>, prior to running.</p>
 <p>`build_ccm_plan` encapsulates the calculations of `compute_ccm`
-  in a <code><a href='https://www.rdocumentation.org/packages/drake/topics/drake-package'>drake</a></code> plan. This seems to run a bit faster than 
+  in a <code>drake</code> plan. This seems to run a bit faster than 
   the `compute_ccm` function.</p>
     
     </div>
@@ -183,7 +183,7 @@ reproducible runs of ccm with randomly generated libraries</p></td>
     <p>`compute_ccm` returns a tibble with columns for the variables that we 
   use in CCM, the data type (whether it's the "actual" time series or 
   "surrogate"), the library size, and the results from CCM</p>
-<p>`build_ccm_plan` returns a <code><a href='https://www.rdocumentation.org/packages/drake/topics/drake-package'>drake</a></code> plan with 
+<p>`build_ccm_plan` returns a <code>drake</code> plan with 
   targets for the helper function, the params to be used for ccm, and the 
   ccm_results (as from <code>compute_ccm</code>).</p>
     
