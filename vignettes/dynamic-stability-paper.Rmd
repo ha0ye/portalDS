@@ -1,0 +1,82 @@
+---
+title: "Dynamic indicators of systemic change and resilience"
+author: "Hao Ye"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Dynamic indicators of systemic change and resilience}
+  %\VignetteEngine{knitr::rmarkdown_notangle}
+  %\VignetteEncoding{UTF-8}
+bibliography: my_lib.bib
+---
+
+```{r, include = FALSE}
+LOCAL <- identical(Sys.getenv("LOCAL"), "true")
+knitr::opts_chunk$set(purl = LOCAL, 
+                      collapse = TRUE,
+                      comment = "#>", 
+                      fig.width = 6
+)
+```
+
+# Abstract
+
+
+
+# Introduction
+
+<!-- importance of whole system change -->
+
+Ecosystems are changing, understanding the nature of changes and their causes is important for decision-making. In other words, how likely are the observations of specific changes under different conceptual models of how ecosystems work.
+
+Unfortunately, ecosystems are complex, with not just multiple components, but interactions among those components that produce dynamics and patterns on multiple scales. Thus, even summarizing the high-dimensional state of an ecosystem is a challenging task.
+
+<!-- motivation for taking a dynamical view -->
+
+Using time series is a natural way to investigate this question. Multiple values through time are required for determining baselines, and examination of the changes over time contains inherent information about what are the plausible underlying mechanisms for generating those changes.
+
+<!-- brief review of history (re: system stability and metrics) -->
+
+Historically, ecosystem stability has been characterized based on the interaction matrics [@May_1973a; @Pimm_1984]. We briefly summarize this approach:
+
+1. Let the abundances of the component species in a system be $n_i$, with $i$ taking on values from $1$ to $N$, the number of species.
+2. Assume that the population dynamics for each species is a function of the other species: $\displaystyle \frac{\mathrm{d} n_i}{\mathrm{d} t} = F_i \left(n_1(t), n_2(t), ..., n_N(t) \right)$
+3. Let the system be in the vicinity of an equilibrium. Then the population dynamics can be linearized around this equilibrium point: $\displaystyle \frac{\mathrm{d} n_i}{\mathrm{d} t} \approx \sum_j{a_{ij} n_j(t)}$, where $a_{ij}$ are the elements of the community matrix $\mathrm{A}$.
+4. The asymptotic stability of the equilibrium point is determined by the signs of the real components of the eigenvalues of the community matrix. Stability occurs when $\textrm{Re}\left(\lambda_i\right) < 0$ for all $\lambda_i$.
+
+Stability - historically based on interactions among species 
+
+
+
+
+<!-- narrow down to specific research topic (empirical measures of system change) -->
+Ushio et al. [-@Ushio_2018] introduced "dynamic stability" as an empirical measure of ecosystem stability. As the dominant eigenvalue of the time-varying interaction matrix, dynamic stability can be viewed as a time-varying and continuous analogue to stability as characterized in Pimm [-@Pimm_1984]. That is, instead of stability being defined as a static, binary property of the system, it is instead computed at each time point as a continuous quantity (where values above 1 correspond to stable states, and values below 1 correspond to unstable states).
+
+$$\textrm{dynamic stability}_t = \left|\lambda_{\textrm{dom}, t}\right|$$
+
+<!-- details of what dynamic stability and related measures are -->
+
+
+<!-- summary of questions and approaches -->
+
+
+
+
+
+
+# Methods
+
+
+
+
+# Results
+
+
+
+# Discussion
+
+
+
+# Conclusions
+
+# References
