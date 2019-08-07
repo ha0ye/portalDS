@@ -24,7 +24,8 @@ Imports:
     cowplot,
     viridis,
     reshape2,
-    forcatsscales,
+    forcats,
+    scales,
     igraph,
     rlang
 Suggests: 
