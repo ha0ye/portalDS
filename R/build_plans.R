@@ -86,8 +86,8 @@ compute_dynamic_stability <- function(block,
     if (is.null(results$smap_matrices))
     {
         results$smap_coeffs <- compute_smap_coeffs(results$block, results$ccm_links, 
-                                           rescale = rescale, 
-                                           rolling_forecast = rolling_forecast)
+                                                   rescale = rescale, 
+                                                   rolling_forecast = rolling_forecast)
         results$smap_matrices <- compute_smap_matrices(results$smap_coeffs,
                                                        results$ccm_links)
         
@@ -127,29 +127,26 @@ build_dynamic_stability_plan <- function(max_E = 16, E_list = seq(max_E),
                                          silent = TRUE, rescale = TRUE, 
                                          rolling_forecast = FALSE)
 {
-    dplyr::bind_rows(
-        drake::drake_plan(
-            simplex_results = compute_simplex(block = block,
-                                              E_list = !!E_list,
-                                              surrogate_method = !!surrogate_method,
-                                              num_surr = !!num_surr, 
-                                              surr_params = !!surr_params)
-        ), 
-        build_ccm_plan(lib_sizes = lib_sizes, 
-                       random_libs = random_libs, 
-                       num_samples = num_samples, 
-                       replace = replace, 
-                       RNGseed = RNGseed, 
-                       silent = silent), 
-        drake::drake_plan(
-            ccm_links = compute_ccm_links(ccm_results),
-            smap_coeffs = compute_smap_coeffs(block, ccm_links, 
-                                              rescale = !!rescale, 
-                                              rolling_forecast = !!rolling_forecast), 
-            smap_matrices = compute_smap_matrices(smap_coeffs, ccm_links), 
-            eigen_decomp = compute_eigen_decomp(smap_matrices), 
-            eigenvalues = eigen_decomp$values, 
-            eigenvectors = eigen_decomp$vectors
-        )
+    drake::drake_plan(
+        simplex_results = compute_simplex(block = block,
+                                          E_list = !!E_list,
+                                          surrogate_method = !!surrogate_method,
+                                          num_surr = !!num_surr, 
+                                          surr_params = !!surr_params), 
+        ccm_results = compute_ccm(simplex_results = simplex_results, 
+                                  lib_sizes = !!lib_sizes, 
+                                  random_libs = !!random_libs, 
+                                  num_samples = !!num_samples, 
+                                  replace = !!replace, 
+                                  RNGseed = !!RNGseed, 
+                                  silent = !!silent), 
+        ccm_links = compute_ccm_links(ccm_results),
+        smap_coeffs = compute_smap_coeffs(block, ccm_links, 
+                                          rescale = !!rescale, 
+                                          rolling_forecast = !!rolling_forecast), 
+        smap_matrices = compute_smap_matrices(smap_coeffs, ccm_links), 
+        eigen_decomp = compute_eigen_decomp(smap_matrices), 
+        eigenvalues = eigen_decomp$values, 
+        eigenvectors = eigen_decomp$vectors
     )
 }

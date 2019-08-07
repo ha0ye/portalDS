@@ -1,6 +1,6 @@
 context("Check full dynamic stability workflow")
 
-test_that("check dynamic stability using block_3sp example data", {
+test_that("Compute dynamic stability using block_3sp example data", {
     set.seed(616382247)
 
     # setup data
@@ -52,10 +52,10 @@ test_that("check dynamic stability using block_3sp example data", {
         s <- ifelse(Re(x[1, ]) == 0, 1, sign(Re(x[1, ])))
         s <- matrix(s, nrow = nrow(x), ncol = ncol(x), byrow = TRUE)
         round(s * x, 4)}), 
-        "68244b7ef9")    
+        "68244b7ef9")
 })
 
-test_that("check compute_dynamic_stability using block_3sp example data", {
+test_that("Verify compute_dynamic_stability function", {
     set.seed(616382247)
     
     # setup data

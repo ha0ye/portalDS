@@ -2,15 +2,11 @@
 % Please edit documentation in R/calculations-ccm.R
 \name{compute_ccm}
 \alias{compute_ccm}
-\alias{build_ccm_plan}
 \title{Run CCM on each pair of time series}
 \usage{
 compute_ccm(simplex_results, lib_sizes = seq(10, 100, by = 10),
   random_libs = TRUE, num_samples = 100, replace = TRUE,
   RNGseed = 42, silent = TRUE)
-
-build_ccm_plan(lib_sizes = seq(10, 100, by = 10), random_libs = TRUE,
-  num_samples = 100, replace = TRUE, RNGseed = 42, silent = TRUE)
 }
 \arguments{
 \item{simplex_results}{the output of \code{\link{compute_simplex}}}
@@ -33,10 +29,6 @@ reproducible runs of ccm with randomly generated libraries}
 `compute_ccm` returns a tibble with columns for the variables that we 
   use in CCM, the data type (whether it's the "actual" time series or 
   "surrogate"), the library size, and the results from CCM
-
-`build_ccm_plan` returns a \code{\link[drake]{drake}} plan with 
-  targets for the helper function, the params to be used for ccm, and the 
-  ccm_results (as from \code{\link{compute_ccm}}).
 }
 \description{
 `compute_ccm` runs pairwise CCM based on the simplex_output - 
@@ -44,8 +36,4 @@ reproducible runs of ccm with randomly generated libraries}
   for both the real data and the surrogate data. The calculations run using 
   \code{\link[furrr]{future_pmap}}. Thus, parallelization should be set by 
   the user, if desired, using \code{\link[future]{plan}}, prior to running.
-
-`build_ccm_plan` encapsulates the calculations of `compute_ccm`
-  in a \code{\link[drake]{drake}} plan. This seems to run a bit faster than 
-  the `compute_ccm` function.
 }

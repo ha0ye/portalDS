@@ -32,7 +32,7 @@ plot_network <- function(ccm_links,
         dplyr::filter(.data$lib_column != .data$target_column) %>%
         dplyr::arrange(.data$target_column) %>%
         dplyr::select(c("target_column", "lib_column")) %>%
-        igraph::graph_from_data_frame(vertices = levels(.data$target_column))
+        igraph::graph_from_data_frame(vertices = levels(ccm_links$target_column))
 
     if (is.null(palette))
     {

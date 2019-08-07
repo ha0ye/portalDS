@@ -2,7 +2,6 @@
 
 export("%>%")
 export(add_regime_shift_highlight)
-export(build_ccm_plan)
 export(build_dynamic_stability_plan)
 export(compute_ccm)
 export(compute_ccm_links)

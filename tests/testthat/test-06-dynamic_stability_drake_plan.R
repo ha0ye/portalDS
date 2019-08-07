@@ -1,16 +1,5 @@
 context("Check functions to build plans for dynamic stability workflow")
 
-test_that("build_ccm_plan produces a correct plan", {
-    skip_on_covr()
-    expect_error(ccm_plan <- build_ccm_plan(), NA)
-    expect_is(ccm_plan, c("drake_plan", "tbl_df"))
-    
-    targets <- c("ccm_func", "ccm_params", "ccm_results")
-    expect_equal(vapply(targets, function(patt) {grep(patt, ccm_plan$target)}, 0), 
-                 seq_along(targets), check.names = FALSE)
-    expect_known_hash(as.character(ccm_plan$command), "731a7491d4")
-})
-
 test_that("check full dynamic stability plan using block_3sp example data", {
     skip_on_covr()
     # setup
@@ -18,8 +7,8 @@ test_that("check full dynamic stability plan using block_3sp example data", {
     block <- setNames(block_3sp[, c("time", "x_t", "y_t", "z_t")], 
                       c("censusdate", "x", "y", "z"))
     targets <- c("simplex_results", 
-                 "ccm_func", "ccm_params", "ccm_results", 
-                 "ccm_links", "smap_coeffs", "smap_matrices", 
+                 "ccm_results", "ccm_links", 
+                 "smap_coeffs", "smap_matrices", 
                  "eigen_decomp", "eigenvalues", "eigenvectors")
     
     # check plan
@@ -31,7 +20,7 @@ test_that("check full dynamic stability plan using block_3sp example data", {
     expect_is(my_plan, c("drake_plan", "tbl_df"))
     expect_equal(vapply(targets, function(patt) {grep(patt, my_plan$target)}, 0), 
                  seq_along(targets), check.names = FALSE)
-    expect_known_hash(as.character(my_plan$command), "1307b57d7a")
+    expect_known_hash(as.character(my_plan$command), "77143d3b63")
 })
 
 test_that("running full dynamic stability plan using block_3sp example data", {
@@ -39,8 +28,8 @@ test_that("running full dynamic stability plan using block_3sp example data", {
     block <- setNames(block_3sp[, c("time", "x_t", "y_t", "z_t")], 
                       c("censusdate", "x", "y", "z"))
     targets <- c("simplex_results", 
-                 "ccm_func", "ccm_params", "ccm_results", 
-                 "ccm_links", "smap_coeffs", "smap_matrices", 
+                 "ccm_results", "ccm_links", 
+                 "smap_coeffs", "smap_matrices", 
                  "eigen_decomp", "eigenvalues", "eigenvectors")
     
     # check plan

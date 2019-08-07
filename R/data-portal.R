@@ -30,7 +30,7 @@ make_portal_block <- function(path = portalr::get_default_data_path(),
     # summarize by each newmmonnumber, and for only the control plots we want
     block <- raw_rodent_data %>%
         dplyr::filter(.data$censusdate < "2015-04-18") %>%
-        dplyr::select(-data$period)
+        dplyr::select(-.data$period)
     
     # check that effort is equal across samples
     stopifnot(length(unique(block$ntraps)) == 1)

@@ -5,4 +5,5 @@ inst/doc
 .Ruserdata
 output/*results*.RDS
 tests/testthat/.drake*
+tests/testthat/Rplots.pdf
 .drake*
