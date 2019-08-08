@@ -36,5 +36,7 @@ test_that("Resource competition model", {
     expect_true(all(c("time", "R1", "R2", "R3", "N1", "N2", "N3", "N4", "N5") %in% names(dat)))
     expect_equal(dat$time, sample_times)
     attributes(dat) <- attributes(dat)[sort(names(attributes(dat)))]
+    expect_known_hash(round(dat[1:25, ], 3), "a3593f0ac9")
+    expect_known_hash(round(dat[1:50, ], 3), "3f773815d0")
     expect_known_hash(round(dat, 3), "4e19e286cc")
 })
