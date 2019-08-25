@@ -12,10 +12,15 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 ```
-# portalDS
+# portalDS `r packageVersion("portalDS")`
 
+<!-- badges: start -->
 [![Build Status](https://travis-ci.org/ha0ye/portalDS.svg?branch=master)](https://travis-ci.org/ha0ye/portalDS)
 [![codecov](https://codecov.io/gh/ha0ye/portalDS/branch/master/graph/badge.svg)](https://codecov.io/gh/ha0ye/portalDS)
+[![DOI](https://zenodo.org/badge/141463282.svg)](https://zenodo.org/badge/latestdoi/141463282)
+<!-- badges: end -->
+
+## Overview
 
 The goal of portalDS is to apply "dynamic stability" (Ushio et al. 2018) to the long-term rodent time series at Portal, to test whether this indicator of whole-ecosystem change predicts or lines up with abrupt community shifts.
 
