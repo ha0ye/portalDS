@@ -1,0 +1,19 @@
+{
+"title": "Compute Dynamic Stability for Rodents at Portal",
+"creators": [
+  {
+    "name": "Ye, Hao", 
+    "orcid": "0000-0002-8630-1458"
+  }
+  ],
+    "description": "R Package Compendium for Dynamic Stability Analysis. Functions for computing dynamic stability for arbitrary community time series data (bundled into an R package), and analysis scripts applying the method to the Portal rodent community.",
+    "keywords": [
+      "empirical dynamics",
+      "time series",
+      "nonlinear", 
+      "critical transition"
+      ],
+    "access_right": "open",
+    "license": "other-open",
+    "upload_type": "software"
+}

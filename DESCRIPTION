@@ -1,6 +1,6 @@
 Package: portalDS
 Title: Compute Dynamic Stability for Rodents at Portal
-Version: 0.1.0
+Version: 0.1.1.9000
 Authors@R: 
     c(person("Hao", "Ye", role = c("aut", "cre"), 
                     email = "hao.ye@weecology.org", 

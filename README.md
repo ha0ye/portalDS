@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# portalDS 0.1.0
+# portalDS 0.1.1.9000
 
 <!-- badges: start -->
 
@@ -24,8 +24,10 @@ This project is set up as an R package that implements functions for
 computing “dynamic stability”, mostly following Ben Marwick’s
 [rrtools](https://github.com/benmarwick/rrtools) setup:
 
-  - The `maizuru-dynamic-stability` vignette reproduces the Maizuru Bay
-    analysis from Ushio et al. 2018 as an example.
+  - The [`maizuru-dynamic-stability`
+    vignette](https://ha0ye.github.io/portalDS/articles/maizuru-dynamic-stability.html)
+    reproduces the Maizuru Bay analysis from Ushio et al. 2018 as an
+    example.
   - The `analysis` folder contains R scripts and objects for the Portal
     dynamic stability analysis.
   - The `data`, `output`, and `figures` folders contain data, results,
