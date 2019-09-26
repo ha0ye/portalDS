@@ -26,9 +26,9 @@
 maizuru_block
 }
 \description{
-Time series of twice-monthly visual census data of the Maizuru 
-  fish community (only the 15 species that had total observation count > 
-  1000). As used in "Fluctuating interaction network and time-varying 
+Time series of twice-monthly visual census data of the Maizuru
+  fish community (only the 15 species that had total observation count >
+  1000). As used in "Fluctuating interaction network and time-varying
   stability of a natural fish community" (Ushio et al. 2018)
 Data are available from https://zenodo.org/record/1181937
 }

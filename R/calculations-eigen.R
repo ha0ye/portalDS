@@ -10,14 +10,14 @@
 #'   }
 #'
 #' @export
-compute_eigen_decomp <- function(smap_matrices)
-{
-    eigen_decomp <- purrr::map(smap_matrices, function(J) {
-        if (any(is.na(J)))
-            return(c("values" = NA, "vectors" = NA))
-        out <- eigen(J)
-        rownames(out$vectors) <- rownames(J)
-        return(out)
-    })
-    return(purrr::transpose(eigen_decomp, .names = c("values", "vectors")))
+compute_eigen_decomp <- function(smap_matrices) {
+  eigen_decomp <- purrr::map(smap_matrices, function(J) {
+    if (any(is.na(J))) {
+      return(c("values" = NA, "vectors" = NA))
+    }
+    out <- eigen(J)
+    rownames(out$vectors) <- rownames(J)
+    return(out)
+  })
+  return(purrr::transpose(eigen_decomp, .names = c("values", "vectors")))
 }

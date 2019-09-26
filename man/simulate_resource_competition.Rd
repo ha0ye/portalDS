@@ -3,6 +3,7 @@
 \name{simulate_resource_competition}
 \alias{simulate_resource_competition}
 \alias{simulate_resource_competition_12sp}
+\alias{sim_resource_competition_12sp}
 \title{Get a data.frame of simulated abundances (resource competition)}
 \usage{
 simulate_resource_competition(params = list(r = rep.int(1, 5), m =
@@ -13,7 +14,7 @@ simulate_resource_competition(params = list(r = rep.int(1, 5), m =
   = c(10, 10, 10), N = c(0.1, 0.1, 0.1, 0.1, 0.1)), sample_times = seq(0,
   3000, by = 1), ...)
 
-simulate_resource_competition_12sp(params = list(r = rep.int(1, 12), m =
+sim_resource_competition_12sp(params = list(r = rep.int(1, 12), m =
   rep.int(0.25, 12), D = 0.25, K = matrix(c(0.39, 0.34, 0.3, 0.24, 0.23,
   0.41, 0.2, 0.45, 0.14, 0.15, 0.38, 0.28, 0.22, 0.39, 0.34, 0.3, 0.27,
   0.16, 0.15, 0.05, 0.38, 0.29, 0.37, 0.31, 0.27, 0.22, 0.39, 0.34, 0.3,
@@ -48,13 +49,13 @@ simulate_resource_competition_12sp(params = list(r = rep.int(1, 12), m =
 a matrix (and `deSolve`) object with the observations (and times)
 }
 \description{
-Simulate time series from the resource competition model of 
-  Huisman & Weissing (1999) <\url{https://doi.org/10.1038/46540}>. The 
-  initial state, parameters, and perturbations are for the 5-species system 
-  competing on 3 resources as described in Huisman & Weissing (2001) 
-  <\url{https://doi.org/10.1086/319929}>. 
-  
-`simulate_resource_competition_12sp()` is a simulation with the same 
-  structure, but is the 12-species system competing on 5 resources, with 
+Simulate time series from the resource competition model of
+  Huisman & Weissing (1999) <\url{https://doi.org/10.1038/46540}>. The
+  initial state, parameters, and perturbations are for the 5-species system
+  competing on 3 resources as described in Huisman & Weissing (2001)
+  <\url{https://doi.org/10.1086/319929}>.
+
+`simulate_resource_competition_12sp()` is a simulation with the same
+  structure, but is the 12-species system competing on 5 resources, with
   introductions of species 6-12 at later times.
 }

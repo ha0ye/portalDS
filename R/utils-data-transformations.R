@@ -7,7 +7,9 @@
 #' @return A rescaled vector the same length as `x`
 #'
 #' @export
-norm_rescale <- function(x, na.rm = TRUE) {(x - mean(x, na.rm = na.rm)) / stats::sd(x, na.rm = na.rm)}
+norm_rescale <- function(x, na.rm = TRUE) {
+  (x - mean(x, na.rm = na.rm)) / stats::sd(x, na.rm = na.rm)
+}
 
 #' @title make_surrogate_annual_spline
 #' @description Generate surrogate time series by computing a mean seasonal
@@ -25,35 +27,32 @@ norm_rescale <- function(x, na.rm = TRUE) {(x - mean(x, na.rm = na.rm)) / stats:
 #'
 #' @importFrom stats smooth.spline predict
 #' @export
-make_surrogate_annual_spline <- function(ts, num_surr = 100, day_of_year = NULL)
-{
-    if (is.data.frame(ts))
-    {
-        ts <- ts[[1]]
-    }
-    if (is.null(day_of_year))
-    {
-        day_of_year <- seq_along(ts)
-    }
-    
-    # filter out NA first
-    n <- length(day_of_year)
-    idx <- which(is.finite(day_of_year) & is.finite(ts))
-    day_of_year <- day_of_year[idx]
-    ts <- ts[idx]
-    
-    xx <- c(day_of_year - 365, day_of_year, day_of_year + 365)
-    yy <- c(ts, ts, ts)
-    seasonal_F <- smooth.spline(xx, yy)
-    seasonal_cyc <- predict(seasonal_F, day_of_year)$y
-    seasonal_resid <- ts - seasonal_cyc
-    
-    vals <- matrix(unlist(
-        lapply(seq(num_surr), function(i) {
-            seasonal_cyc + sample(seasonal_resid, n)
-        })
-    ), ncol = num_surr)
-    
-    out <- matrix(NA, nrow = n, ncol = num_surr)
-    out[idx, ] <- vals
+make_surrogate_annual_spline <- function(ts, num_surr = 100, day_of_year = NULL) {
+  if (is.data.frame(ts)) {
+    ts <- ts[[1]]
+  }
+  if (is.null(day_of_year)) {
+    day_of_year <- seq_along(ts)
+  }
+
+  # filter out NA first
+  n <- length(day_of_year)
+  idx <- which(is.finite(day_of_year) & is.finite(ts))
+  day_of_year <- day_of_year[idx]
+  ts <- ts[idx]
+
+  xx <- c(day_of_year - 365, day_of_year, day_of_year + 365)
+  yy <- c(ts, ts, ts)
+  seasonal_F <- smooth.spline(xx, yy)
+  seasonal_cyc <- predict(seasonal_F, day_of_year)$y
+  seasonal_resid <- ts - seasonal_cyc
+
+  vals <- matrix(unlist(
+    lapply(seq(num_surr), function(i) {
+      seasonal_cyc + sample(seasonal_resid, n)
+    })
+  ), ncol = num_surr)
+
+  out <- matrix(NA, nrow = n, ncol = num_surr)
+  out[idx, ] <- vals
 }

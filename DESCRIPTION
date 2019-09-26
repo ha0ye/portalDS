@@ -2,52 +2,59 @@ Package: portalDS
 Title: Compute Dynamic Stability for Rodents at Portal
 Version: 0.1.1.9000
 Authors@R: 
-    c(person("Hao", "Ye", role = c("aut", "cre"), 
-                    email = "hao.ye@weecology.org", 
-                    comment = c(ORCID = "0000-0002-8630-1458")))
-Description: R Package Compendium for Dynamic Stability Analysis. Functions for computing dynamic stability for arbitrary community time series data (bundled into an R package), and analysis scripts applying the method to the Portal rodent community.
-Depends: R (>= 3.4.0)
+    person(given = "Hao",
+           family = "Ye",
+           role = c("aut", "cre"),
+           email = "hao.ye@weecology.org",
+           comment = c(ORCID = "0000-0002-8630-1458"))
+Description: R Package Compendium for Dynamic Stability Analysis.
+    Functions for computing dynamic stability for arbitrary community time
+    series data (bundled into an R package), and analysis scripts applying
+    the method to the Portal rodent community.
 License: MIT + file LICENSE
 URL: https://ha0ye.github.io/portalDS, https://github.com/ha0ye/portalDS
 BugReports: https://github.com/ha0ye/portalDS/issues
-Encoding: UTF-8
-LazyData: true
+Depends: 
+    R (>= 3.4.0)
 Imports: 
-    rEDM (>= 0.7.4),
+    cowplot,
+    deSolve,
     dplyr,
-    purrr,
-    tidyr,
-    portalr (>= 0.2.4),
-    magrittr,
+    drake,
+    forcats,
+    forecast,
+    furrr,
     ggplot2,
     ggraph,
-    cowplot,
-    viridis,
-    reshape2,
-    forcats,
-    scales,
     igraph,
-    rlang,
-    forecast,
-    stringr,
     lubridate,
-    drake,
-    furrr,
-    deSolve
+    magrittr,
+    portalr (>= 0.2.4),
+    purrr,
+    rEDM (>= 0.7.4),
+    reshape2,
+    rlang,
+    scales,
+    stringr,
+    tidyr,
+    viridis
 Suggests: 
+    covr,
+    future,
+    future.callr,
+    here,
     knitr,
+    LDATS (>= 0.0.5),
+    pkgdown,
     rmarkdown,
     testthat,
-    pkgdown, 
-    here, 
-    covr, 
-    LDATS (>= 0.0.5), 
-    vdiffr, 
-    future,
-    future.callr
-RoxygenNote: 6.1.1
+    vdiffr
+VignetteBuilder: 
+    knitr
 Remotes: 
-    weecology/portalr,
+    ha0ye/rEDM,
     weecology/LDATS,
-    ha0ye/rEDM
-VignetteBuilder: knitr
+    weecology/portalr
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1

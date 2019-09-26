@@ -26,14 +26,14 @@ reproducible runs of ccm with randomly generated libraries}
 \item{silent}{prevents warning messages from being printed to the R console}
 }
 \value{
-`compute_ccm` returns a tibble with columns for the variables that we 
-  use in CCM, the data type (whether it's the "actual" time series or 
+`compute_ccm` returns a tibble with columns for the variables that we
+  use in CCM, the data type (whether it's the "actual" time series or
   "surrogate"), the library size, and the results from CCM
 }
 \description{
-`compute_ccm` runs pairwise CCM based on the simplex_output - 
-  using the best embedding dimension from the simplex results, and computed 
-  for both the real data and the surrogate data. The calculations run using 
-  \code{\link[furrr]{future_pmap}}. Thus, parallelization should be set by 
+`compute_ccm` runs pairwise CCM based on the simplex_output -
+  using the best embedding dimension from the simplex results, and computed
+  for both the real data and the surrogate data. The calculations run using
+  \code{\link[furrr]{future_pmap}}. Thus, parallelization should be set by
   the user, if desired, using \code{\link[future]{plan}}, prior to running.
 }

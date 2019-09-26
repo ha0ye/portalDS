@@ -15,13 +15,13 @@ column is a time series of abundances.}
 \item{E_list}{the embedding dimension or range of embedding dimensions to
 search over.}
 
-\item{surrogate_method}{which surrogate method to use: 
-options are "annual_spline" or methods available in 
+\item{surrogate_method}{which surrogate method to use:
+options are "annual_spline" or methods available in
 \code{\link[rEDM]{make_surrogate_data}}}
 
 \item{num_surr}{number of surrogates to compute}
 
-\item{surr_params}{a list of named optional arguments to be passed into the 
+\item{surr_params}{a list of named optional arguments to be passed into the
 surrogate data function}
 }
 \value{

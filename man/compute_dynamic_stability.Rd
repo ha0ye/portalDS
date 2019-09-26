@@ -21,7 +21,7 @@ build_dynamic_stability_plan(max_E = 16, E_list = seq(max_E),
 }
 \arguments{
 \item{block}{a data.frame containing time series for the community. Each
-column is a time series of abundances, and a `censusdate` column is used 
+column is a time series of abundances, and a `censusdate` column is used
 as the column containing the time value.}
 
 \item{results_file}{the location of the results to be stored on disk.}
@@ -33,13 +33,13 @@ value for `max_E`}
 \item{E_list}{the embedding dimension or range of embedding dimensions to
 search over.}
 
-\item{surrogate_method}{which surrogate method to use: 
-options are "annual_spline" or methods available in 
+\item{surrogate_method}{which surrogate method to use:
+options are "annual_spline" or methods available in
 \code{\link[rEDM]{make_surrogate_data}}}
 
 \item{num_surr}{number of surrogates to compute}
 
-\item{surr_params}{a list of named optional arguments to be passed into the 
+\item{surr_params}{a list of named optional arguments to be passed into the
 surrogate data function}
 
 \item{lib_sizes}{the vector of library sizes to try}
@@ -66,7 +66,7 @@ a list with named components for the individual output objects
 XXX
 }
 \description{
-`compute_dynamic_stability` runs the full dynamic stability 
+`compute_dynamic_stability` runs the full dynamic stability
   analysis for community time series. The analysis has multiple steps:
   \enumerate{
     \item{run simplex projection on each time series to identify the optimal
@@ -74,7 +74,7 @@ XXX
     \item{generate surrogate time series, assumming that the data have just a
       seasonal pattern}
     \item{run ccm on each pairwise interaction, including the surrogate data}
-    \item{identify the significant interactions by comparing the CCM for the 
+    \item{identify the significant interactions by comparing the CCM for the
       real time series against the calculations for the surrogate data}
     \item{run S-map models for each time series, using the appropriate number of
       lags, and including the important interacting variables}
@@ -83,6 +83,6 @@ XXX
     \item{perform eigen-decomposition on the s-map coefficient matrices}
   }
 
-`build_dynamic_stability_plan` creates a drake plan for the 
+`build_dynamic_stability_plan` creates a drake plan for the
   dynamic stability analysis.
 }

@@ -12,10 +12,12 @@ bibliography: my_lib.bib
 
 ```{r, include = FALSE}
 LOCAL <- identical(Sys.getenv("LOCAL"), "true")
-knitr::opts_chunk$set(purl = LOCAL, 
-                      collapse = TRUE,
-                      comment = "#>", 
-                      fig.width = 6)
+knitr::opts_chunk$set(
+  purl = LOCAL,
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6
+)
 ```
 
 # Introduction
@@ -42,13 +44,15 @@ data(maizuru_block)
 maizuru_palette <- viridis::viridis(NCOL(maizuru_block) - 1)
 names(maizuru_palette) <- sort(names(maizuru_block[, -1]))
 
-x_axis_time <- scale_x_date(limits = as.Date(c("2005-03-01", "2011-01-01")),
-                            date_breaks = "1 year", date_labels = "%Y", expand = c(0.01, 0))
+x_axis_time <- scale_x_date(
+  limits = as.Date(c("2005-03-01", "2011-01-01")),
+  date_breaks = "1 year", date_labels = "%Y", expand = c(0.01, 0)
+)
 
 
 plot_time_series(maizuru_block) +
   x_axis_time +
-  scale_color_manual(values = maizuru_palette) + 
+  scale_color_manual(values = maizuru_palette) +
   guides(color = FALSE)
 ```
 
@@ -61,13 +65,17 @@ Perform the dynamic stability analysis for the maizuru system. The steps involve
 
 ```{r compute simplex}
 simplex_results <- compute_simplex(maizuru_block,
-                                   E_list = 1:24,
-                                   surrogate_method = "twin", 
-                                   num_surr = 200, 
-                                   surr_params = list(T_period = 24, 
-                                                      quantile_vec = c(0.875, 0.88, 0.89, 0.90, 0.91, 0.92, 
-                                                                       0.93, 0.94, 0.95, 0.85, 0.84, 0.83, 
-                                                                       0.82, 0.81, 0.80, 0.96))
+  E_list = 1:24,
+  surrogate_method = "twin",
+  num_surr = 200,
+  surr_params = list(
+    T_period = 24,
+    quantile_vec = c(
+      0.875, 0.88, 0.89, 0.90, 0.91, 0.92,
+      0.93, 0.94, 0.95, 0.85, 0.84, 0.83,
+      0.82, 0.81, 0.80, 0.96
+    )
+  )
 )
 ```
 
@@ -76,11 +84,12 @@ simplex_results <- compute_simplex(maizuru_block,
 ```{r compute ccm}
 # future::plan(future.callr::callr)
 # ccm_results <- compute_ccm(simplex_results,
-#                            lib_sizes = c(6, 12, 24, 40, 80, 140, 220, 320, NROW(maizuru_block)), 
+#                            lib_sizes = c(6, 12, 24, 40, 80, 140, 220, 320, NROW(maizuru_block)),
 #                            num_samples = 200)
 
 data_path <- system.file("extdata", "maizuru_ccm_results.RDS",
-                         package = "portalDS", mustWork = TRUE)
+  package = "portalDS", mustWork = TRUE
+)
 ccm_results <- readRDS(data_path)
 ```
     
@@ -93,15 +102,18 @@ ccm_links <- compute_ccm_links(ccm_results)
 4. run S-map models for each time series, using the appropriate number of lags, and including the important interacting variables (we rescale the time series to each have mean = 0, variance = 1)
 
 ```{r smap coeffs}
-smap_coeffs <- compute_smap_coeffs(maizuru_block, ccm_links, 
-                                   rescale = TRUE)
+smap_coeffs <- compute_smap_coeffs(maizuru_block, ccm_links,
+  rescale = TRUE
+)
 ```
 
 5. extract out the s-map coefficients from the models and assemble matrices for the system
 
 ```{r smap matrices}
-smap_matrices <- compute_smap_matrices(smap_coeffs,
-                                       ccm_links)
+smap_matrices <- compute_smap_matrices(
+  smap_coeffs,
+  ccm_links
+)
 
 # add date labels for each matrix in list
 stopifnot(length(smap_matrices) == NROW(maizuru_block))
@@ -136,12 +148,13 @@ The remaining components allow us to plot a subset of the network, while keeping
 
 ```{r interaction subnetwork}
 halichoeres_links <- ccm_links %>%
-  filter(stringr::str_detect(lib_column, "Halichoeres") | 
-           stringr::str_detect(target_column, "Halichoeres"))
+  filter(stringr::str_detect(lib_column, "Halichoeres") |
+    stringr::str_detect(target_column, "Halichoeres"))
 
-halichoeres_network <- plot_network(halichoeres_links, 
-                                    palette = maizuru_palette, 
-                                    existing_graph = maizuru_network$graph)
+halichoeres_network <- plot_network(halichoeres_links,
+  palette = maizuru_palette,
+  existing_graph = maizuru_network$graph
+)
 
 print(halichoeres_network$plot)
 ```
@@ -160,7 +173,7 @@ Note that `plot_eigenvalues` has a number of additional parameters, which allow 
 
 ```{r}
 eigenvalues %>%
-  plot_eigenvalues(num_values = 2, highlight_complex = TRUE) + 
+  plot_eigenvalues(num_values = 2, highlight_complex = TRUE) +
   x_axis_time
 ```
 
@@ -170,8 +183,8 @@ Just as with the eigenvalues, we can plot the dominant eigenvector(s) as it chan
 
 ```{r}
 eigenvectors %>%
-  plot_eigenvectors(num_values = 2) + 
-  scale_color_manual(values = maizuru_palette) + 
+  plot_eigenvectors(num_values = 2) +
+  scale_color_manual(values = maizuru_palette) +
   x_axis_time
 ```
 

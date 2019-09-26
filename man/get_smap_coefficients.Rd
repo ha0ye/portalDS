@@ -24,10 +24,10 @@ method == "s-map")}
 the data.frame with the s-map coefficients
 }
 \description{
-This function is meant to be called from within 
-  \code{\link{compute_smap_coeffs}}, which also pre-generates the block so 
-  that the first variable is to be predicted, and the remaining columns are 
-  the causal variables and lags of the predicted variable. This function 
-  searches over the values of theta for the best fit (by lowest MAE), and then 
+This function is meant to be called from within
+  \code{\link{compute_smap_coeffs}}, which also pre-generates the block so
+  that the first variable is to be predicted, and the remaining columns are
+  the causal variables and lags of the predicted variable. This function
+  searches over the values of theta for the best fit (by lowest MAE), and then
   returns the data.frame with the s-map coefficients
 }
