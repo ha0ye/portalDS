@@ -4,6 +4,7 @@
 ^\.Rproj\.user$
 ^data/*.RDS$
 ^.travis.yml$
+^.pre-commit-config.yaml$
 ^figures$
 ^codecov.yml$
 ^output$
