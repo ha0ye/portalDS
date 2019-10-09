@@ -2,7 +2,7 @@
 title: "Dynamic indicators of systemic change and resilience"
 author: "Hao Ye"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: bookdown::html_document2
 vignette: >
   %\VignetteIndexEntry{Dynamic indicators of systemic change and resilience}
   %\VignetteEngine{knitr::rmarkdown_notangle}
@@ -10,13 +10,15 @@ vignette: >
 bibliography: my_lib.bib
 ---
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
 LOCAL <- identical(Sys.getenv("LOCAL"), "true")
 knitr::opts_chunk$set(purl = LOCAL, 
                       collapse = TRUE,
                       comment = "#>", 
                       fig.width = 6
 )
+
+library(portalDS)
 ```
 
 # Abstract
@@ -50,22 +52,60 @@ Stability - historically based on interactions among species
 
 
 <!-- narrow down to specific research topic (empirical measures of system change) -->
-Ushio et al. [-@Ushio_2018] introduced "dynamic stability" as an empirical measure of ecosystem stability. As the dominant eigenvalue of the time-varying interaction matrix, dynamic stability can be viewed as a time-varying and continuous analogue to stability as characterized in Pimm [-@Pimm_1984]. That is, instead of stability being defined as a static, binary property of the system, it is instead computed at each time point as a continuous quantity (where values above 1 correspond to stable states, and values below 1 correspond to unstable states).
+Ushio et al. [-@Ushio_2018] introduced "dynamic stability" as an empirical measure of ecosystem stability. Dynamic stability is defined as the dominant eigenvalue of the time-varying interaction matrix, and is thus a time-varying, continuous analogue to the static, binary definition of stability in Pimm [-@Pimm_1984]. At each time point, dynamic stability is a continuous quantity (with values above 1 corresponding to stable states, and values below 1 corresponding to unstable states).
 
 $$\textrm{dynamic stability}_t = \left|\lambda_{\textrm{dom}, t}\right|$$
 
 <!-- details of what dynamic stability and related measures are -->
 
 
+
+
 <!-- summary of questions and approaches -->
 
+```{r portal block setup, include = FALSE}
+block <- make_portal_block(filter_q = 0.5)
+```
 
 
+(ref:portal-time-series-caption) Abundance time series of `r NCOL(block)-1` species from control plots at Portal, AZ.
+
+```{r portal-time-series, fig.cap = '(ref:portal-time-series-caption)', echo = FALSE}
+plot_time_series(block, scale = NULL)
+```
 
 
 
 # Methods
+We apply dynamic stability to abundance time series from the rodent community at Portal, AZ (ref). 
 
+## Data
+
+Following [@Christensen_2018], we compute the site-wide abundance on the 8 control plots for the Portal data up through April 2015. (At this time a change in treatments occurred, which would decrease the number of plots with continuous observations of the control condition.) Rodent abundances are scaled to 8 plots (in some censuses, not all of the plots were sampled, e.g. due to weather).
+
+Because EDM methods rely on extracting signal from the time series directly, we chose to pre-filter the species to those that were non-zero for at least half of the time points. This reduced the number of species from 21 to 7 (see Figure ).
+
+## Dynamic Stability Analysis
+
+We follow the main procedure as outlined in [@Ushio_2018]:
+
+0. Simplex projection
+
+1. Use convergent cross mapping [@Sugihara_2012] to construct the pairwise interaction network: i.e. test whether there is a causal effect, $n_i \rightarrow n_j \forall i,j \in \{1..N\}, i \ne j$
+
+$A = 
+
+2. For each time series $n_j$, fit a multivariate S-map model [@Sugihara_1994, @Deyle_2016], where causal influences identified in step 1 are included; $V_i = \{k, n_k \rightarrow n_i\}$. Here, each $n_k$ substitutes for a lag of $n_i$: i.e. the multivariate state vector for the S-map model is:
+
+$$\mathbf{n}^\prime_i(t) = \{n_i(t), n_i(t-1), \dots, n_i(t-(E_i-1-|V_i|)\} \bigcup \{n_k(t)\}, k \in V_i$$
+
+The multivariate state vector, $\mathbf{n}^\prime_i(t)$, is then used in the S-map model, and $\theta$ is fit via maximizing (rho?) under leave-one-out cross-validation.
+
+3. 
+
+## Surrogate method for convergent cross mapping
+
+[@Ushio_2018] use a phase-lock twin surrogate method as a way to deal with seasonal signals when identifying significant causal interactions. Although the Portal rodent abundances also exhibit seasonal patterns, sampling occurs on the new moon, and thus occurs at different times of year. 
 
 
 
