@@ -7,12 +7,13 @@ Authors@R:
            role = c("aut", "cre"),
            email = "hao.ye@weecology.org",
            comment = c(ORCID = "0000-0002-8630-1458"))
-Description: R Package Compendium for Dynamic Stability Analysis.
-    Functions for computing dynamic stability for arbitrary community time
-    series data (bundled into an R package), and analysis scripts applying
-    the method to the Portal rodent community.
+Description: R Package Compendium for Dynamic Stability
+    Analysis.  Functions for computing dynamic stability for arbitrary
+    community time series data (bundled into an R package), and analysis
+    scripts applying the method to the Portal rodent community.
 License: MIT + file LICENSE
-URL: https://ha0ye.github.io/portalDS, https://github.com/ha0ye/portalDS
+URL: https://ha0ye.github.io/portalDS,
+    https://github.com/ha0ye/portalDS
 BugReports: https://github.com/ha0ye/portalDS/issues
 Depends: 
     R (>= 3.4.0)
@@ -29,6 +30,9 @@ Imports:
     igraph,
     lubridate,
     magrittr,
+    portalr (>= 0.2.4),
+    purrr,
+    rEDM (>= 0.7.4),
     reshape2,
     rlang,
     scales,
