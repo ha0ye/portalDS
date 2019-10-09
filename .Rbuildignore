@@ -9,3 +9,5 @@
 ^codecov.yml$
 ^output$
 ^analysis$
+^.lintr$
+^.zenodo.json$
