@@ -36,7 +36,8 @@ compute_simplex <- function(block, E_list = 1:10,
       ~ dplyr::filter(., .data$mae == min(.data$mae)) %>%
         dplyr::pull(.data$E) %>%
         as.integer()
-    ))
+    )) %>%
+    dplyr::ungroup()
 
   surrogate_method <- tolower(surrogate_method)
   if (surrogate_method == "twin") {
@@ -59,8 +60,8 @@ compute_simplex <- function(block, E_list = 1:10,
         ~ do.call(
           make_surrogate_annual_spline,
           c(
-            list(ts = ..1, num_surr = num_surr),
-            day_of_year
+            list(ts = ..1, num_surr = num_surr, day_of_year = day_of_year), 
+            surr_params
           )
         )
       )
@@ -71,10 +72,7 @@ compute_simplex <- function(block, E_list = 1:10,
         ~ do.call(
           rEDM::make_surrogate_data,
           c(
-            list(
-              ts = ..1, num_surr = num_surr,
-              method = surrogate_method
-            ),
+            list(ts = ..1, num_surr = num_surr, method = surrogate_method),
             surr_params
           )
         )

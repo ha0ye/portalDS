@@ -77,7 +77,7 @@ test_that("compute_ccm_links works as expected", {
   expect_equal(dim(ccm_links), c(32, 5))
   expect_setequal(var_names, as.character(ccm_links$lib_column))
   expect_setequal(var_names, as.character(ccm_links$target_column))
-  expect_known_hash(ccm_links, "dd99bafb30")
+  expect_known_hash(ccm_links, "7d4d62837e")
 })
 
 test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {

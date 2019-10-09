@@ -395,12 +395,17 @@ plot_time_series <- function(block,
   time <- dplyr::pull(block, time_column)
   block <- dplyr::select(block, -time_column)
 
-  if (tolower(scale) == "unif") {
+  y_label <- "abundance"
+  if (is.null(scale) || length(scale) == 0)
+  {
+  } else if (tolower(scale) == "unif") {
     block <- block %>%
       dplyr::mutate_all(scales::rescale)
+    y_label <- "relative abundance"
   } else if (tolower(scale) == "norm") {
     block <- block %>%
       dplyr::mutate_all(norm_rescale)
+    y_label <- "scaled abundance"
   }
   timeseries <- block %>%
     dplyr::mutate(time = time) %>%
@@ -414,7 +419,7 @@ plot_time_series <- function(block,
     ggplot(aes(x = .data$time, y = .data$abundance, color = .data$species)) +
     geom_line(size = 1) +
     scale_color_manual(values = palette) +
-    labs(x = NULL, y = "relative abundance", color = "species") +
+    labs(x = NULL, y = y_label, color = "species") +
     theme_bw(
       base_size = base_size, base_family = base_family,
       base_line_size = base_line_size
