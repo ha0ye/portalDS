@@ -11,3 +11,5 @@
 ^analysis$
 ^.lintr$
 ^.zenodo.json$
+^Dockerfile$
+^\.travis\.yml$
