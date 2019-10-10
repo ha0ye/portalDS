@@ -13,4 +13,3 @@ RUN apt-get -y update -qq \
   && apt-get install -y --no-install-recommends \
     libgsl0-dev \ 
   && R -e "devtools::install_dev_deps('/portalDS', dep = TRUE)"
-  

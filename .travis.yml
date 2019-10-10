@@ -15,6 +15,7 @@ before_install:
 
   # run the docker container and copy over the files into the container
   - docker run --name portalds -t -d $REPO /bin/bash
+  - docker exec -i portalds bash -c "rm -fr /portalDS"
   - docker cp ../portalDS portalds:/
 
 script:
