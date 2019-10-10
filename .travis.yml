@@ -14,15 +14,15 @@ services:
   - docker
 
 before_install:
-    # create & run container using our dockerfile, i.e. compile pkg and render Rmd to Word doc
-  - docker build -t $REPO .
+  # retrieve the docker container from docker hub
+  - docker pull $REPO
 
-# push our custom docker container to docker hub, env vars stored on travis-ci.org
+  # run the docker container and copy over the files into the container
+  - docker run --name portalds -t -d $REPO /bin/bash
+  - docker cp ../portalDS portalds:/
+  - docker exec -i portalds bash -c "cd portalDS"
+
+script:
+  - docker exec -i portalds bash -c "R CMD CHECK ."
+
 after_success:
-  - docker login -u $DOCKER_USER -p $DOCKER_PAT
-  - export REPO=$DOCKER_USER/portal_ds
-  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
-  - docker build -f Dockerfile -t $REPO:$COMMIT .
-  - docker tag $REPO:$COMMIT $REPO:$TAG
-  - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
-  - docker push $REPO
