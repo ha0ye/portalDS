@@ -1,4 +1,5 @@
-# get the base image, the rocker/verse has R, RStudio and pandoc
+# base image: rocker/verse (with a specific version of R)
+#   has R, RStudio, tidyverse, devtools, tex, and publishing-related packages
 FROM rocker/verse:3.5.3
 
 # required

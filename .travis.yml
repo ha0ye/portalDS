@@ -1,13 +1,9 @@
-# Build our Docker container and R pkg on Travis
-
 env:
   global:
   - REPO=$DOCKER_USER/portal_ds
 
 sudo: required
-
 warnings_are_errors: false
-
 language: generic
 
 services:
@@ -20,9 +16,9 @@ before_install:
   # run the docker container and copy over the files into the container
   - docker run --name portalds -t -d $REPO /bin/bash
   - docker cp ../portalDS portalds:/
-  - docker exec -i portalds bash -c "cd portalDS"
 
 script:
-  - docker exec -i portalds bash -c "R CMD CHECK ."
+  # navigate into the directory and run devtools::check on the package
+  - docker exec -i portalds bash -c "cd portalDS && Rscript -e 'devtools::check()'"
 
 after_success:
