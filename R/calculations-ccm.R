@@ -116,7 +116,8 @@ compute_ccm_links <- function(ccm_results,
         as.numeric())
     ) %>%
     dplyr::arrange(.data$lib_column) %>%
-    dplyr::select(-.data$data)
+    dplyr::select(-.data$data) %>%
+    dplyr::ungroup()
 
   # Filter links
   #   - must either be significant (passing thresholds)
