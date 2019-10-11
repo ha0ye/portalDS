@@ -77,7 +77,11 @@ test_that("compute_ccm_links works as expected", {
   expect_equal(dim(ccm_links), c(32, 5))
   expect_setequal(var_names, as.character(ccm_links$lib_column))
   expect_setequal(var_names, as.character(ccm_links$target_column))
-  expect_known_hash(ccm_links, "7d4d62837e")
+  expect_known_hash(ccm_links$lib_column, "02ce1d4781")
+  expect_known_hash(ccm_links$target_column, "4df39ae1db")
+  expect_known_hash(ccm_links$E, "e990dcabd5")
+  expect_known_hash(ccm_links$delta_rho, "14882dd2f7")
+  expect_known_hash(ccm_links$rho_minus_upper_q_null, "956cc84116")
 })
 
 test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {

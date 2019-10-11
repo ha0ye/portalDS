@@ -1,6 +1,6 @@
 env:
   global:
-  - REPO=$DOCKER_USER/portal_ds
+  - REPO=haoye/portal_ds
 
 sudo: required
 warnings_are_errors: false

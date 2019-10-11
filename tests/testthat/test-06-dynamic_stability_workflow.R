@@ -39,7 +39,7 @@ test_that("Compute dynamic stability using block_3sp example data", {
 
   # ccm links
   expect_error(ccm_links <- compute_ccm_links(ccm_results), NA)
-  expect_known_hash(ccm_links, "c6f0a32414")
+  expect_known_hash(ccm_links, "70474772ed")
 
   # s-map coefficients
   expect_error(smap_coeffs <- compute_smap_coeffs(block, ccm_links), NA)
@@ -104,7 +104,7 @@ test_that("Verify compute_dynamic_stability function", {
     dplyr::mutate_at(ccm_results, c("rho", "mae", "rmse"), round, 4),
     "40a8eb1668"
   )
-  expect_known_hash(ccm_links, "c6f0a32414")
+  expect_known_hash(ccm_links, "70474772ed")
   expect_known_hash(lapply(smap_coeffs, round, 4), "3f88e8ddf9")
   expect_known_hash(lapply(smap_matrices, round, 4), "5393993b55")
   expect_known_hash(lapply(eigenvalues, round, 4), "c5a2f2aaca")

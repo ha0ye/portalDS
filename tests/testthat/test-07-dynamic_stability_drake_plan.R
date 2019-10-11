@@ -67,12 +67,12 @@ test_that("running full dynamic stability plan using block_3sp example data", {
 
   # check targets
   simplex_results$simplex_out <- lapply(simplex_results$simplex_out, round, 4)
-  expect_known_hash(simplex_results, "ae7a4100e9")
+  expect_known_hash(simplex_results, "b00009fc2d")
   expect_known_hash(
     dplyr::mutate_at(ccm_results, c("rho", "mae", "rmse"), round, 4),
     "40a8eb1668"
   )
-  expect_known_hash(ccm_links, "4351514392")
+  expect_known_hash(ccm_links, "70474772ed")
   expect_known_hash(lapply(smap_coeffs, round, 4), "3f88e8ddf9")
   expect_known_hash(lapply(smap_matrices, round, 4), "5393993b55")
   expect_known_hash(lapply(eigenvalues, round, 4), "c5a2f2aaca")
