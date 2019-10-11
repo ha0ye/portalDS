@@ -150,9 +150,10 @@ test_that("eigen decomposition of smap matrices works as expected", {
       dimnames = list(NULL, names(maizuru_eigenvectors[!idx]))
     )
   )
-  expect_known_hash(lapply(maizuru_eigenvectors[[24]], round, 3), "c3a0a80682")
-  expect_known_hash(lapply(maizuru_eigenvectors[[47]], round, 3), "561a3d0879")
-  expect_known_hash(lapply(maizuru_eigenvectors[[256]], round, 3), "a38255505a")
+  expect_known_hash(round(Re(maizuru_eigenvectors[[24]]), 3), "cdb9d4dd5e")
+  expect_known_hash(round(Im(maizuru_eigenvectors[[24]]), 3), "23ba19a4c5")
+  expect_known_hash(round(Re(maizuru_eigenvectors[[47]]), 3), "65084c32e5")
+  expect_known_hash(round(Im(maizuru_eigenvectors[[256]]), 3), "491828cb0f")
   
   expect_equal(
     names(maizuru_eigenvalues),
