@@ -29,7 +29,7 @@ test_that("Flour beetle model", {
 })
 
 test_that("Resource competition model", {
-  sample_times <- seq(0, 100, by = 2)
+  sample_times <- seq(0, 50, by = 1)
   columns <- c("time", "R1", "R2", "R3", "N1", "N2", "N3", "N4", "N5")
 
   expect_error(dat <- simulate_resource_competition(sample_times = sample_times), NA)
@@ -39,5 +39,5 @@ test_that("Resource competition model", {
   expect_true(all(columns %in% names(dat)))
   expect_equal(dat$time, sample_times)
   attributes(dat) <- attributes(dat)[sort(names(attributes(dat)))]
-  expect_known_hash(round(dat, 3), "1359371669")
+  expect_known_hash(round(dat, 2), "ef6b6da73f")
 })

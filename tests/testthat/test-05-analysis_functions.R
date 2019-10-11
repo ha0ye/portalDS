@@ -121,7 +121,7 @@ test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
   expect_known_hash(smap_matrices, "ca491bb58d")
 })
 
-test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
+test_that("eigen decomposition of smap matrices works as expected", {
   data_path <- system.file("extdata", "maizuru_smap_matrices.RDS",
     package = "portalDS", mustWork = TRUE
   )
@@ -137,7 +137,7 @@ test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
   expect_error(idx <- vapply(maizuru_eigenvalues, anyNA, TRUE), NA)
   expect_error(eigenvalue_matrix <- do.call(rbind, maizuru_eigenvalues[!idx]), NA)
   expect_equal(dim(eigenvalue_matrix), c(sum(!idx), 312))
-  expect_known_hash(eigenvalue_matrix, "cbf145998b")
+  expect_known_hash(round(eigenvalue_matrix, 3), "d47a22a320")
 
   expect_error(maizuru_eigenvectors <- eigen_decomp$vectors, NA)
   expect_type(maizuru_eigenvectors, "list")
@@ -150,8 +150,10 @@ test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
       dimnames = list(NULL, names(maizuru_eigenvectors[!idx]))
     )
   )
-  expect_known_hash(maizuru_eigenvectors[!idx], "8d49244739")
-
+  expect_known_hash(lapply(maizuru_eigenvectors[[24]], round, 3), "c3a0a80682")
+  expect_known_hash(lapply(maizuru_eigenvectors[[47]], round, 3), "561a3d0879")
+  expect_known_hash(lapply(maizuru_eigenvectors[[256]], round, 3), "a38255505a")
+  
   expect_equal(
     names(maizuru_eigenvalues),
     names(maizuru_eigenvectors)
