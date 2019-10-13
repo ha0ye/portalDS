@@ -1,6 +1,6 @@
 # base image: rocker/verse (with a specific version of R)
 #   has R, RStudio, tidyverse, devtools, tex, and publishing-related packages
-FROM rocker/verse:3.5.3
+FROM rocker/verse:3.6.0
 
 # required
 MAINTAINER Hao Ye <lhopitalified@gmail.com>
@@ -12,4 +12,6 @@ COPY . /portalDS
 RUN apt-get -y update -qq \ 
   && apt-get install -y --no-install-recommends \
     libgsl0-dev \ 
-  && R -e "devtools::install_dev_deps('/portalDS', dep = TRUE)"
+  && R -e "devtools::install_dev_deps('/portalDS', dep = TRUE)" \ 
+  && R -e "install.packages('tidyr', repos='http://cran.rstudio.com/')" \ 
+  && R -e "install.packages('testthat', repos='http://cran.rstudio.com/')"
