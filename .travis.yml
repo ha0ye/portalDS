@@ -1,35 +1,43 @@
-language: r
-cache: packages
+env:
+  global:
+  - REPO=haoye/portal_ds
+
 sudo: required
-dist: "xenial"
 warnings_are_errors: false
+language: generic
 
-r_check_args: "--no-vignettes"
+services:
+  - docker
 
-r_packages:
-  - covr
+before_install:
+  # copy environmental variables to a file
+  - env > env_file
 
-addons:
-  apt:
-    packages:
-      - libgsl0-dbg
-      - libgsl0-dev
-    update: true
+  # retrieve the docker container from docker hub
+  - docker pull $REPO
 
-matrix:
-  include:
-  - r: devel
-  - r: release
-    after_success:
-    - R CMD INSTALL .
-    - Rscript -e 'pkgdown::build_site()'
-    - Rscript -e 'covr::codecov()'
-    deploy:
-      provider: pages
-      skip-cleanup: true
-      github-token: $GITHUB_PAT
-      keep-history: true
-      local-dir: docs
-      on:
-        branch: master
-        
+  # run the docker container and copy over the files into the container
+  - docker run --env-file env_file --name portalds -t -d $REPO /bin/bash
+  - docker exec -i portalds bash -c "rm -fr /portalDS"
+  - docker cp ../portalDS portalds:/
+
+script:
+  # navigate into the directory and run devtools::check on the package
+  - docker exec -i portalds bash -c "cd portalDS && Rscript -e 'devtools::check()'"
+
+after_success:
+  # run code coverage, pkgdown, deploy new pkgdown docs
+  - docker exec -i portalds bash -c "R CMD INSTALL portalDS"
+  - docker exec -i portalds bash -c "cd portalDS && Rscript -e 'covr::codecov()'"
+  - docker exec -i portalds bash -c "cd portalDS && Rscript -e 'pkgdown::build_site()'"
+  - docker cp portalds:/portalDS/docs docs
+  
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_PAT
+  keep-history: true
+  local-dir: docs
+  on:
+    branch: master
+  

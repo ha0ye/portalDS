@@ -5,15 +5,8 @@ NULL
 
 if (getRversion() >= "2.15.1") {
   utils::globalVariables(
-    # c(".", "1", "2", "abundance", "BA", "best_E", "censusdate", "coeff_name",
-    #   "const", "data_type", "delta_rho", "E", "lambda",
-    #   "lib_column", "lib_size", "mae", "newmoonnumber", "nplots",
-    #   "ntraps", "num_pred", "period", "predictor", "quantile_q", "rho",
-    #   "rho_minus_upper_q_null", "rmse", "simplex_out", "SO", "species",
-    #   "surr_CI", "target", "target_column", "upper_q", "Var1", "Var2",
-    #   "block", "ccm_func", "ccm_links", "ccm_params", "ccm_results",
-    #   "eigen_decomp", "from_idx", "get_smap_coefficients", "simplex_results",
-    #   "smap_coeffs", "smap_matrices", "to_idx")
+    c("block", "ccm_links", "ccm_results", "eigen_decomp", "simplex_results", 
+      "smap_coeffs", "smap_matrices")
   )
 }
 

@@ -77,7 +77,11 @@ test_that("compute_ccm_links works as expected", {
   expect_equal(dim(ccm_links), c(32, 5))
   expect_setequal(var_names, as.character(ccm_links$lib_column))
   expect_setequal(var_names, as.character(ccm_links$target_column))
-  expect_known_hash(ccm_links, "7d4d62837e")
+  expect_known_hash(ccm_links$lib_column, "02ce1d4781")
+  expect_known_hash(ccm_links$target_column, "4df39ae1db")
+  expect_known_hash(ccm_links$E, "e990dcabd5")
+  expect_known_hash(ccm_links$delta_rho, "14882dd2f7")
+  expect_known_hash(ccm_links$rho_minus_upper_q_null, "956cc84116")
 })
 
 test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
@@ -117,7 +121,7 @@ test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
   expect_known_hash(smap_matrices, "ca491bb58d")
 })
 
-test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
+test_that("eigen decomposition of smap matrices works as expected", {
   data_path <- system.file("extdata", "maizuru_smap_matrices.RDS",
     package = "portalDS", mustWork = TRUE
   )
@@ -133,7 +137,7 @@ test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
   expect_error(idx <- vapply(maizuru_eigenvalues, anyNA, TRUE), NA)
   expect_error(eigenvalue_matrix <- do.call(rbind, maizuru_eigenvalues[!idx]), NA)
   expect_equal(dim(eigenvalue_matrix), c(sum(!idx), 312))
-  expect_known_hash(eigenvalue_matrix, "cbf145998b")
+  expect_known_hash(round(eigenvalue_matrix, 3), "d47a22a320")
 
   expect_error(maizuru_eigenvectors <- eigen_decomp$vectors, NA)
   expect_type(maizuru_eigenvectors, "list")
@@ -146,7 +150,18 @@ test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
       dimnames = list(NULL, names(maizuru_eigenvectors[!idx]))
     )
   )
-  expect_known_hash(maizuru_eigenvectors[!idx], "8d49244739")
+  
+  f <- function(x) {
+    x <- round(Re(x), 2)
+    s <- sign(apply(x, 2, sum))
+    s <- matrix(s, nrow = nrow(x), ncol = ncol(x), byrow = TRUE)
+    round(abs(s * x), 2)
+  }
+
+  expect_known_hash(f(maizuru_eigenvectors[[24]][1:13,1:13]), "8cbd60f279")
+  expect_known_hash(f(maizuru_eigenvectors[[47]][1:13,1:13]), "dbe02d2c59")
+  expect_known_hash(f(maizuru_eigenvectors[[128]][1:13,1:13]), "f664915b9b")
+  expect_known_hash(f(maizuru_eigenvectors[[256]][1:13,1:13]), "22a2636d68")
 
   expect_equal(
     names(maizuru_eigenvalues),
