@@ -11,7 +11,7 @@ services:
 
 before_install:
   # copy environmental variables to a file
-  - env > env_file
+  - bash env_copy.sh
 
   # retrieve the docker container from docker hub
   - docker pull $REPO
