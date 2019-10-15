@@ -11,7 +11,7 @@ services:
 
 before_install:
   # copy environmental variables to a file
-  - env > env_file
+  - bash env_copy.sh
 
   # retrieve the docker container from docker hub
   - docker pull $REPO
@@ -19,6 +19,7 @@ before_install:
   # run the docker container and copy over the files into the container
   - docker run --env-file env_file --name portalds -t -d $REPO /bin/bash
   - docker exec -i portalds bash -c "rm -fr /portalDS"
+  - rm env_file
   - docker cp ../portalDS portalds:/
 
 script:
