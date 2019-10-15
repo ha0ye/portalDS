@@ -13,3 +13,4 @@
 ^.zenodo.json$
 ^Dockerfile$
 ^\.travis\.yml$
+^env_copy.sh$
