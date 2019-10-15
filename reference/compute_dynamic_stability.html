@@ -32,14 +32,14 @@
 
 <meta property="og:title" content="compute_dynamic_stability — compute_dynamic_stability" />
 
-<meta property="og:description" content="`compute_dynamic_stability` runs the full dynamic stability 
+<meta property="og:description" content="`compute_dynamic_stability` runs the full dynamic stability
   analysis for community time series. The analysis has multiple steps:
 run simplex projection on each time series to identify the optimal
       embedding dimension
 generate surrogate time series, assumming that the data have just a
       seasonal pattern
 run ccm on each pairwise interaction, including the surrogate data
-identify the significant interactions by comparing the CCM for the 
+identify the significant interactions by comparing the CCM for the
       real time series against the calculations for the surrogate data
 run S-map models for each time series, using the appropriate number of
       lags, and including the important interacting variables
@@ -48,7 +48,7 @@ extract out the s-map coefficients from the models and assemble
 perform eigen-decomposition on the s-map coefficient matrices
 " />
 
-<meta property="og:description" content="`build_dynamic_stability_plan` creates a drake plan for the 
+<meta property="og:description" content="`build_dynamic_stability_plan` creates a drake plan for the
   dynamic stability analysis." />
 <meta name="twitter:card" content="summary" />
 
@@ -135,14 +135,14 @@ perform eigen-decomposition on the s-map coefficient matrices
 
     <div class="ref-description">
     
-    <p>`compute_dynamic_stability` runs the full dynamic stability 
+    <p>`compute_dynamic_stability` runs the full dynamic stability
   analysis for community time series. The analysis has multiple steps:</p><ol>
 <li><p>run simplex projection on each time series to identify the optimal
       embedding dimension</p></li>
 <li><p>generate surrogate time series, assumming that the data have just a
       seasonal pattern</p></li>
 <li><p>run ccm on each pairwise interaction, including the surrogate data</p></li>
-<li><p>identify the significant interactions by comparing the CCM for the 
+<li><p>identify the significant interactions by comparing the CCM for the
       real time series against the calculations for the surrogate data</p></li>
 <li><p>run S-map models for each time series, using the appropriate number of
       lags, and including the important interacting variables</p></li>
@@ -151,7 +151,7 @@ perform eigen-decomposition on the s-map coefficient matrices
 <li><p>perform eigen-decomposition on the s-map coefficient matrices</p></li>
 </ol>
 
-    <p>`build_dynamic_stability_plan` creates a drake plan for the 
+    <p>`build_dynamic_stability_plan` creates a drake plan for the
   dynamic stability analysis.</p>
     
     </div>
@@ -176,7 +176,7 @@ perform eigen-decomposition on the s-map coefficient matrices
     <tr>
       <th>block</th>
       <td><p>a data.frame containing time series for the community. Each
-column is a time series of abundances, and a `censusdate` column is used 
+column is a time series of abundances, and a `censusdate` column is used
 as the column containing the time value.</p></td>
     </tr>
     <tr>
@@ -196,8 +196,8 @@ search over.</p></td>
     </tr>
     <tr>
       <th>surrogate_method</th>
-      <td><p>which surrogate method to use: 
-options are "annual_spline" or methods available in 
+      <td><p>which surrogate method to use:
+options are "annual_spline" or methods available in
 <code><a href='https://www.rdocumentation.org/packages/rEDM/topics/make_surrogate_data'>make_surrogate_data</a></code></p></td>
     </tr>
     <tr>
@@ -206,7 +206,7 @@ options are "annual_spline" or methods available in
     </tr>
     <tr>
       <th>surr_params</th>
-      <td><p>a list of named optional arguments to be passed into the 
+      <td><p>a list of named optional arguments to be passed into the
 surrogate data function</p></td>
     </tr>
     <tr>

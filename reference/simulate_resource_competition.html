@@ -32,13 +32,13 @@
 
 <meta property="og:title" content="Get a data.frame of simulated abundances (resource competition) — simulate_resource_competition" />
 
-<meta property="og:description" content="Simulate time series from the resource competition model of 
-  Huisman &amp;amp; Weissing (1999) &amp;lt;https://doi.org/10.1038/46540&amp;gt;. The 
-  initial state, parameters, and perturbations are for the 5-species system 
-  competing on 3 resources as described in Huisman &amp;amp; Weissing (2001) 
-  &amp;lt;https://doi.org/10.1086/319929&amp;gt;.  
-`simulate_resource_competition_12sp()` is a simulation with the same 
-  structure, but is the 12-species system competing on 5 resources, with 
+<meta property="og:description" content="Simulate time series from the resource competition model of
+  Huisman &amp;amp; Weissing (1999) &amp;lt;https://doi.org/10.1038/46540&amp;gt;. The
+  initial state, parameters, and perturbations are for the 5-species system
+  competing on 3 resources as described in Huisman &amp;amp; Weissing (2001)
+  &amp;lt;https://doi.org/10.1086/319929&amp;gt;.
+`simulate_resource_competition_12sp()` is a simulation with the same
+  structure, but is the 12-species system competing on 5 resources, with
   introductions of species 6-12 at later times." />
 <meta name="twitter:card" content="summary" />
 
@@ -125,13 +125,13 @@
 
     <div class="ref-description">
     
-    <p>Simulate time series from the resource competition model of 
-  Huisman &amp; Weissing (1999) &lt;<a href='https://doi.org/10.1038/46540'>https://doi.org/10.1038/46540</a>&gt;. The 
-  initial state, parameters, and perturbations are for the 5-species system 
-  competing on 3 resources as described in Huisman &amp; Weissing (2001) 
-  &lt;<a href='https://doi.org/10.1086/319929'>https://doi.org/10.1086/319929</a>&gt;.</p>  
-<p>`simulate_resource_competition_12sp()` is a simulation with the same 
-  structure, but is the 12-species system competing on 5 resources, with 
+    <p>Simulate time series from the resource competition model of
+  Huisman &amp; Weissing (1999) &lt;<a href='https://doi.org/10.1038/46540'>https://doi.org/10.1038/46540</a>&gt;. The
+  initial state, parameters, and perturbations are for the 5-species system
+  competing on 3 resources as described in Huisman &amp; Weissing (2001)
+  &lt;<a href='https://doi.org/10.1086/319929'>https://doi.org/10.1086/319929</a>&gt;.</p>
+<p>`simulate_resource_competition_12sp()` is a simulation with the same
+  structure, but is the 12-species system competing on 5 resources, with
   introductions of species 6-12 at later times.</p>
     
     </div>
@@ -144,7 +144,7 @@
   <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>10</span>, <span class='fl'>10</span>, <span class='fl'>10</span>), <span class='kw'>N</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>0.1</span>, <span class='fl'>0.1</span>, <span class='fl'>0.1</span>, <span class='fl'>0.1</span>, <span class='fl'>0.1</span>)), <span class='kw'>sample_times</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>0</span>,
   <span class='fl'>3000</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fl'>1</span>), <span class='no'>...</span>)
 
-<span class='fu'>simulate_resource_competition_12sp</span>(<span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>r</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep.int</a></span>(<span class='fl'>1</span>, <span class='fl'>12</span>), <span class='kw'>m</span> <span class='kw'>=</span>
+<span class='fu'>sim_resource_competition_12sp</span>(<span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>r</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep.int</a></span>(<span class='fl'>1</span>, <span class='fl'>12</span>), <span class='kw'>m</span> <span class='kw'>=</span>
   <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep.int</a></span>(<span class='fl'>0.25</span>, <span class='fl'>12</span>), <span class='kw'>D</span> <span class='kw'>=</span> <span class='fl'>0.25</span>, <span class='kw'>K</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/matrix'>matrix</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>0.39</span>, <span class='fl'>0.34</span>, <span class='fl'>0.3</span>, <span class='fl'>0.24</span>, <span class='fl'>0.23</span>,
   <span class='fl'>0.41</span>, <span class='fl'>0.2</span>, <span class='fl'>0.45</span>, <span class='fl'>0.14</span>, <span class='fl'>0.15</span>, <span class='fl'>0.38</span>, <span class='fl'>0.28</span>, <span class='fl'>0.22</span>, <span class='fl'>0.39</span>, <span class='fl'>0.34</span>, <span class='fl'>0.3</span>, <span class='fl'>0.27</span>,
   <span class='fl'>0.16</span>, <span class='fl'>0.15</span>, <span class='fl'>0.05</span>, <span class='fl'>0.38</span>, <span class='fl'>0.29</span>, <span class='fl'>0.37</span>, <span class='fl'>0.31</span>, <span class='fl'>0.27</span>, <span class='fl'>0.22</span>, <span class='fl'>0.39</span>, <span class='fl'>0.34</span>, <span class='fl'>0.3</span>,

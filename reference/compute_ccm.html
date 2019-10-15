@@ -32,10 +32,10 @@
 
 <meta property="og:title" content="Run CCM on each pair of time series — compute_ccm" />
 
-<meta property="og:description" content="`compute_ccm` runs pairwise CCM based on the simplex_output - 
-  using the best embedding dimension from the simplex results, and computed 
-  for both the real data and the surrogate data. The calculations run using 
-  future_pmap. Thus, parallelization should be set by 
+<meta property="og:description" content="`compute_ccm` runs pairwise CCM based on the simplex_output -
+  using the best embedding dimension from the simplex results, and computed
+  for both the real data and the surrogate data. The calculations run using
+  future_pmap. Thus, parallelization should be set by
   the user, if desired, using plan, prior to running." />
 <meta name="twitter:card" content="summary" />
 
@@ -122,10 +122,10 @@
 
     <div class="ref-description">
     
-    <p>`compute_ccm` runs pairwise CCM based on the simplex_output - 
-  using the best embedding dimension from the simplex results, and computed 
-  for both the real data and the surrogate data. The calculations run using 
-  <code><a href='https://www.rdocumentation.org/packages/furrr/topics/future_map2'>future_pmap</a></code>. Thus, parallelization should be set by 
+    <p>`compute_ccm` runs pairwise CCM based on the simplex_output -
+  using the best embedding dimension from the simplex results, and computed
+  for both the real data and the surrogate data. The calculations run using
+  <code><a href='https://www.rdocumentation.org/packages/furrr/topics/future_map2'>future_pmap</a></code>. Thus, parallelization should be set by
   the user, if desired, using <code><a href='https://www.rdocumentation.org/packages/future/topics/plan'>plan</a></code>, prior to running.</p>
     
     </div>
@@ -171,8 +171,8 @@ reproducible runs of ccm with randomly generated libraries</p></td>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>`compute_ccm` returns a tibble with columns for the variables that we 
-  use in CCM, the data type (whether it's the "actual" time series or 
+    <p>`compute_ccm` returns a tibble with columns for the variables that we
+  use in CCM, the data type (whether it's the "actual" time series or
   "surrogate"), the library size, and the results from CCM</p>
     
 

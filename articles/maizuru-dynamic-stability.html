@@ -80,7 +80,7 @@
       <h1>Compute Dynamic Stability for the Maizuru Bay Fish Community</h1>
                         <h4 class="author">Hao Ye</h4>
             
-            <h4 class="date">2019-08-27</h4>
+            <h4 class="date">2019-10-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ha0ye/portalDS/blob/master/vignettes/maizuru-dynamic-stability.Rmd"><code>vignettes/maizuru-dynamic-stability.Rmd</code></a></small>
       <div class="hidden name"><code>maizuru-dynamic-stability.Rmd</code></div>
@@ -109,17 +109,19 @@
 <a class="sourceLine" id="cb2-3" data-line-number="3">maizuru_palette &lt;-<span class="st"> </span>viridis<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NCOL</a></span>(maizuru_block) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)</a>
 <a class="sourceLine" id="cb2-4" data-line-number="4"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(maizuru_palette) &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sort">sort</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(maizuru_block[, <span class="dv">-1</span>]))</a>
 <a class="sourceLine" id="cb2-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb2-6" data-line-number="6">x_axis_time &lt;-<span class="st"> </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_date.html">scale_x_date</a></span>(<span class="dt">limits =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.Date">as.Date</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"2005-03-01"</span>, <span class="st">"2011-01-01"</span>)),</a>
-<a class="sourceLine" id="cb2-7" data-line-number="7">                            <span class="dt">date_breaks =</span> <span class="st">"1 year"</span>, <span class="dt">date_labels =</span> <span class="st">"%Y"</span>, <span class="dt">expand =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="fl">0.01</span>, <span class="dv">0</span>))</a>
-<a class="sourceLine" id="cb2-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb2-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="kw"><a href="../reference/plot_time_series.html">plot_time_series</a></span>(maizuru_block) <span class="op">+</span></a>
-<a class="sourceLine" id="cb2-11" data-line-number="11"><span class="st">  </span>x_axis_time <span class="op">+</span></a>
-<a class="sourceLine" id="cb2-12" data-line-number="12"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="dt">values =</span> maizuru_palette) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span>(<span class="dt">color =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb2-14" data-line-number="14"><span class="co">#&gt; Scale for 'colour' is already present. Adding another scale for</span></a>
-<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="co">#&gt; 'colour', which will replace the existing scale.</span></a>
-<a class="sourceLine" id="cb2-16" data-line-number="16"><span class="co">#&gt; Warning: Removed 2175 rows containing missing values (geom_path).</span></a></code></pre></div>
+<a class="sourceLine" id="cb2-6" data-line-number="6">x_axis_time &lt;-<span class="st"> </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_date.html">scale_x_date</a></span>(</a>
+<a class="sourceLine" id="cb2-7" data-line-number="7">  <span class="dt">limits =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.Date">as.Date</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"2005-03-01"</span>, <span class="st">"2011-01-01"</span>)),</a>
+<a class="sourceLine" id="cb2-8" data-line-number="8">  <span class="dt">date_breaks =</span> <span class="st">"1 year"</span>, <span class="dt">date_labels =</span> <span class="st">"%Y"</span>, <span class="dt">expand =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="fl">0.01</span>, <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb2-9" data-line-number="9">)</a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb2-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb2-12" data-line-number="12"><span class="kw"><a href="../reference/plot_time_series.html">plot_time_series</a></span>(maizuru_block) <span class="op">+</span></a>
+<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="st">  </span>x_axis_time <span class="op">+</span></a>
+<a class="sourceLine" id="cb2-14" data-line-number="14"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="dt">values =</span> maizuru_palette) <span class="op">+</span></a>
+<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span>(<span class="dt">color =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb2-16" data-line-number="16"><span class="co">#&gt; Scale for 'colour' is already present. Adding another scale for</span></a>
+<a class="sourceLine" id="cb2-17" data-line-number="17"><span class="co">#&gt; 'colour', which will replace the existing scale.</span></a>
+<a class="sourceLine" id="cb2-18" data-line-number="18"><span class="co">#&gt; Warning: Removed 2175 rows containing missing values (geom_path).</span></a></code></pre></div>
 <p><img src="maizuru-dynamic-stability_files/figure-html/time%20series-1.png" width="576"></p>
 </div>
 <div id="dynamic-stability-calculations" class="section level1">
@@ -128,25 +130,30 @@
 <p>Perform the dynamic stability analysis for the maizuru system. The steps involved in the full analysis are:</p>
 <p>1a. Run simplex projection on each time series to identify the optimal embedding dimension 1b. Generate surrogate time series (here, using the twin-surrogate method)</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">simplex_results &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compute_simplex.html">compute_simplex</a></span>(maizuru_block,</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">                                   <span class="dt">E_list =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">24</span>,</a>
-<a class="sourceLine" id="cb3-3" data-line-number="3">                                   <span class="dt">surrogate_method =</span> <span class="st">"twin"</span>, </a>
-<a class="sourceLine" id="cb3-4" data-line-number="4">                                   <span class="dt">num_surr =</span> <span class="dv">200</span>, </a>
-<a class="sourceLine" id="cb3-5" data-line-number="5">                                   <span class="dt">surr_params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">T_period =</span> <span class="dv">24</span>, </a>
-<a class="sourceLine" id="cb3-6" data-line-number="6">                                                      <span class="dt">quantile_vec =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="fl">0.875</span>, <span class="fl">0.88</span>, <span class="fl">0.89</span>, <span class="fl">0.90</span>, <span class="fl">0.91</span>, <span class="fl">0.92</span>, </a>
-<a class="sourceLine" id="cb3-7" data-line-number="7">                                                                       <span class="fl">0.93</span>, <span class="fl">0.94</span>, <span class="fl">0.95</span>, <span class="fl">0.85</span>, <span class="fl">0.84</span>, <span class="fl">0.83</span>, </a>
-<a class="sourceLine" id="cb3-8" data-line-number="8">                                                                       <span class="fl">0.82</span>, <span class="fl">0.81</span>, <span class="fl">0.80</span>, <span class="fl">0.96</span>))</a>
-<a class="sourceLine" id="cb3-9" data-line-number="9">)</a></code></pre></div>
+<a class="sourceLine" id="cb3-2" data-line-number="2">  <span class="dt">E_list =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">24</span>,</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3">  <span class="dt">surrogate_method =</span> <span class="st">"twin"</span>,</a>
+<a class="sourceLine" id="cb3-4" data-line-number="4">  <span class="dt">num_surr =</span> <span class="dv">200</span>,</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5">  <span class="dt">surr_params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
+<a class="sourceLine" id="cb3-6" data-line-number="6">    <span class="dt">T_period =</span> <span class="dv">24</span>,</a>
+<a class="sourceLine" id="cb3-7" data-line-number="7">    <span class="dt">quantile_vec =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(</a>
+<a class="sourceLine" id="cb3-8" data-line-number="8">      <span class="fl">0.875</span>, <span class="fl">0.88</span>, <span class="fl">0.89</span>, <span class="fl">0.90</span>, <span class="fl">0.91</span>, <span class="fl">0.92</span>,</a>
+<a class="sourceLine" id="cb3-9" data-line-number="9">      <span class="fl">0.93</span>, <span class="fl">0.94</span>, <span class="fl">0.95</span>, <span class="fl">0.85</span>, <span class="fl">0.84</span>, <span class="fl">0.83</span>,</a>
+<a class="sourceLine" id="cb3-10" data-line-number="10">      <span class="fl">0.82</span>, <span class="fl">0.81</span>, <span class="fl">0.80</span>, <span class="fl">0.96</span></a>
+<a class="sourceLine" id="cb3-11" data-line-number="11">    )</a>
+<a class="sourceLine" id="cb3-12" data-line-number="12">  )</a>
+<a class="sourceLine" id="cb3-13" data-line-number="13">)</a></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
 <li>Run ccm on each pairwise interaction, including the surrogate data, and using the embedding dimension identified previously. Since this takes a while to run, we’ve commented out the actual code, and instead load a pre-generated results file.</li>
 </ol>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># future::plan(future.callr::callr)</span></a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co"># ccm_results &lt;- compute_ccm(simplex_results,</span></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#                            lib_sizes = c(6, 12, 24, 40, 80, 140, 220, 320, NROW(maizuru_block)), </span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#                            lib_sizes = c(6, 12, 24, 40, 80, 140, 220, 320, NROW(maizuru_block)),</span></a>
 <a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#                            num_samples = 200)</span></a>
 <a class="sourceLine" id="cb4-5" data-line-number="5"></a>
 <a class="sourceLine" id="cb4-6" data-line-number="6">data_path &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"maizuru_ccm_results.RDS"</span>,</a>
-<a class="sourceLine" id="cb4-7" data-line-number="7">                         <span class="dt">package =</span> <span class="st">"portalDS"</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb4-8" data-line-number="8">ccm_results &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/readRDS">readRDS</a></span>(data_path)</a></code></pre></div>
+<a class="sourceLine" id="cb4-7" data-line-number="7">  <span class="dt">package =</span> <span class="st">"portalDS"</span>, <span class="dt">mustWork =</span> <span class="ot">TRUE</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8">)</a>
+<a class="sourceLine" id="cb4-9" data-line-number="9">ccm_results &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/readRDS">readRDS</a></span>(data_path)</a></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
 <li>identify the significant interactions by comparing the CCM results for the real time series against the comparable calculations for the surrogate data</li>
 </ol>
@@ -154,17 +161,20 @@
 <ol start="4" style="list-style-type: decimal">
 <li>run S-map models for each time series, using the appropriate number of lags, and including the important interacting variables (we rescale the time series to each have mean = 0, variance = 1)</li>
 </ol>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">smap_coeffs &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compute_smap_coeffs.html">compute_smap_coeffs</a></span>(maizuru_block, ccm_links, </a>
-<a class="sourceLine" id="cb6-2" data-line-number="2">                                   <span class="dt">rescale =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">smap_coeffs &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compute_smap_coeffs.html">compute_smap_coeffs</a></span>(maizuru_block, ccm_links,</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">  <span class="dt">rescale =</span> <span class="ot">TRUE</span></a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">)</a></code></pre></div>
 <ol start="5" style="list-style-type: decimal">
 <li>extract out the s-map coefficients from the models and assemble matrices for the system</li>
 </ol>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">smap_matrices &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compute_smap_matrices.html">compute_smap_matrices</a></span>(smap_coeffs,</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">                                       ccm_links)</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co"># add date labels for each matrix in list</span></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/stopifnot">stopifnot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(smap_matrices) <span class="op">==</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NROW</a></span>(maizuru_block))</a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(smap_matrices) &lt;-<span class="st"> </span>maizuru_block<span class="op">$</span>censusdate</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">smap_matrices &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compute_smap_matrices.html">compute_smap_matrices</a></span>(</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">  smap_coeffs,</a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">  ccm_links</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">)</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co"># add date labels for each matrix in list</span></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/stopifnot">stopifnot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(smap_matrices) <span class="op">==</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NROW</a></span>(maizuru_block))</a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(smap_matrices) &lt;-<span class="st"> </span>maizuru_block<span class="op">$</span>censusdate</a></code></pre></div>
 <ol start="6" style="list-style-type: decimal">
 <li>perform eigen-decomposition on the s-map coefficient matrices</li>
 </ol>
@@ -185,14 +195,15 @@
 <p><img src="maizuru-dynamic-stability_files/figure-html/view%20interaction%20network-1.png" width="576"></p>
 <p>The remaining components allow us to plot a subset of the network, while keeping the same layout of nodes and the associated colors.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">halichoeres_links &lt;-<span class="st"> </span>ccm_links <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(stringr<span class="op">::</span><span class="kw"><a href="https://stringr.tidyverse.org/reference/str_detect.html">str_detect</a></span>(lib_column, <span class="st">"Halichoeres"</span>) <span class="op">|</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="st">           </span>stringr<span class="op">::</span><span class="kw"><a href="https://stringr.tidyverse.org/reference/str_detect.html">str_detect</a></span>(target_column, <span class="st">"Halichoeres"</span>))</a>
+<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(stringr<span class="op">::</span><span class="kw"><a href="https://stringr.tidyverse.org/reference/str_detect.html">str_detect</a></span>(lib_column, <span class="st">"Halichoeres"</span>) <span class="op">|</span></a>
+<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="st">    </span>stringr<span class="op">::</span><span class="kw"><a href="https://stringr.tidyverse.org/reference/str_detect.html">str_detect</a></span>(target_column, <span class="st">"Halichoeres"</span>))</a>
 <a class="sourceLine" id="cb11-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb11-5" data-line-number="5">halichoeres_network &lt;-<span class="st"> </span><span class="kw"><a href="../reference/plot_network.html">plot_network</a></span>(halichoeres_links, </a>
-<a class="sourceLine" id="cb11-6" data-line-number="6">                                    <span class="dt">palette =</span> maizuru_palette, </a>
-<a class="sourceLine" id="cb11-7" data-line-number="7">                                    <span class="dt">existing_graph =</span> maizuru_network<span class="op">$</span>graph)</a>
-<a class="sourceLine" id="cb11-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb11-9" data-line-number="9"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(halichoeres_network<span class="op">$</span>plot)</a></code></pre></div>
+<a class="sourceLine" id="cb11-5" data-line-number="5">halichoeres_network &lt;-<span class="st"> </span><span class="kw"><a href="../reference/plot_network.html">plot_network</a></span>(halichoeres_links,</a>
+<a class="sourceLine" id="cb11-6" data-line-number="6">  <span class="dt">palette =</span> maizuru_palette,</a>
+<a class="sourceLine" id="cb11-7" data-line-number="7">  <span class="dt">existing_graph =</span> maizuru_network<span class="op">$</span>graph</a>
+<a class="sourceLine" id="cb11-8" data-line-number="8">)</a>
+<a class="sourceLine" id="cb11-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb11-10" data-line-number="10"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(halichoeres_network<span class="op">$</span>plot)</a></code></pre></div>
 <p><img src="maizuru-dynamic-stability_files/figure-html/interaction%20subnetwork-1.png" width="576"></p>
 </div>
 <div id="eigenvalues" class="section level2">
@@ -206,7 +217,7 @@
 <p><img src="maizuru-dynamic-stability_files/figure-html/unnamed-chunk-2-1.png" width="576"></p>
 <p>Note that <code>plot_eigenvalues</code> has a number of additional parameters, which allow us to plot multiple eigenvalues simultaneously, or identify when the dominant eigenvalue is complex (red points):</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">eigenvalues <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/plot_eigenvalues.html">plot_eigenvalues</a></span>(<span class="dt">num_values =</span> <span class="dv">2</span>, <span class="dt">highlight_complex =</span> <span class="ot">TRUE</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/plot_eigenvalues.html">plot_eigenvalues</a></span>(<span class="dt">num_values =</span> <span class="dv">2</span>, <span class="dt">highlight_complex =</span> <span class="ot">TRUE</span>) <span class="op">+</span></a>
 <a class="sourceLine" id="cb13-3" data-line-number="3"><span class="st">  </span>x_axis_time</a>
 <a class="sourceLine" id="cb13-4" data-line-number="4"><span class="co">#&gt; Warning: Removed 242 rows containing missing values (geom_path).</span></a>
 <a class="sourceLine" id="cb13-5" data-line-number="5"><span class="co">#&gt; Warning: Removed 221 rows containing missing values (geom_point).</span></a></code></pre></div>
@@ -217,8 +228,8 @@
 <a href="#eigenvectors" class="anchor"></a>Eigenvectors</h2>
 <p>Just as with the eigenvalues, we can plot the dominant eigenvector(s) as it changes in time. Note that there are only 13 dimensions here, because we drop the 2 species that share no links with the others.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">eigenvectors <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/plot_eigenvectors.html">plot_eigenvectors</a></span>(<span class="dt">num_values =</span> <span class="dv">2</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="dt">values =</span> maizuru_palette) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/plot_eigenvectors.html">plot_eigenvectors</a></span>(<span class="dt">num_values =</span> <span class="dv">2</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb14-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="dt">values =</span> maizuru_palette) <span class="op">+</span></a>
 <a class="sourceLine" id="cb14-4" data-line-number="4"><span class="st">  </span>x_axis_time</a>
 <a class="sourceLine" id="cb14-5" data-line-number="5"><span class="co">#&gt; Scale for 'colour' is already present. Adding another scale for</span></a>
 <a class="sourceLine" id="cb14-6" data-line-number="6"><span class="co">#&gt; 'colour', which will replace the existing scale.</span></a>
@@ -233,7 +244,7 @@
 <a href="#references" class="anchor"></a>References</h1>
 <div id="refs" class="references">
 <div id="ref-Ushio_2018">
-<p>Ushio, Masayuki, Chih-hao Hsieh, Reiji Masuda, Ethan R Deyle, Hao Ye, Chun-Wei Chang, George Sugihara, and Michio Kondoh. 2018. “Fluctuating Interaction Network and Time-Varying Stability of a Natural Fish Community.” <em>Nature</em> 554 (7692): 360–63. <a href="https://doi.org/10.1038/nature25504" class="uri">https://doi.org/10.1038/nature25504</a>.</p>
+<p>Ushio, Masayuki, Chih-hao Hsieh, Reiji Masuda, Ethan R Deyle, Hao Ye, Chun-Wei Chang, George Sugihara, and Michio Kondoh. 2018. “Fluctuating Interaction Network and Time-Varying Stability of a Natural Fish Community.” <em>Nature</em> 554 (7692): 360–63. <a href="https://doi.org/10.1038/nature25504">https://doi.org/10.1038/nature25504</a>.</p>
 </div>
 </div>
 </div>
