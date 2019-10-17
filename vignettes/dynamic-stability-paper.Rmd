@@ -41,8 +41,8 @@ Using time series is a natural way to investigate this question. Multiple values
 
 Historically, ecosystem stability has been characterized based on the interaction matrics [@May_1973a; @Pimm_1984]. We briefly summarize this approach:
 
-1. Let the abundances of the component species in a system be $n_i$, with $i$ taking on values from $1$ to $N$, the number of species.
-2. Assume that the population dynamics for each species is a function of the other species: $\displaystyle \frac{\mathrm{d} n_i}{\mathrm{d} t} = F_i \left(n_1(t), n_2(t), ..., n_N(t) \right)$
+1. Let the abundances of the component species in a system be $n_i$, with $i$ taking on values from $1$ to $s$, the number of species.
+2. Assume that the population dynamics for each species is a function of the other species: $\displaystyle \frac{\mathrm{d} n_i}{\mathrm{d} t} = F_i \left(n_1(t), n_2(t), ..., n_s(t) \right)$
 3. Let the system be in the vicinity of an equilibrium. Then the population dynamics can be linearized around this equilibrium point: $\displaystyle \frac{\mathrm{d} n_i}{\mathrm{d} t} \approx \sum_j{a_{ij} n_j(t)}$, where $a_{ij}$ are the elements of the community matrix $\mathrm{A}$.
 4. The asymptotic stability of the equilibrium point is determined by the signs of the real components of the eigenvalues of the community matrix. Stability occurs when $\textrm{Re}\left(\lambda_i\right) < 0$ for all $\lambda_i$.
 
@@ -54,7 +54,7 @@ Stability - historically based on interactions among species
 <!-- narrow down to specific research topic (empirical measures of system change) -->
 Ushio et al. [-@Ushio_2018] introduced "dynamic stability" as an empirical measure of ecosystem stability. Dynamic stability is defined as the dominant eigenvalue of the time-varying interaction matrix, and is thus a time-varying, continuous analogue to the static, binary definition of stability in Pimm [-@Pimm_1984]. At each time point, dynamic stability is a continuous quantity (with values above 1 corresponding to stable states, and values below 1 corresponding to unstable states).
 
-$$\textrm{dynamic stability}_t = \left|\lambda_{\textrm{dom}, t}\right|$$
+$$\textrm{dynamic stability}(t) = \left|\lambda_{\textrm{dom}}(t)\right|$$
 
 <!-- details of what dynamic stability and related measures are -->
 
@@ -87,27 +87,48 @@ Because EDM methods rely on extracting signal from the time series directly, we 
 
 ## Dynamic Stability Analysis
 
-We follow the main procedure as outlined in [@Ushio_2018]:
+The general procedure for the analysis follows the outline described in [@Ushio_2018]:
 
-0. Simplex projection
+1. For each individual time series, $n_i, i \in \{1 \dots s\}$, apply simplex projection [@Sugihara_1990] to identify the optimal embedding dimension, $E_i$  Here, we test values of $E_i$ from $1$ to $16$, choosing the value that minimizes mean absolute error of one-step ahead forecasts.
 
-1. Use convergent cross mapping [@Sugihara_2012] to construct the pairwise interaction network: i.e. test whether there is a causal effect, $n_i \rightarrow n_j \forall i,j \in \{1..N\}, i \ne j$
+2. Construct the pairwise interaction network, using convergent cross mapping (CCM) [@Sugihara_2012]. For each pair of $i, j \in \{1 \dots s\}, i \ne j$, we test whether there is a causal effect, $n_i \rightarrow n_j$, by cross mapping from $n_j$ to $n_i$, $n_j \xrightarrow{\text{xmap}} n_i$. For the CCM analysis, we use the embedding dimension of the variable used for reconstruction; i.e. for $n_j \xrightarrow{\text{xmap}} n_i$, use $E_j$ as identified in step 1.  
+  Parameters for CCM are as follows:  
+    * library sizes: `r seq(10, 100, by = 10)`
+    * number of samples at each library size: `r 100`
+    * points within each sample are sampled randomly, and with replacement
+    * links are significant if $\rho_{L=100} - \rho_{L=10} > 0.1$ (i.e. the increase in cross map $\rho$ is greater than $0.1$) and $\rho_{L=100}$ exceeds the `0.975` quantile of a null distribution of $\rho_{L=100}$ computed using surrogate time series of $n_j$
+    * for each $n_j$, $200$ surrogate time series are generated via \@ref(ccm-surrogates)
 
-$A = 
+3. For each time series $n_j$, fit a time series model with dimensionality of at least $E_j$ using the S-map method [@Sugihara_1994]. The predictors for each $n_j$ include the causal influences identified in step 2.  
+  Let $V_j = \{k, n_k \rightarrow n_j\}$ identify the causal influences of $n_j$. In the typical univariate S-map model for $n_j$, the state vector is defined as:
+  $$\mathbf{n}_j(t) = \{n_j(t), n_j(t-1), \dots, n_j(t-(E_j-1)\}$$
+  Here, for the multivariate S-map model for $n_j$, the $n_k$ substitute for the oldest lag of $n_j$; i.e. the state vector is:  
+  $$\mathbf{n}^\prime_j(t) = \{n_j(t), n_j(t-1), \dots, n_j(t-(E_j-|V_j|-1)\} \bigcup \{n_k(t)\}, k \in V_j$$  
+  If the $n_k$ predictors would replace all the lags of $n_j$, $|V_j| \ge E_j$, then the state vector is instead expanded to include $n_j(t)$: 
+  $$\mathbf{n}^\prime_j(t) = \{n_j(t)\} \bigcup \{n_k(t)\}, k \in V_j$$  
+  The multivariate state vector, $\mathbf{n}^\prime_i(t)$, is then used in the S-map model:  
+  $$\hat{n}_j(t+1) = \mathbf{c}_j(t) \cdot \mathbf{n}^\prime_j(t) + c^0_j(t)$$  
+  The coefficients $\mathbf{c}_j(t)$ are fitted with nonlinear tuning parameter, $\theta$. $\theta$ is selected as the value which minimizes the mean absolute error of one-step ahead forecasts, from among: {`r c( seq(0, 1, by = 0.1), seq(1.5, 10, by = 0.5))`}
+  
+4. The individual S-map models from step 3 can be combined, representing the dynamics of the system in matrix form:  
+  $$\mathbf{N}(t+1) = \mathbf{J_0}(t) \mathbf{N}(t) + \mathbf{J_1}(t) \mathbf{N}(t-1) + \dots + \mathbf{J_d}(t) \mathbf{N}(t-d) + \mathbf{C}^0(t)$$  
+  where $d$ represents the largest lag from any individual S-map model, $d = \mathrm{max} \{0, E_1 - |V_1| - 1, E_2 - |V_2| - 1, \dots, E_s - |V_s| - 1\}$. The matrix variables are defined as: $\mathbf{N}(t) = \begin{pmatrix} n_1(t) \\ n_2(t) \\ \vdots \\ n_s(t) \end{pmatrix}$, $\mathbf{C}^0(t) = \begin{pmatrix} c_1^0(t) \\ c_2^0(t) \\ \vdots \\ c_s^0(t) \end{pmatrix}$ and the $\mathbf{J}_\tau(t)$ contain the elements of the $\mathbf{c}_j(t)$ distributed accordingly, but which are otherwise $0$.   
+  This can be re-written as:
+  $$\mathbf{W}(t+1) = \mathbf{A}(t) \mathbf{W}(t) + \mathbf{B}(t)$$
+  with $\mathbf{W}(t) = \begin{pmatrix} \mathbf{N}(t) \\ \mathbf{N}(t-1) \\ \vdots \\ \mathbf{N}(t-d) \end{pmatrix}$ and $\mathbf{B}(t) = \begin{pmatrix} \mathbf{C}^0(t) \\ \mathbf{0} \\ \vdots \end{pmatrix}$ and $\mathbf{A}(t) = \begin{pmatrix} \mathbf{J}_0(t) & \mathbf{J}_1(t) & \dots & \dots & \mathbf{J}_d(t) \\ I & \mathbf{0} & \dots & \mathbf{0} & \mathbf{0} \\ \vdots & \vdots & \ddots & \vdots & \vdots\\ \mathbf{0} & \mathbf{0} & \dots & I & \mathbf{0} \end{pmatrix}$. Here, $I$ is the identity matrix of size $s$, and $\mathbf{0}$ is the zero matrix or vector, accordingly.
 
-2. For each time series $n_j$, fit a multivariate S-map model [@Sugihara_1994, @Deyle_2016], where causal influences identified in step 1 are included; $V_i = \{k, n_k \rightarrow n_i\}$. Here, each $n_k$ substitutes for a lag of $n_i$: i.e. the multivariate state vector for the S-map model is:
+5. According to [@Deyle_2016], the coefficients of the S-map model can be interpreted as the time-varying interactions between individual time series, and via [@Ushio_2018], the matrix $\mathbf{A}(t)$ as the time-varying interaction matrix, whose properties characterize the state-dependent dynamics of the system (here, estimated at each time step). Thus, metrics computed on $\mathbf{A}(t)$ should describe how the system is changing.
+  We compute the following metrics on $\mathbf{A}(t)$:
+    * "dynamic stability" as the magnitude of the dominant eigenvalue:  
+    $$\textrm{dynamic stability}(t) = \left|\lambda_{\textrm{dom}}(t)\right|$$
+    * "volume contraction rate" as the trace:
+    $$\textrm{VCR}(t) = \textrm{Tr}\left(\mathbf{A}(t)\right)$$
 
-$$\mathbf{n}^\prime_i(t) = \{n_i(t), n_i(t-1), \dots, n_i(t-(E_i-1-|V_i|)\} \bigcup \{n_k(t)\}, k \in V_i$$
+## Surrogate method for convergent cross mapping{#ccm-surrogates}
 
-The multivariate state vector, $\mathbf{n}^\prime_i(t)$, is then used in the S-map model, and $\theta$ is fit via maximizing (rho?) under leave-one-out cross-validation.
+[@Ushio_2018] use a phase-lock twin surrogate method to account for seasonal patterns as a potential confounder when identifying significant causal interactions. Although the Portal rodent abundances also exhibit seasonal patterns, sampling occurs on the new moon, meaning data points represent different times of year and do not fall into convenient equivalence classes for the phase-lock method.
 
-3. 
-
-## Surrogate method for convergent cross mapping
-
-[@Ushio_2018] use a phase-lock twin surrogate method as a way to deal with seasonal signals when identifying significant causal interactions. Although the Portal rodent abundances also exhibit seasonal patterns, sampling occurs on the new moon, and thus occurs at different times of year. 
-
-
+Instead, we compute surrogates by computing the average annual pattern (using the day of year for each observation), and then shuffling the residuals (i.e. the null model is a fixed seasonal pattern, with i.i.d. deviations). 
 
 # Results
 
