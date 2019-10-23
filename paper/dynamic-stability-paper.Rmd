@@ -25,7 +25,10 @@ library(portalDS)
 
 # Abstract
 
-Quantifying change in a high-dimensional complex systems is challenging. The observed changes in state can occur as a result of endogenous dynamics, external forcing, or their interactions in addition to being deterministic, stochastic, or deterministic responses to stochastic forcing. 
+Quantifying change in a high-dimensional complex systems is challenging. The observed changes in state can occur as a result of endogenous dynamics, external forcing, or their interactions in addition to being deterministic, stochastic, or deterministic responses to stochastic forcing.
+
+Among the ecological literature, there is substantial focus on determining whether systems are "stable" and computing metrics of "stability". However, the complexity of possible system changes exceeds such binary or scalar quantifications. Here, we explore 
+
 
 # Introduction
 
@@ -106,58 +109,64 @@ The general procedure for the analysis follows the outline described in [@Ushio_
 
 3. For each time series $n_i$, fit a time series model with dimensionality of at least $E_i$ using the S-map method [@Sugihara_1994]. The predictors for each $n_i$ include the causal influences identified in step 2.  
   Let $V_i = \{k, n_k \rightarrow n_i\}$ identify the causal influences of $n_i$. In the typical univariate S-map model for $n_i$, the state vector is defined as:
-  $$\mathbf{x}_i(t) = \{n_i(t), n_i(t-1), \dots, n_i(t-(E_i-1)\}$$
-  Here, for the multivariate S-map model for $n_i$, the $n_k$ substitute for the oldest lag of $n_i$; i.e. the state vector is defined as:  
-  $$\mathbf{z}_i(t) = \left\{n_i(t)\right\} \bigcup \left\{n_k(t), k \in V_i\right\} \bigcup \left\{n_i(t-1), \dots, n_i(t-(E_i-\left|V_i\right|-1)\right\}$$  
-  If $\left|V_i\right| \ge E_i$, then the last term above is dropped entirely.
-  The multivariate state vector, $\mathbf{z}_i(t)$, is then used in the S-map model:  
+  $$\mathbf{x}_i(t) = \langle n_i(t), n_i(t-1), \dots, n_i(t-(E_i-1)) \rangle$$
+  In the multivariate S-map model for $n_i$, each causal influence of $n_i$ is substituted for a lag of $n_i$, starting with the oldest. The resulting state vector is defined as:  
+  $$\mathbf{x}_i(t) = \langle n_i(t), \left\{n_k(t), k \in V_i\right\}, n_i(t-1), \dots, n_i(t-(E_i-\left|V_i\right|-1)\rangle$$  
+  If $\left|V_i\right| \ge E_i$, then the state vector includes no lags, and consists instead of $n_i(t)$ and each $n_k(t)$.  
+  The multivariate state vector, $\mathbf{x}_i(t)$, is then used in the S-map model:  
   \begin{equation}
-  \hat{n}_i(t+1) = \mathbf{b}_i(t) \cdot \mathbf{z}_i(t) + c^0_i(t)
+  \hat{n}_i(t+1) = \mathbf{b}_i(t) \cdot \mathbf{x}_i(t) + c^0_i(t)
   (\#eq:species-smap-model)
   \end{equation}  
   The coefficients $\mathbf{b}_i(t)$ are fitted with nonlinear tuning parameter, $\theta$. $\theta$ is selected as the value which minimizes the mean absolute error of one-step ahead forecasts, from among: {`r c( seq(0, 1, by = 0.1), seq(1.5, 10, by = 0.5))`}
   
-4. The individual S-map models, \@ref(eq:species-smap-model), can be combined, representing the dynamics of the system in matrix form:  
+4. The individual S-map models, \@ref(eq:species-smap-model), can be combined to represent the dynamics of the system in matrix form:  
   \begin{equation}
-  \mathbf{N}(t+1) = \mathbf{J_0}(t) \mathbf{N}(t) + \mathbf{J_1}(t) \mathbf{N}(t-1) + \dots + \mathbf{J_d}(t) \mathbf{N}(t-d) + \mathbf{C}^0(t)
+  \mathbf{N}(t+1) = \mathbf{J}_0(t) \mathbf{N}(t) + \mathbf{J}_1(t) \mathbf{N}(t-1) + \dots + \mathbf{J}_d(t) \mathbf{N}(t-d) + \mathbf{C}^0(t)
   (\#eq:system-smap-model)
   \end{equation}  
-  where $d$ represents the largest lag from any individual S-map model, $d = \mathrm{max} \{0, E_1 - \left|V_1\right| - 1, E_2 - \left|V_2\right| - 1, \dots, E_s - \left|V_s\right| - 1\}$. The matrix variables are defined as: $\mathbf{N}(t) = \begin{pmatrix} n_1(t) \\ n_2(t) \\ \vdots \\ n_s(t) \end{pmatrix}$, $\mathbf{C}^0(t) = \begin{pmatrix} c_1^0(t) \\ c_2^0(t) \\ \vdots \\ c_s^0(t) \end{pmatrix}$ and the $\mathbf{J}_\tau(t)$ contain the elements of the S-map coefficients in $\mathbf{c}_i(t)$ distributed accordingly:
-    * $J_{0, i, j} =  b_{i, n_j}$ when $i = j$ or $n_j \rightarrow n_i$ (thus $b_{i, j}$ is estimated in \@ref(eq:species-smap-model)
-    * $J_{\tau, i, i} = b_{i, n_i(t-\tau)}$ when $n_i(t-\tau)$ is a component of $\mathbf{z}_i(t)$ in \@ref(eq:species-smap-model)
+  where $d$ represents the largest lag from any individual S-map model, $d = \mathrm{max} \{0, E_1 - \left|V_1\right| - 1, E_2 - \left|V_2\right| - 1, \dots, E_s - \left|V_s\right| - 1\}$. The matrix variables are defined as: $\mathbf{N}(t) = \begin{pmatrix} n_1(t) \\ n_2(t) \\ \vdots \\ n_s(t) \end{pmatrix}$, $\mathbf{C}^0(t) = \begin{pmatrix} c_1^0(t) \\ c_2^0(t) \\ \vdots \\ c_s^0(t) \end{pmatrix}$ and the $\mathbf{J}_\tau(t)$ contain the elements of the S-map coefficients in $\mathbf{b}_i(t)$ distributed accordingly:
+    * $J_{0, i, j} =  b_{i, n_j}$ when $i = j$ or $n_j \rightarrow n_i$ and so $b_{i, n_j}$ is estimated in \@ref(eq:species-smap-model)
+    * $J_{\tau, i, i} = b_{i, n_i(t-\tau)}$ when $n_i(t-\tau)$ is a component of $\mathbf{x}_i(t)$ and so $b_{i, n_i(t-\tau)}$ is estimated in \@ref(eq:species-smap-model)
     * $J_{\tau, i, j} = 0$, otherwise.  
   \@ref(eq:system-smap-model) can then be re-written as:
   \begin{equation}
   \mathbf{W}(t+1) = \mathbf{J}(t) \mathbf{W}(t) + \mathbf{B}(t)
   (\#eq:system-matrix-model)
   \end{equation}  
-  with $\mathbf{W}(t) = \begin{pmatrix} \mathbf{N}(t) \\ \mathbf{N}(t-1) \\ \vdots \\ \mathbf{N}(t-d) \end{pmatrix}$ and $\mathbf{B}(t) = \begin{pmatrix} \mathbf{C}^0(t) \\ \mathbf{0} \\ \vdots \mathbf{0} \end{pmatrix}$ and $\mathbf{J}(t) = \begin{pmatrix} \mathbf{J}_0(t) & \mathbf{J}_1(t) & \dots & \dots & \mathbf{J}_d(t) \\ I & \mathbf{0} & \dots & \mathbf{0} & \mathbf{0} \\ \vdots & \vdots & \ddots & \vdots & \vdots\\ \mathbf{0} & \mathbf{0} & \dots & I & \mathbf{0} \end{pmatrix}$.  
+  with $\mathbf{W}(t) = \begin{pmatrix} \mathbf{N}(t) \\ \mathbf{N}(t-1) \\ \mathbf{N}(t-2) \\ \vdots \\ \mathbf{N}(t-d) \end{pmatrix}$ and $\mathbf{B}(t) = \begin{pmatrix} \mathbf{C}^0(t) \\ \mathbf{0} \\ \mathbf{0} \\ \vdots \\ \mathbf{0} \end{pmatrix}$ and $\mathbf{J}(t) = \begin{pmatrix} \mathbf{J}_0(t) & \mathbf{J}_1(t) & \dots & \dots & \mathbf{J}_d(t) \\
+  I & \mathbf{0} & \dots & \mathbf{0} & \mathbf{0} \\
+  \mathbf{0} & I & \dots & \mathbf{0} & \mathbf{0} \\
+  \vdots & \vdots & \ddots & \vdots & \vdots\\
+  \mathbf{0} & \mathbf{0} & \dots & I & \mathbf{0} \end{pmatrix}$.  
   Here, $I$ is the identity matrix of size $s$, and $\mathbf{0}$ is the zero matrix or vector, accordingly.
 
-5. According to [@Deyle_2016], the coefficients of the S-map model can be interpreted as the time-varying interactions between individual time series, and via [@Ushio_2018], the matrix $\mathbf{J}(t)$ as the time-varying interaction matrix, whose properties characterize the state-dependent dynamics of the system (here, estimated at each time step). Thus, metrics computed on $\mathbf{J}(t)$ describe how the system is changing.
+5. According to [@Deyle_2016], the coefficients of the multivariate S-map model, \@ref(eq:species-smap-model), can be interpreted as the time-varying interactions between individual time series. Via [@Ushio_2018], the matrix $\mathbf{J}(t)$ is then the time-varying interaction matrix, whose properties characterize the state-dependent dynamics of the system (here, estimated at each time step). Thus, metrics computed on $\mathbf{J}(t)$ are quantitative summaries of how the system is changing.
 
 ## Metrics for community change{#metrics}
 
 We compute the following metrics on $\mathbf{J}(t)$:
 
-  * "dynamic stability" is the magnitude of the dominant eigenvalue of $J(t)$, as in [@Ushio_2018]:  
+  * "dynamic stability" is the magnitude of the dominant eigenvalue of $\mathbf{J}(t)$, as in [@Ushio_2018]:  
   $$\textrm{dynamic stability}(t) = \left|\lambda_{\textrm{dom}}(t)\right|$$
-  * "local convergence" is the largest singular value in the singular value decomposition of $J(t)$, measuring the largest semi-axis of the transformation imposed by $J(t)$ applied to a unit circle.
-  * "volume contraction" as the determinant of $J(t)$:
-  $$\textrm{VCR}(t) = \textrm{Tr}\left(\mathbf{J}(t)\right)$$
+  * "local convergence" is the largest singular value in the singular value decomposition of $\mathbf{J}(t)$:
+  $$\textrm{local convergence}(t) = \Sigma_{\textrm{dom}}(t)$$
+  * "volume contraction" is the determinant of $\mathbf{J}(t)$:
+  $$\textrm{volume contraction}(t) = \left|\mathbf{J}(t)\right|$$
+  * "total variance" is the trace of $\mathbf{J}(t) \mathbf{J}(t)^T$:
+  $$\textrm{total variance}(t) = \textrm{Tr}\left(\mathbf{J}(t) \mathbf{J}(t)^T\right)$$
+
+## Discrete-time vs. continuous-time Jacobians
+
+We note that the interaction matrix estimated in \@ref(eq:system-matrix-model), besides being time-varying, is not strictly equivalent to the interaction matrix that is usually described in the literature on stability [@May_1973a; @Pimm_1984; @Novak_2016]. Here, time series are used to estimate $\mathbf{J}$, which can be interpreted as the Jacobian of the discrete-time map $G$, $\mathbf{n}(t+1) = G(\mathbf{n}(t))$. In contrast, the interaction matrix of e.g. @Novak_2016, $\mathbf{A}$, is the Jacobian of the continuous-time function $F$, $\dot{\mathbf{n}}(t) = F(\mathbf{n}(t))$. Consequently, properties of the dynamic systems represented by $F$ and $G$, will be computed in different ways, and have different critical thresholds.
+
+For example, as reported in [@Ushio_2018], stability occurs when the magnitude of the dominant eigenvalue is less than $1$, $\left|\lambda_{\textrm{dom}}(t)\right| < 1$, whereas in the continuous-time case, stability requires that the real part of all eigenvalues be less than $0$. Similarly, we define volume contraction as the determininant of the discrete-time Jacobian, $\left|\mathbf{J}\right|$, or equivalently, the product of its eigenvalues. This is in contrast to [@Strogatz_1994], where volume contraction is computed as the trace of the (continuous-time) Jacobian, $\mathrm{Tr} (\mathbf{A})$. Observe that since $\mathbf{J} \approx \exp{\mathbf{A}}$, the eigenvalues of $\mathbf{J}$ and $\mathbf{A}$ are similarly related, thus providing the link between the continuous-time and discrete-time formulations.
 
 ## Surrogate method for convergent cross mapping{#ccm-surrogates}
 
-[@Ushio_2018] use a phase-lock twin surrogate method to account for seasonal patterns as a potential confounder when identifying significant causal interactions. Although the Portal rodent abundances also exhibit seasonal patterns, sampling occurs on the new moon, meaning data points represent different times of year and do not fall into convenient equivalence classes for the phase-lock method.
+[@Ushio_2018] use a phase-lock twin surrogate method to account for seasonal patterns as a potential confounder when identifying significant causal interactions. Although the Portal rodent abundances also exhibit seasonal patterns, sampling occurs on the new moon, meaning data points represent different times of year and do not fall into convenient equivalence classes for the phase-lock method, such as the 1st of every month.
 
-Instead, we compute surrogates by computing the average annual pattern (using the day of year for each observation), and then shuffling the residuals (i.e. the null model is a fixed seasonal pattern, with i.i.d. deviations). 
-
-## A note on Jacobian-based calculations
-
-We note that the interaction matrix estimated in \@ref(eq:system-matrix-model), besides being time-varying, is not equivalent to the interaction matrix typically examined in the literature on stability [@May_1973a; @Pimm_1984; @Novak_2016]. Here, time series are used to estimate $\mathbf{J}$, which can be thought of as the Jacobian of the discrete-time map $G$, $\mathbf{n}(t+1) = G(\mathbf{n}(t))$. In contrast, the interaction matrix is typically the Jacobian, $\mathbf{A}$, of the continuous-time function $F$, $\dot{\mathbf{n}}(t) = F(\mathbf{n}(t))$, 
-
-Consequently, the descriptions of the metrics in \@ref(metrics) may be different than as presented in other works. For example, as reported in [@Ushio_2018], stability occurs when the magnitude of the dominant eigenvalue is less than $1$, $\left|\lambda_{\textrm{dom}}(t)\right| < 1$, whereas in the continuous-time case,
-stability requires that the real part of all eigenvalues be less than $0$. Similarly, we define volume contraction as the determininant of the discrete-time Jacobian, $\left|\mathbf{J}\right|$, or equivalently, the product of its eigenvalues. This is in contrast to [@Strogatz_1994], where the colume contraction is computed as the trace of the (continuous-time) Jacobian, $\mathrm{Tr} (\mathbf{A})$. Observe that since $\mathbf{J} \approx \exp{\mathbf{A}}$, the eigenvalues of $\mathbf{J}$ and $\mathbf{A}$ are similarly related, thus providing the link between the continuous-time and discrete-time formulations.
+Thus, we generate surrogate time series by computing the average annual pattern (using the day of year for each observation), and then shuffling the residuals (i.e. the null model is a fixed seasonal pattern, with resampled deviations estimated from the actual time series). 
 
 # Results
 
