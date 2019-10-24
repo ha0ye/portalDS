@@ -4,8 +4,9 @@
 \alias{plot_singular_values}
 \title{plot_singular_values}
 \usage{
-plot_singular_values(singular_values, num_values = 1, line_size = 1,
-  base_size = 16, plot_file = NULL, width = 6, height = NULL)
+plot_singular_values(singular_values, num_values = 1,
+  id_var = "censusdate", line_size = 1, base_size = 16,
+  plot_file = NULL, width = 6, height = NULL)
 }
 \arguments{
 \item{singular_values}{a list of vectors for the singular values:

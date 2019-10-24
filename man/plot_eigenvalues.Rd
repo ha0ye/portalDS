@@ -4,7 +4,7 @@
 \alias{plot_eigenvalues}
 \title{plot_eigenvalues}
 \usage{
-plot_eigenvalues(eigenvalues, num_values = 1,
+plot_eigenvalues(eigenvalues, num_values = 1, id_var = "censusdate",
   highlight_complex = FALSE, line_size = 1, base_size = 16,
   plot_file = NULL, width = 6, height = NULL)
 }

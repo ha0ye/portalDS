@@ -191,30 +191,21 @@ plot_smap_coeffs <- function(smap_matrices, base_size = 16,
 #'
 #' @export
 plot_eigenvalues <- function(eigenvalues, num_values = 1,
-                             highlight_complex = FALSE, line_size = 1,
-                             base_size = 16,
-                             plot_file = NULL, width = 6, height = NULL) {
-  # generate df for plotting
-  eigenvalue_dist <- extract_values(eigenvalues) %>%
+                             id_var = "censusdate",
+                             highlight_complex = FALSE, 
+                             line_size = 1, base_size = 16,
+                             plot_file = NULL, width = 6, height = NULL)
+{
+  eigenvalue_dist <- extract_values(eigenvalues, id_var = id_var) %>%
     dplyr::filter(.data$rank <= num_values) %>%
-    dplyr::mutate(value = abs(value))
+    dplyr::mutate(value = abs(.data$value))
   
-  my_plot <- eigenvalue_dist %>%
-    ggplot(aes(
-      x = .data$censusdate, y = .data$value,
-      color = as.factor(.data$rank), group = rev(.data$rank)
-    )) +
-    geom_line(size = line_size) +
-    scale_color_viridis_d(option = "inferno") +
-    geom_hline(yintercept = 1.0, size = 1, linetype = 2) +
-    labs(x = NULL, y = "dynamic stability \n(higher is more unstable)", color = "rank") +
-    theme_bw(
-      base_size = base_size, base_family = "Helvetica",
-      base_line_size = 1
-    ) +
-    theme(panel.grid.minor = element_line(size = 1)) +
-    guides(color = FALSE)
-
+  my_plot <- plot_matrix_values(eigenvalue_dist, 
+                                id_var = id_var, 
+                                y_label = "dynamic stability \n(higher is more unstable)", 
+                                line_size = line_size, 
+                                base_size = base_size)
+  
   if (highlight_complex && num_values >= 2) {
     complex_df <- data.frame(
       censusdate = eigenvalue_dist %>%
@@ -228,29 +219,14 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
     my_plot <- my_plot +
       geom_point(data = complex_df, color = "red")
   }
-
+  
   # save output
   if (!is.null(plot_file)) {
     cowplot::ggsave(plot_file, my_plot,
-      width = width, height = height
+                    width = width, height = height
     )
   }
   return(my_plot)
-}
-
-extract_values <- function(values_list, id_var = "censusdate")
-{
-  purrr::map_dfr(values_list, .id = id_var, 
-                 function(vals) {
-                   if (any(is.na(vals))) {
-                     return(data.frame())
-                   }
-                   data.frame(
-                     value = vals, 
-                     rank = seq(-vals)
-                   )
-                 }) %>%
-    dplyr::mutate_at(vars(id_var), as.Date)
 }
 
 #' @title plot_singular_values
@@ -266,29 +242,20 @@ extract_values <- function(values_list, id_var = "censusdate")
 #'
 #' @export
 plot_singular_values <- function(singular_values, num_values = 1,
-                             line_size = 1,
-                             base_size = 16,
-                             plot_file = NULL, width = 6, height = NULL) {
-  # generate df for plotting
+                                 id_var = "censusdate",
+                                 line_size = 1,
+                                 base_size = 16,
+                                 plot_file = NULL, width = 6, height = NULL)
+{
   sigma_dist <- extract_values(singular_values) %>%
     dplyr::filter(.data$rank <= num_values)
   
-  my_plot <- sigma_dist %>%
-    ggplot(aes(
-      x = .data$censusdate, y = .data$value,
-      color = as.factor(.data$rank), group = rev(.data$rank)
-    )) +
-    geom_line(size = line_size) +
-    scale_color_viridis_d(option = "inferno") +
-    geom_hline(yintercept = 1.0, size = 1, linetype = 2) +
-    labs(x = NULL, y = "local convergence \n(higher is more unstable)", color = "rank") +
-    theme_bw(
-      base_size = base_size, base_family = "Helvetica",
-      base_line_size = 1
-    ) +
-    theme(panel.grid.minor = element_line(size = 1)) +
-    guides(color = FALSE)
-  
+  my_plot <- plot_matrix_values(sigma_dist, 
+                                id_var = id_var, 
+                                y_label = "local convergence \n(higher is more divergence)", 
+                                line_size = line_size, 
+                                base_size = base_size)
+
   # save output
   if (!is.null(plot_file)) {
     cowplot::ggsave(plot_file, my_plot,
