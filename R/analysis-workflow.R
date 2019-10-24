@@ -39,7 +39,8 @@ compute_dynamic_stability <- function(block,
                                       random_libs = TRUE, num_samples = 100,
                                       replace = TRUE, RNGseed = 42,
                                       silent = TRUE, rescale = TRUE,
-                                      rolling_forecast = FALSE) {
+                                      rolling_forecast = FALSE)
+{
   if (is.null(results_file) || !file.exists(results_file)) {
     results <- list()
   } else {
@@ -100,6 +101,11 @@ compute_dynamic_stability <- function(block,
     results$eigenvalues <- eigen_decomp$values
     results$eigenvectors <- eigen_decomp$vectors
   }
+  
+  # check for svd
+  if (is.null(results$svd_decomp)) {
+    results$svd_decomp <- compute_svd_decomp(results$smap_matrices)
+  }
 
   if (!is.null(results_file)) {
     saveRDS(results, file = results_file)
@@ -147,6 +153,7 @@ build_dynamic_stability_plan <- function(max_E = 16, E_list = seq(max_E),
     smap_matrices = compute_smap_matrices(smap_coeffs, ccm_links),
     eigen_decomp = compute_eigen_decomp(smap_matrices),
     eigenvalues = eigen_decomp$values,
-    eigenvectors = eigen_decomp$vectors
+    eigenvectors = eigen_decomp$vectors, 
+    svd_decomp = compute_svd_decomp(smap_matrices)
   )
 }

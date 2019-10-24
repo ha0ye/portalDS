@@ -27,8 +27,8 @@ surrogate data function}
 \value{
 A tibble with columns for the species name (taken from the original
   column names), the abundance time series for each species, the output from
-  `rEDM::simplex()`, the best embedding dimension, as determined by the E
-  that minimizes MAE, and surrogate time series
+  \code{\link[rEDM]{simplex}}, the best embedding dimension, as determined by 
+  the E that minimizes MAE, and surrogate time series
 }
 \description{
 Run simplex projection models for each time series in the

@@ -121,12 +121,12 @@ test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
   expect_known_hash(smap_matrices, "ca491bb58d")
 })
 
-test_that("eigen decomposition of smap matrices works as expected", {
-  data_path <- system.file("extdata", "maizuru_smap_matrices.RDS",
-    package = "portalDS", mustWork = TRUE
-  )
-  maizuru_smap_matrices <- readRDS(data_path)
+data_path <- system.file("extdata", "maizuru_smap_matrices.RDS",
+                         package = "portalDS", mustWork = TRUE
+)
+maizuru_smap_matrices <- readRDS(data_path)
 
+test_that("eigen decomposition of smap matrices works as expected", {
   expect_error(eigen_decomp <- compute_eigen_decomp(maizuru_smap_matrices), NA)
   expect_type(eigen_decomp, "list")
   expect_equal(names(eigen_decomp), c("values", "vectors"))

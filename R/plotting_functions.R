@@ -195,23 +195,12 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
                              base_size = 16,
                              plot_file = NULL, width = 6, height = NULL) {
   # generate df for plotting
-  eigenvalue_dist <- purrr::map_dfr(seq(eigenvalues), function(i) {
-    lambda <- eigenvalues[[i]]
-    if (any(is.na(lambda))) {
-      return(data.frame())
-    }
-    lambda <- sort(abs(lambda), decreasing = TRUE)
-    data.frame(
-      lambda = lambda, censusdate = names(eigenvalues)[i],
-      rank = seq(lambda), stringsAsFactors = FALSE
-    )
-  }) %>%
-    dplyr::filter(.data$rank <= num_values) %>%
-    dplyr::mutate(censusdate = as.Date(.data$censusdate))
-
+  eigenvalue_dist <- extract_values(eigenvalues) %>%
+    dplyr::filter(.data$rank <= num_values)
+  
   my_plot <- eigenvalue_dist %>%
     ggplot(aes(
-      x = .data$censusdate, y = .data$lambda,
+      x = .data$censusdate, y = .data$value,
       color = as.factor(.data$rank), group = rev(.data$rank)
     )) +
     geom_line(size = line_size) +
@@ -228,7 +217,7 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
   if (highlight_complex && num_values >= 2) {
     complex_df <- data.frame(
       censusdate = eigenvalue_dist %>%
-        tidyr::spread(.data$rank, .data$lambda) %>%
+        tidyr::spread(.data$rank, .data$value) %>%
         dplyr::filter(.data$`1` < .data$`2` + 0.001) %>%
         dplyr::select(.data$censusdate),
       lambda = min(eigenvalue_dist$lambda, na.rm = TRUE),
@@ -243,6 +232,66 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
   if (!is.null(plot_file)) {
     cowplot::ggsave(plot_file, my_plot,
       width = width, height = height
+    )
+  }
+  return(my_plot)
+}
+
+extract_values <- function(values_list, id_var = "censusdate")
+{
+  purrr::map_dfr(values_list, .id = id_var, 
+                 function(vals) {
+                   if (any(is.na(vals))) {
+                     return(data.frame())
+                   }
+                   data.frame(
+                     value = vals, 
+                     rank = rank(-vals)
+                   )
+                 }) %>%
+    dplyr::mutate_at(vars(id_var), as.Date)
+}
+
+#' @title plot_singular_values
+#' @description Visualize the dominant singular value(s) from running the S-map
+#'   model on the community time series as part of the dynamic stability analysis
+#' @param singular_values a list of vectors for the singular values:
+#'   the number of elements in the list corresponds to the time points of the
+#'   s-map model, and each element is a vector of the singular values, computed
+#'   from the matrix of the s-map coefficients at that time step
+#' @inheritParams plot_eigenvalues
+#'
+#' @return A ggplot object of the singular values plot
+#'
+#' @export
+plot_singular_values <- function(singular_values, num_values = 1,
+                             line_size = 1,
+                             base_size = 16,
+                             plot_file = NULL, width = 6, height = NULL) {
+  # generate df for plotting
+  sigma_dist <- extract_values(singular_values) %>%
+    dplyr::filter(.data$rank <= num_values)
+  
+  my_plot <- sigma_dist %>%
+    ggplot(aes(
+      x = .data$censusdate, y = .data$value,
+      color = as.factor(.data$rank), group = rev(.data$rank)
+    )) +
+    geom_line(size = line_size) +
+    scale_color_viridis_d(option = "inferno") +
+    geom_hline(yintercept = 1.0, size = 1, linetype = 2) +
+    labs(x = NULL, y = "local convergence \n(higher is more unstable)", color = "rank") +
+    theme_bw(
+      base_size = base_size, base_family = "Helvetica",
+      base_line_size = 1
+    ) +
+    theme(panel.grid.minor = element_line(size = 1)) +
+    guides(color = FALSE)
+  
+  # save output
+  if (!is.null(plot_file)) {
+    cowplot::ggsave(plot_file, my_plot,
+                    width = width, height = height
     )
   }
   return(my_plot)

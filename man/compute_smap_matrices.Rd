@@ -30,12 +30,15 @@ See \code{\link{compute_smap_coeffs}} for details on the input data.
   Let the variables in the system be x^{i} with i = 1..N.
   For the S-map model predicting x^{i}_{t+1}, let the coefficient
   corresponding to variable x^{j} at lag tau be c^{tau}_{ij}.
-  Then the Jacobian is the block matrix:
-  J = [[ C^0 C^1 ... C^K]
-       [ I   0   ... 0  ]
-       [ ... ... ... 0  ]
-       [ ... ... I   0  ]]
-  where K is the maximum lag, and C^{tau} is the matrix formed by the values
+  Then the Jacobian is the block matrix, J = 
+  \tabular{rrrrr}{
+    C^0 \tab C^1 \tab ... \tab C^(d-1) \tab C^d\cr
+      I \tab   0 \tab ... \tab       0 \tab   0\cr
+      0 \tab   I \tab ... \tab       0 \tab   0\cr
+    ... \tab ... \tab ... \tab     ... \tab ...\cr
+      0 \tab   0 \tab ... \tab       I \tab   0
+   }
+  where d is the maximum lag, and C^{tau} is the matrix formed by the values
   c^{tau}_{ij}. (Note that many of these values will be 0.)
 
   This function computes J at each time step.

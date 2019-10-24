@@ -14,8 +14,8 @@
 #'   surrogate data function
 #' @return A tibble with columns for the species name (taken from the original
 #'   column names), the abundance time series for each species, the output from
-#'   `rEDM::simplex()`, the best embedding dimension, as determined by the E
-#'   that minimizes MAE, and surrogate time series
+#'   \code{\link[rEDM]{simplex}}, the best embedding dimension, as determined by 
+#'   the E that minimizes MAE, and surrogate time series
 #'
 #' @export
 compute_simplex <- function(block, E_list = 1:10,
