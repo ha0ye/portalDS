@@ -196,7 +196,8 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
                              plot_file = NULL, width = 6, height = NULL) {
   # generate df for plotting
   eigenvalue_dist <- extract_values(eigenvalues) %>%
-    dplyr::filter(.data$rank <= num_values)
+    dplyr::filter(.data$rank <= num_values) %>%
+    dplyr::mutate(value = abs(value))
   
   my_plot <- eigenvalue_dist %>%
     ggplot(aes(
@@ -220,7 +221,7 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
         tidyr::spread(.data$rank, .data$value) %>%
         dplyr::filter(.data$`1` < .data$`2` + 0.001) %>%
         dplyr::select(.data$censusdate),
-      lambda = min(eigenvalue_dist$lambda, na.rm = TRUE),
+      value = min(eigenvalue_dist$value, na.rm = TRUE),
       rank = 1
     ) %>%
       tidyr::complete(censusdate = eigenvalue_dist$censusdate, fill = list(lambda = NA, rank = 1))
@@ -246,7 +247,7 @@ extract_values <- function(values_list, id_var = "censusdate")
                    }
                    data.frame(
                      value = vals, 
-                     rank = rank(-vals)
+                     rank = seq(-vals)
                    )
                  }) %>%
     dplyr::mutate_at(vars(id_var), as.Date)
