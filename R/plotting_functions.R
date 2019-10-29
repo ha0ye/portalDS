@@ -32,21 +32,21 @@ plot_network <- function(ccm_links,
     dplyr::arrange(.data$target_column) %>%
     dplyr::select(c("target_column", "lib_column")) %>%
     igraph::graph_from_data_frame(vertices = levels(ccm_links$target_column))
-
+  
   if (is.null(palette)) {
     vertices <- igraph::V(my_graph)
     palette <- viridis::viridis(length(vertices), option = palette_option)
     names(palette) <- igraph::as_ids(vertices)
   }
-
+  
   my_graph <- create_layout(my_graph, layout = layout)
-
+  
   if (!is.null(existing_graph)) {
     idx <- match(my_graph$name, existing_graph$name)
     my_graph$x <- existing_graph$x[idx]
     my_graph$y <- existing_graph$y[idx]
   }
-
+  
   my_plot <- ggraph(my_graph) +
     geom_edge_link(
       edge_width = 0.5, start_cap = circle(0.3, "inches"),
@@ -65,7 +65,7 @@ plot_network <- function(ccm_links,
     ) +
     scale_fill_manual(values = palette) +
     guides(fill = guide_legend(title = "Species"))
-
+  
   return(list(
     plot = my_plot,
     palette = palette,
@@ -103,7 +103,7 @@ plot_smap_coeffs <- function(smap_matrices, base_size = 16,
     return(out)
   }) %>%
     dplyr::rename(target = .data$Var1, predictor = .data$Var2)
-
+  
   # identify coefficients that matter
   to_keep <- smap_coeff_df %>%
     dplyr::group_by(.data$target, .data$predictor) %>%
@@ -112,10 +112,10 @@ plot_smap_coeffs <- function(smap_matrices, base_size = 16,
   smap_coeff_df <- smap_coeff_df %>%
     dplyr::mutate(coeff_name = paste0(.data$target, .data$predictor)) %>%
     dplyr::filter(.data$coeff_name %in% to_keep$coeff_name)
-
+  
   # convert time index into dates
   smap_coeff_df$censusdate <- as.Date(names(smap_matrices)[smap_coeff_df$t])
-
+  
   # time series plot
   ts_plot <- ggplot(
     smap_coeff_df,
@@ -139,7 +139,7 @@ plot_smap_coeffs <- function(smap_matrices, base_size = 16,
       base_line_size = 1
     ) +
     guides(color = FALSE, fill = FALSE)
-
+  
   # density plot
   density_plot <- ggplot(
     smap_coeff_df,
@@ -156,19 +156,19 @@ plot_smap_coeffs <- function(smap_matrices, base_size = 16,
       base_line_size = 1
     ) +
     guides(color = FALSE, fill = FALSE)
-
+  
   combined_plot <- cowplot::plot_grid(ts_plot, density_plot,
-    nrow = 1,
-    rel_widths = c(3, 1)
+                                      nrow = 1,
+                                      rel_widths = c(3, 1)
   )
   if (is.null(height)) {
     height <- nlevels(smap_coeff_df$target)
   }
-
+  
   # save output
   if (!is.null(plot_file)) {
     cowplot::ggsave(plot_file, combined_plot,
-      width = width, height = height
+                    width = width, height = height
     )
   }
   return(combined_plot)
@@ -196,7 +196,7 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
                              line_size = 1, base_size = 16,
                              plot_file = NULL, width = 6, height = NULL)
 {
-  eigenvalue_dist <- extract_values(eigenvalues, id_var = id_var) %>%
+  eigenvalue_dist <- extract_matrix_values(eigenvalues, id_var = id_var) %>%
     dplyr::filter(.data$rank <= num_values) %>%
     dplyr::mutate(value = abs(.data$value))
   
@@ -241,13 +241,13 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
 #' @return A ggplot object of the singular values plot
 #'
 #' @export
-plot_singular_values <- function(singular_values, num_values = 1,
-                                 id_var = "censusdate",
-                                 line_size = 1,
-                                 base_size = 16,
-                                 plot_file = NULL, width = 6, height = NULL)
+plot_svd_values <- function(singular_values, num_values = 1,
+                            id_var = "censusdate",
+                            line_size = 1,
+                            base_size = 16,
+                            plot_file = NULL, width = 6, height = NULL)
 {
-  sigma_dist <- extract_values(singular_values) %>%
+  sigma_dist <- extract_matrix_values(singular_values) %>%
     dplyr::filter(.data$rank <= num_values)
   
   my_plot <- plot_matrix_values(sigma_dist, 
@@ -255,7 +255,7 @@ plot_singular_values <- function(singular_values, num_values = 1,
                                 y_label = "local convergence \n(higher is more divergence)", 
                                 line_size = line_size, 
                                 base_size = base_size)
-
+  
   # save output
   if (!is.null(plot_file)) {
     cowplot::ggsave(plot_file, my_plot,
@@ -290,37 +290,15 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
                               base_size = 16,
                               plot_file = NULL, width = 6, height = NULL) {
   # extract vars
-  non_null_idx <- dplyr::first(which(!sapply(eigenvectors, anyNA)))
+  non_null_idx <- dplyr::first(which(!vapply(eigenvectors, is.null, FALSE)))
   var_names <- rownames(eigenvectors[[non_null_idx]])
   var_idx <- grep("_0", var_names)
   var_names <- gsub("_0", "", var_names[var_idx])
-
-  # normalize eigenvectors so that length = 1
-  vector_scale <- function(v) {
-    sum_sq <- sum(abs(v)^2)
-    v / sqrt(sum_sq)
-  }
-
-  # make data.frame of eigenvector components
-  v_df <- purrr::map_dfr(seq(eigenvectors), function(i) {
-    v <- eigenvectors[[i]]
-    if (anyNA(v) || is.null(v)) {
-      return()
-    }
-    out <- reshape2::melt(v[var_idx, seq_len(num_values), drop = FALSE])
-    out$t <- i
-    return(out)
-  }) %>%
-    dplyr::rename(variable = .data$Var1, rank = .data$Var2) %>%
-    dplyr::mutate(
-      censusdate = as.Date(names(eigenvectors)[t]),
-      variable = as.factor(var_names[.data$variable]),
-      value = abs(Re(.data$value))
-    ) %>%
-    dplyr::group_by(.data$t, .data$rank) %>%
-    dplyr::mutate(value = vector_scale(.data$value)) %>%
-    dplyr::ungroup()
-
+  
+  v_df <- extract_matrix_vectors(eigenvectors, 
+                                 row_idx = var_idx, 
+                                 col_idx = seq_len(num_values))
+  
   if (add_IPR) {
     # compute IPR = Inverse Participation Ratio
     #   for each eigenvector
@@ -335,14 +313,14 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
         censusdate = as.Date(names(eigenvectors)[t]),
         variable = "IPR"
       )
-
+    
     v_df$component <- "eigenvector"
     ipr_df$component <- "IPR"
-
+    
     dat <- dplyr::bind_rows(v_df, ipr_df)
     dat$variable <- as.factor(dat$variable)
     dat$variable <- forcats::fct_relevel(dat$variable, c(var_names, "IPR"))
-
+    
     my_plot <- dat %>%
       ggplot(aes(x = .data$censusdate, y = .data$value, color = .data$variable)) +
       facet_grid(component + rank ~ ., switch = "y") +
@@ -369,21 +347,109 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
       legend.key = element_rect(fill = "#AAAABB")
     ) +
     guides(color = guide_legend(override.aes = list(size = 1)))
-
+  
   if (num_values == 1) {
     my_plot <- my_plot + theme(
       strip.background = element_blank(),
       strip.text.y = element_blank()
     )
   }
-
+  
   if (!is.null(plot_file)) {
     cowplot::ggsave(plot_file, my_plot,
-      width = width, height = height
+                    width = width, height = height
     )
   }
   return(my_plot)
 }
+
+plot_svd_vectors <- function(svd_vectors, num_values = 1,
+                             add_IPR = FALSE, line_size = 1,
+                             palette_option = "plasma",
+                             base_size = 16,
+                             plot_file = NULL, width = 6, height = NULL) {
+  # extract vars
+  non_null_idx <- dplyr::first(which(!vapply(svd_vectors, anyNA, FALSE)))
+  var_names <- rownames(svd_vectors[[non_null_idx]])
+  
+  id_var <- "censusdate"
+  # make data.frame of eigenvector components
+  v_df <- purrr::map_dfr(svd_vectors, .id = id_var, 
+                         function(v) {
+                           if (anyNA(v) || is.null(v)) {
+                             return()
+                           }
+                           reshape2::melt(v, as.is = TRUE)
+                         }) %>%
+    dplyr::rename(variable = .data$Var1, rank = .data$Var2) %>%
+    dplyr::mutate_at(vars(id_var), as.Date) %>%
+    dplyr::filter(.data$rank <= num_values)
+
+  if (add_IPR) {
+    # compute IPR = Inverse Participation Ratio
+    #   for each eigenvector
+    #     normalize so that sum([v_i]^2) = 1
+    #     IPR = sum([v_i]^4)
+    #     ranges from 1/N (N = length of eigenvector) to 1
+    ipr_df <- v_df %>%
+      dplyr::group_by(.data$t, .data$rank) %>%
+      dplyr::summarize(value = sum(abs(.data$value)^4)) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(
+        censusdate = as.Date(names(eigenvectors)[t]),
+        variable = "IPR"
+      )
+    
+    v_df$component <- "eigenvector"
+    ipr_df$component <- "IPR"
+    
+    dat <- dplyr::bind_rows(v_df, ipr_df)
+    dat$variable <- as.factor(dat$variable)
+    dat$variable <- forcats::fct_relevel(dat$variable, c(var_names, "IPR"))
+    
+    my_plot <- dat %>%
+      ggplot(aes(x = .data$censusdate, y = .data$value, color = .data$variable)) +
+      facet_grid(component + rank ~ ., switch = "y") +
+      scale_y_continuous(limits = c(0, 1)) +
+      scale_color_viridis_d(option = palette_option)
+  } else {
+    my_plot <- v_df %>%
+      ggplot(aes(x = !!sym(id_var), y = .data$value, color = .data$variable)) +
+      facet_grid(rank ~ ., scales = "free", switch = "y") +
+      scale_color_viridis(discrete = TRUE, option = "plasma")
+  }
+  my_plot <- my_plot +
+    scale_x_date(expand = c(0.01, 0)) +
+    geom_line(size = line_size) +
+    theme_bw(
+      base_size = base_size, base_family = "Helvetica",
+      base_line_size = 1
+    ) +
+    labs(x = id_var, y = "value", color = "variable") +
+    theme(
+      panel.background = element_rect(fill = "#AAAABB", color = NA),
+      panel.grid.major = element_line(color = "grey30", size = 1),
+      panel.grid.minor = element_line(color = "grey30", size = 1),
+      legend.key = element_rect(fill = "#AAAABB")
+    ) +
+    guides(color = guide_legend(override.aes = list(size = 1)))
+  
+  if (num_values == 1) {
+    my_plot <- my_plot + theme(
+      strip.background = element_blank(),
+      strip.text.y = element_blank()
+    )
+  }
+  
+  if (!is.null(plot_file)) {
+    cowplot::ggsave(plot_file, my_plot,
+                    width = width, height = height
+    )
+  }
+  return(my_plot)
+}
+
+
 
 #' @title plot_time_series
 #' @description plot the time series in `block`, using the appropriate rescaling
@@ -411,7 +477,7 @@ plot_time_series <- function(block,
                              base_line_size = 1) {
   time <- dplyr::pull(block, time_column)
   block <- dplyr::select(block, -time_column)
-
+  
   y_label <- "abundance"
   if (is.null(scale) || length(scale) == 0)
   {
@@ -427,11 +493,11 @@ plot_time_series <- function(block,
   timeseries <- block %>%
     dplyr::mutate(time = time) %>%
     tidyr::gather("species", "abundance", -.data$time)
-
+  
   palette <- viridis::viridis(length(unique(timeseries$species)),
-    option = palette_option
+                              option = palette_option
   )
-
+  
   timeseries %>%
     ggplot(aes(x = .data$time, y = .data$abundance, color = .data$species)) +
     geom_line(size = 1) +
@@ -463,7 +529,7 @@ add_regime_shift_highlight <- function(my_plot,
   ## using dates from Christensen et al. 2018
   # lower_date <- as.Date(c("1983-12-01", "1988-10-01", "1998-09-01", "2009-06-01"))
   # upper_date <- as.Date(c("1984-07-01", "1996-01-01", "1999-12-01", "2010-09-01"))
-
+  
   my_plot + geom_rect(
     data = data.frame(
       xmin = lower_date, xmax = upper_date,
