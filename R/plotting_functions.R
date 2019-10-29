@@ -290,7 +290,7 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
                               base_size = 16,
                               plot_file = NULL, width = 6, height = NULL) {
   # extract vars
-  non_null_idx <- dplyr::first(which(!vapply(eigenvectors, is.null, FALSE)))
+  non_null_idx <- dplyr::first(which(!vapply(svd_vectors, anyNA, FALSE)))
   var_names <- rownames(eigenvectors[[non_null_idx]])
   var_idx <- grep("_0", var_names)
   var_names <- gsub("_0", "", var_names[var_idx])
@@ -364,6 +364,7 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
 }
 
 plot_svd_vectors <- function(svd_vectors, num_values = 1,
+                             id_var = "censusdate", 
                              add_IPR = FALSE, line_size = 1,
                              palette_option = "plasma",
                              base_size = 16,
@@ -372,18 +373,9 @@ plot_svd_vectors <- function(svd_vectors, num_values = 1,
   non_null_idx <- dplyr::first(which(!vapply(svd_vectors, anyNA, FALSE)))
   var_names <- rownames(svd_vectors[[non_null_idx]])
   
-  id_var <- "censusdate"
-  # make data.frame of eigenvector components
-  v_df <- purrr::map_dfr(svd_vectors, .id = id_var, 
-                         function(v) {
-                           if (anyNA(v) || is.null(v)) {
-                             return()
-                           }
-                           reshape2::melt(v, as.is = TRUE)
-                         }) %>%
-    dplyr::rename(variable = .data$Var1, rank = .data$Var2) %>%
-    dplyr::mutate_at(vars(id_var), as.Date) %>%
-    dplyr::filter(.data$rank <= num_values)
+  v_df <- extract_matrix_vectors(svd_vectors, 
+                                 rescale = FALSE, 
+                                 col_idx = seq_len(num_values))
 
   if (add_IPR) {
     # compute IPR = Inverse Participation Ratio

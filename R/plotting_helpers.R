@@ -46,7 +46,7 @@ extract_matrix_vectors <- function(vectors_list, id_var = "censusdate",
                                    row_idx = NULL, 
                                    col_idx = NULL)
 {
-    non_null_idx <- dplyr::first(which(!vapply(vectors_list, is.null, FALSE)))
+    non_null_idx <- dplyr::first(which(!vapply(vectors_list, anyNA, FALSE)))
     if (is.null(row_idx))
     {
         row_idx <- seq_len(NROW(vectors_list[[non_null_idx]]))
@@ -56,7 +56,7 @@ extract_matrix_vectors <- function(vectors_list, id_var = "censusdate",
         col_idx <- seq_len(NCOL(vectors_list[[non_null_idx]]))
     }
     
-    out <- purrr::map_dfr(eigenvectors, 
+    out <- purrr::map_dfr(vectors_list, 
                            .id = id_var, 
                            function(v) {
                                if (anyNA(v) || is.null(v)) {
