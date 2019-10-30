@@ -14,9 +14,9 @@ extract_matrix_values <- function(values_list, id_var = "censusdate")
         dplyr::mutate_at(vars(id_var), as.Date)
 }
 
-plot_matrix_values <- function(values_dist, id_var = "censusdate", 
-                               y_label = "dynamic stability \n(higher is more unstable)", 
-                               line_size = 1, base_size = 16)
+make_matrix_value_plot <- function(values_dist, id_var = "censusdate", 
+                                   y_label = "dynamic stability \n(higher is more unstable)", 
+                                   line_size = 1, base_size = 16)
 {
     ggplot(values_dist, 
            aes(x = !!sym(id_var), y = .data$value,
@@ -98,4 +98,82 @@ add_IPR <- function(v_df, comp_name = "eigenvector", id_var = "censusdate")
     dat$variable <- as.factor(dat$variable)
     dat$variable <- forcats::fct_relevel(dat$variable, "IPR", after = Inf)
     return(dat)
+}
+
+make_matrix_vector_plot <- function(v_df, 
+                                comp_name = "eigenvector", 
+                                num_values = 1, 
+                                id_var = "censusdate", 
+                                add_IPR = FALSE, 
+                                palette_option = "plasma", 
+                                line_size = 1, base_size = 16)
+{
+    if (add_IPR)
+    {
+        v_df <-  add_IPR(v_df, comp_name = comp_name, id_var = id_var)
+        row_facet_groups <- rlang::quos(component, rank)
+    } else {
+        row_facet_groups <- rlang::quos(rank)
+    }
+    
+    my_plot <- v_df %>%
+        ggplot(aes(x = !!sym(id_var), y = .data$value, color = .data$variable)) +
+        facet_grid(rows = vars(!!!row_facet_groups), scales = "free", switch = "y") +
+        scale_x_date(expand = c(0.01, 0)) +
+        scale_y_continuous(limits = c(0, 1)) +
+        scale_color_viridis_d(option = palette_option) + 
+        geom_line(size = line_size) +
+        theme_bw(
+            base_size = base_size, base_family = "Helvetica",
+            base_line_size = 1
+        ) +
+        labs(x = "censusdate", y = "value", color = "variable") +
+        theme(
+            panel.background = element_rect(fill = "#AAAABB", color = NA),
+            panel.grid.major = element_line(color = "grey30", size = 1),
+            panel.grid.minor = element_line(color = "grey30", size = 1),
+            legend.key = element_rect(fill = "#AAAABB")
+        ) +
+        guides(color = guide_legend(override.aes = list(size = 1)))
+    
+    if (num_values == 1) {
+        my_plot <- my_plot + theme(
+            strip.background = element_blank(),
+            strip.text.y = element_blank()
+        )
+    }
+    return(my_plot)
+}
+
+#' @title add_regime_shift_highlight
+#' @description add transparent bars to highlight specific time spans
+#' @param my_plot the original ggplot object
+#' @param lower_date a vector of the beginnings of the time spans
+#' @param upper_date a vector of the ends of the time spans
+#' @param alpha the transparency of the bars to add to the plot
+#' @param fill the fill color of the bars to add to the plot
+#'
+#' @return A ggplot object with the bars added
+#'
+#' @export
+add_regime_shift_highlight <- function(my_plot,
+                                       ## using dates from updated analysis code (weecology/LDA-kratplots)
+                                       lower_date = as.Date(c("1983-11-12", "1990-01-06", "1998-12-22", "2009-05-23")),
+                                       upper_date = as.Date(c("1985-03-16", "1992-04-04", "1999-11-06", "2011-01-05")),
+                                       alpha = 0.5, fill = "grey30") {
+    ## using dates from Christensen et al. 2018
+    # lower_date <- as.Date(c("1983-12-01", "1988-10-01", "1998-09-01", "2009-06-01"))
+    # upper_date <- as.Date(c("1984-07-01", "1996-01-01", "1999-12-01", "2010-09-01"))
+    
+    my_plot + geom_rect(
+        data = data.frame(
+            xmin = lower_date, xmax = upper_date,
+            ymin = -Inf, ymax = Inf
+        ),
+        mapping = aes(
+            xmin = .data$xmin, xmax = .data$xmax,
+            ymin = .data$ymin, ymax = .data$ymax
+        ),
+        alpha = alpha, inherit.aes = FALSE, fill = fill
+    )
 }

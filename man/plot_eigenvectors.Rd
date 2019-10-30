@@ -2,9 +2,14 @@
 % Please edit documentation in R/plotting_functions.R
 \name{plot_eigenvectors}
 \alias{plot_eigenvectors}
-\title{plot_eigenvectors}
+\alias{plot_svd_vectors}
+\title{Plot time-varying vector components}
 \usage{
 plot_eigenvectors(eigenvectors, num_values = 1, id_var = "censusdate",
+  add_IPR = FALSE, palette_option = "plasma", line_size = 1,
+  base_size = 16, plot_file = NULL, width = 6, height = NULL)
+
+plot_svd_vectors(svd_vectors, num_values = 1, id_var = "censusdate",
   add_IPR = FALSE, palette_option = "plasma", line_size = 1,
   base_size = 16, plot_file = NULL, width = 6, height = NULL)
 }
@@ -12,8 +17,7 @@ plot_eigenvectors(eigenvectors, num_values = 1, id_var = "censusdate",
 \item{eigenvectors}{a list of matrices for the eigenvectors:
 the number of elements in the list corresponds to the time points of the
 s-map model, and each element is a matrix, where the columns are the
-eigenvectors, in descending order, the rows correspond to the axes of the
-system}
+eigenvectors, in descending order according to the eigenvalues}
 
 \item{num_values}{the number of eigenvectors to plot}
 
@@ -37,11 +41,19 @@ default), then the plot is not saved to a file}
 \item{width}{width of the saved plot}
 
 \item{height}{height of the saved plot}
+
+\item{svd_vectors}{a list of matrices for the SVD vectors:
+the number of elements in the list corresponds to the time points of the
+s-map model, and each element is a matrix, where the columns are the
+the SVD vectors, in descending order according to the singular values}
 }
 \value{
-A ggplot object of the eigenvector plot
+A ggplot object of the plot
 }
 \description{
-Visualize the dominant eigenvector(s) from running the S-map
-  model on the community time series as part of the dynamic stability analysis
+`plot_eigenvectors()` visualizes the dominant eigenvector(s) 
+  from running the S-map model on the community time series
+
+`plot_svd_vectors()` visualizes the dominant SVD vector(s) 
+  from running the S-map model on the community time series
 }
