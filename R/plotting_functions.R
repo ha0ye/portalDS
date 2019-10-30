@@ -285,34 +285,37 @@ plot_svd_values <- function(singular_values, num_values = 1,
 #'
 #' @export
 plot_eigenvectors <- function(eigenvectors, num_values = 1,
-                              add_IPR = FALSE, line_size = 1,
+                              id_var = "censusdate", 
+                              add_IPR = FALSE, 
                               palette_option = "plasma",
-                              base_size = 16,
-                              plot_file = NULL, width = 6, height = NULL) {
+                              line_size = 1, base_size = 16,
+                              plot_file = NULL, width = 6, height = NULL)
+{
   # extract vars
-  non_null_idx <- dplyr::first(which(!vapply(svd_vectors, anyNA, FALSE)))
+  non_null_idx <- dplyr::first(which(!vapply(eigenvectors, anyNA, FALSE)))
   var_names <- rownames(eigenvectors[[non_null_idx]])
   var_idx <- grep("_0", var_names)
   var_names <- gsub("_0", "", var_names[var_idx])
   
   v_df <- extract_matrix_vectors(eigenvectors, 
+                                 id_var = id_var, 
+                                 rescale = TRUE, 
                                  row_idx = var_idx, 
-                                 col_idx = seq_len(num_values))
+                                 col_idx = seq_len(num_values)) %>%
+    dplyr::mutate(variable = gsub("_0", "", .data$variable))
   
-  if (add_IPR) {
+  if (add_IPR)
+  {
     # compute IPR = Inverse Participation Ratio
     #   for each eigenvector
     #     normalize so that sum([v_i]^2) = 1
     #     IPR = sum([v_i]^4)
     #     ranges from 1/N (N = length of eigenvector) to 1
     ipr_df <- v_df %>%
-      dplyr::group_by(.data$t, .data$rank) %>%
+      dplyr::group_by_at(c(id_var, "rank")) %>%
       dplyr::summarize(value = sum(abs(.data$value)^4)) %>%
       dplyr::ungroup() %>%
-      dplyr::mutate(
-        censusdate = as.Date(names(eigenvectors)[t]),
-        variable = "IPR"
-      )
+      dplyr::mutate(variable = "IPR")
     
     v_df$component <- "eigenvector"
     ipr_df$component <- "IPR"

@@ -4,9 +4,9 @@
 \alias{plot_eigenvectors}
 \title{plot_eigenvectors}
 \usage{
-plot_eigenvectors(eigenvectors, num_values = 1, add_IPR = FALSE,
-  line_size = 1, palette_option = "plasma", base_size = 16,
-  plot_file = NULL, width = 6, height = NULL)
+plot_eigenvectors(eigenvectors, num_values = 1, id_var = "censusdate",
+  add_IPR = FALSE, palette_option = "plasma", line_size = 1,
+  base_size = 16, plot_file = NULL, width = 6, height = NULL)
 }
 \arguments{
 \item{eigenvectors}{a list of matrices for the eigenvectors:
@@ -21,10 +21,10 @@ system}
 numerical quantity that measures how evenly the different components
 contribute to the eigenvector}
 
-\item{line_size}{the line width for the plot}
-
 \item{palette_option}{the color palette to use (see \code{\link[viridis]{viridis}}
 for more info)}
+
+\item{line_size}{the line width for the plot}
 
 \item{base_size}{the base font size}
 

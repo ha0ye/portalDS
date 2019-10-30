@@ -19,8 +19,7 @@ plot_matrix_values <- function(values_dist, id_var = "censusdate",
                                line_size = 1, base_size = 16)
 {
     ggplot(values_dist, 
-           aes(
-               x = !!sym(id_var), y = .data$value,
+           aes(x = !!sym(id_var), y = .data$value,
                color = as.factor(.data$rank), group = rev(.data$rank)
            )) +
         geom_line(size = line_size) +
@@ -57,13 +56,13 @@ extract_matrix_vectors <- function(vectors_list, id_var = "censusdate",
     }
     
     out <- purrr::map_dfr(vectors_list, 
-                           .id = id_var, 
-                           function(v) {
-                               if (anyNA(v) || is.null(v)) {
-                                   return()
-                               }
-                               reshape2::melt(v[row_idx, col_idx, drop = FALSE], as.is = TRUE)
-                           }) %>% 
+                          .id = id_var, 
+                          function(v) {
+                              if (anyNA(v) || is.null(v)) {
+                                  return()
+                              }
+                              reshape2::melt(v[row_idx, col_idx, drop = FALSE], as.is = TRUE)
+                          }) %>% 
         dplyr::mutate_at(vars(id_var), as.Date) %>%
         dplyr::rename(variable = .data$Var1, rank = .data$Var2) %>%
         dplyr::mutate(value = abs(Re(.data$value)))

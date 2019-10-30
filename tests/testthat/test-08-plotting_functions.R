@@ -1,4 +1,4 @@
-context("Plotting function")
+context("Plotting functions")
 
 # vdiffr::manage_cases(filter = "plotting")
 
