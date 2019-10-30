@@ -77,3 +77,25 @@ extract_matrix_vectors <- function(vectors_list, id_var = "censusdate",
     
     return(out)
 }
+
+# compute IPR = Inverse Participation Ratio
+#   for each eigenvector
+#     normalize so that sum([v_i]^2) = 1
+#     IPR = sum([v_i]^4)
+#     ranges from 1/N (N = length of eigenvector) to 1
+add_IPR <- function(v_df, comp_name = "eigenvector", id_var = "censusdate")
+{
+    ipr_df <- v_df %>%
+        dplyr::group_by_at(c(id_var, "rank")) %>%
+        dplyr::summarize(value = sum(abs(.data$value)^4)) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(variable = "IPR")
+    
+    v_df$component <- comp_name
+    ipr_df$component <- "IPR"
+    
+    dat <- dplyr::bind_rows(v_df, ipr_df)
+    dat$variable <- as.factor(dat$variable)
+    dat$variable <- forcats::fct_relevel(dat$variable, "IPR", after = Inf)
+    return(dat)
+}

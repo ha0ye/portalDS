@@ -17,6 +17,9 @@ system}
 
 \item{num_values}{the number of eigenvectors to plot}
 
+\item{id_var}{when constructing the long-format tibble,what should be the 
+variable name containing the time index}
+
 \item{add_IPR}{whether to also plot the Inverse Participation Ratio, a
 numerical quantity that measures how evenly the different components
 contribute to the eigenvector}

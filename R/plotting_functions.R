@@ -182,6 +182,8 @@ plot_smap_coeffs <- function(smap_matrices, base_size = 16,
 #'   s-map model, and each element is a vector of the eigenvalues, computed
 #'   from the matrix of the s-map coefficients at that time step
 #' @param num_values the number of eigenvalues to plot
+#' @param id_var when constructing the long-format tibble,what should be the 
+#'   variable name containing the time index
 #' @param highlight_complex whether to also draw points to indicate when the
 #'   dominant eigenvalue is complex
 #' @param line_size the line width for the plot
@@ -278,6 +280,7 @@ plot_svd_values <- function(singular_values, num_values = 1,
 #'   numerical quantity that measures how evenly the different components
 #'   contribute to the eigenvector
 #' @param line_size the line width for the plot
+#' @inheritParams plot_eigenvalues
 #' @inheritParams plot_network
 #' @inheritParams plot_smap_coeffs
 #'
@@ -306,34 +309,19 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
   
   if (add_IPR)
   {
-    # compute IPR = Inverse Participation Ratio
-    #   for each eigenvector
-    #     normalize so that sum([v_i]^2) = 1
-    #     IPR = sum([v_i]^4)
-    #     ranges from 1/N (N = length of eigenvector) to 1
-    ipr_df <- v_df %>%
-      dplyr::group_by_at(c(id_var, "rank")) %>%
-      dplyr::summarize(value = sum(abs(.data$value)^4)) %>%
-      dplyr::ungroup() %>%
-      dplyr::mutate(variable = "IPR")
+    v_df <- v_df %>%
+      add_IPR(comp_name = "eigenvector", id_var = id_var)
     
-    v_df$component <- "eigenvector"
-    ipr_df$component <- "IPR"
-    
-    dat <- dplyr::bind_rows(v_df, ipr_df)
-    dat$variable <- as.factor(dat$variable)
-    dat$variable <- forcats::fct_relevel(dat$variable, c(var_names, "IPR"))
-    
-    my_plot <- dat %>%
-      ggplot(aes(x = .data$censusdate, y = .data$value, color = .data$variable)) +
-      facet_grid(component + rank ~ ., switch = "y") +
+    my_plot <- v_df %>%
+      ggplot(aes(x = !!sym(id_var), y = .data$value, color = .data$variable)) +
+      facet_grid(component + rank ~ ., scales = "free", switch = "y") +
       scale_y_continuous(limits = c(0, 1)) +
       scale_color_viridis_d(option = palette_option)
   } else {
     my_plot <- v_df %>%
-      ggplot(aes(x = .data$censusdate, y = .data$value, color = .data$variable)) +
+      ggplot(aes(x = !!sym(id_var), y = .data$value, color = .data$variable)) +
       facet_grid(rank ~ ., scales = "free", switch = "y") +
-      scale_color_viridis(discrete = TRUE, option = "plasma")
+      scale_color_viridis_d(option = palette_option)
   }
   my_plot <- my_plot +
     scale_x_date(expand = c(0.01, 0)) +

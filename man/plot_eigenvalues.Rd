@@ -16,6 +16,9 @@ from the matrix of the s-map coefficients at that time step}
 
 \item{num_values}{the number of eigenvalues to plot}
 
+\item{id_var}{when constructing the long-format tibble,what should be the 
+variable name containing the time index}
+
 \item{highlight_complex}{whether to also draw points to indicate when the
 dominant eigenvalue is complex}
 

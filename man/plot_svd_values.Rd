@@ -16,6 +16,9 @@ from the matrix of the s-map coefficients at that time step}
 
 \item{num_values}{the number of eigenvalues to plot}
 
+\item{id_var}{when constructing the long-format tibble,what should be the 
+variable name containing the time index}
+
 \item{line_size}{the line width for the plot}
 
 \item{base_size}{the base font size}
