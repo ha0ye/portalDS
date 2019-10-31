@@ -75,3 +75,21 @@ test_that("check plotting of eigenvalues and eigenvectors", {
   vdiffr::expect_doppelganger("Maizuru Eigenvectors", eigenvector_plot)
   vdiffr::expect_doppelganger("Maizuru Eigenvectors (IPR)", eigenvector_plot_IPR)
 })
+
+test_that("check plotting of SVD values and vectors", {
+    svd_decomp <- compute_svd_decomp(maizuru_smap_matrices)
+    
+    maizuru_svd_values <- svd_decomp$d
+    expect_error(svd_values_plot <- plot_svd_values(maizuru_svd_values, 
+                                                        num_values = 2), NA)
+    
+    maizuru_svd_vectors <- svd_decomp$u
+    expect_error(svd_vectors_plot <- plot_svd_vectors(maizuru_svd_vectors,
+                                                       num_values = 2
+    ), NA)
+    
+    skip_on_travis()
+    vdiffr::expect_doppelganger("Maizuru SVD values", svd_values_plot)
+    vdiffr::expect_doppelganger("Maizuru SVD vectors", svd_vectors_plot)
+})
+

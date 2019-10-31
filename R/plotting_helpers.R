@@ -65,7 +65,7 @@ extract_matrix_vectors <- function(vectors_list, id_var = "censusdate",
                           }) %>% 
         dplyr::mutate_at(vars(id_var), as.Date) %>%
         dplyr::rename(variable = .data$Var1, rank = .data$Var2) %>%
-        dplyr::mutate(value = abs(Re(.data$value)))
+        dplyr::mutate(value = Re(.data$value))
     
     if (rescale)
     {
@@ -120,7 +120,7 @@ make_matrix_vector_plot <- function(v_df,
         ggplot(aes(x = !!sym(id_var), y = .data$value, color = .data$variable)) +
         facet_grid(rows = vars(!!!row_facet_groups), scales = "free", switch = "y") +
         scale_x_date(expand = c(0.01, 0)) +
-        scale_y_continuous(limits = c(0, 1)) +
+        scale_y_continuous(limits = c(-1, 1)) +
         scale_color_viridis_d(option = palette_option) + 
         geom_line(size = line_size) +
         theme_bw(
