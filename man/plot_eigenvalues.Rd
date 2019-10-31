@@ -2,11 +2,16 @@
 % Please edit documentation in R/plotting_functions.R
 \name{plot_eigenvalues}
 \alias{plot_eigenvalues}
+\alias{plot_svd_values}
 \title{plot_eigenvalues}
 \usage{
-plot_eigenvalues(eigenvalues, num_values = 1,
+plot_eigenvalues(eigenvalues, num_values = 1, id_var = "censusdate",
   highlight_complex = FALSE, line_size = 1, base_size = 16,
   plot_file = NULL, width = 6, height = NULL)
+
+plot_svd_values(singular_values, num_values = 1, id_var = "censusdate",
+  line_size = 1, base_size = 16, plot_file = NULL, width = 6,
+  height = NULL)
 }
 \arguments{
 \item{eigenvalues}{a list of vectors for the eigenvalues:
@@ -15,6 +20,9 @@ s-map model, and each element is a vector of the eigenvalues, computed
 from the matrix of the s-map coefficients at that time step}
 
 \item{num_values}{the number of eigenvalues to plot}
+
+\item{id_var}{when constructing the long-format tibble,what should be the 
+variable name containing the time index}
 
 \item{highlight_complex}{whether to also draw points to indicate when the
 dominant eigenvalue is complex}
@@ -29,11 +37,19 @@ default), then the plot is not saved to a file}
 \item{width}{width of the saved plot}
 
 \item{height}{height of the saved plot}
+
+\item{singular_values}{a list of vectors for the singular values:
+the number of elements in the list corresponds to the time points of the
+s-map model, and each element is a vector of the singular values, computed
+from the matrix of the s-map coefficients at that time step}
 }
 \value{
-A ggplot object of the eigenvalue plot
+A ggplot object of the plot
 }
 \description{
-Visualize the dominant eigenvalue(s) from running the S-map
-  model on the community time series as part of the dynamic stability analysis
+`plot_eigenvalues()` visualizes the dominant eigenvalue(s) from 
+  running the S-map model on the community time series
+
+`plot_svd_values()` visualizes the dominant singular value(s) 
+  from running the S-map model on the community time series
 }

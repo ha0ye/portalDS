@@ -67,6 +67,7 @@ compute_svd_decomp <- function(smap_matrices, s = NULL)
     # compute s from rownames
     regex_splits <- stringr::str_match(rownames(smap_matrices[[idx]]), "(.+)_(\\d+)")
     s <- max(which(regex_splits[, 3] == "0"))
+    var_names <- regex_splits[seq(s), 2]
   }
   
   svd_out <- purrr::map(smap_matrices, function(J) {
@@ -75,6 +76,7 @@ compute_svd_decomp <- function(smap_matrices, s = NULL)
     }
     
     out <- svd(J[seq_len(s), ])
+    rownames(out$u) <- var_names
     return(out)
   })
   return(purrr::transpose(svd_out, .names = c("d", "u", "v")))

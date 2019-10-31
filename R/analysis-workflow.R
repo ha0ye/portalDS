@@ -103,7 +103,7 @@ compute_dynamic_stability <- function(block,
   }
   
   # check for svd
-  if (is.null(results$svd_decomp)) {
+  if (is.null(results$singular_values) || is.null(results$singular_vectors_left)) {
     results$svd_decomp <- compute_svd_decomp(results$smap_matrices)
   }
 

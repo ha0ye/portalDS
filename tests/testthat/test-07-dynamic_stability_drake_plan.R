@@ -12,7 +12,8 @@ test_that("check full dynamic stability plan using block_3sp example data", {
     "simplex_results",
     "ccm_results", "ccm_links",
     "smap_coeffs", "smap_matrices",
-    "eigen_decomp", "eigenvalues", "eigenvectors"
+    "eigen_decomp", "eigenvalues", "eigenvectors", 
+    "svd_decomp"
   )
 
   # check plan
@@ -30,7 +31,7 @@ test_that("check full dynamic stability plan using block_3sp example data", {
   seq_along(targets),
   check.names = FALSE
   )
-  expect_known_hash(as.character(my_plan$command), "77143d3b63")
+  expect_known_hash(as.character(my_plan$command), "3cd57e66a2")
 })
 
 test_that("running full dynamic stability plan using block_3sp example data", {

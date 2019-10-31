@@ -27,50 +27,50 @@ plot_network <- function(ccm_links,
                          palette = NULL,
                          palette_option = "plasma",
                          existing_graph = NULL) {
-  my_graph <- ccm_links %>%
-    dplyr::filter(.data$lib_column != .data$target_column) %>%
-    dplyr::arrange(.data$target_column) %>%
-    dplyr::select(c("target_column", "lib_column")) %>%
-    igraph::graph_from_data_frame(vertices = levels(ccm_links$target_column))
-
-  if (is.null(palette)) {
-    vertices <- igraph::V(my_graph)
-    palette <- viridis::viridis(length(vertices), option = palette_option)
-    names(palette) <- igraph::as_ids(vertices)
-  }
-
-  my_graph <- create_layout(my_graph, layout = layout)
-
-  if (!is.null(existing_graph)) {
-    idx <- match(my_graph$name, existing_graph$name)
-    my_graph$x <- existing_graph$x[idx]
-    my_graph$y <- existing_graph$y[idx]
-  }
-
-  my_plot <- ggraph(my_graph) +
-    geom_edge_link(
-      edge_width = 0.5, start_cap = circle(0.3, "inches"),
-      end_cap = circle(0.3, "inches"),
-      arrow = arrow(angle = 20, type = "closed")
-    ) +
-    geom_node_circle(aes(r = 0.08, fill = .data$name)) +
-    theme_graph(
-      foreground = "black", fg_text_colour = "white",
-      background = "transparent"
-    ) +
-    coord_fixed() +
-    theme(
-      text = element_text(family = "Helvetica"),
-      panel.border = element_rect(color = NA, fill = NA)
-    ) +
-    scale_fill_manual(values = palette) +
-    guides(fill = guide_legend(title = "Species"))
-
-  return(list(
-    plot = my_plot,
-    palette = palette,
-    graph = my_graph
-  ))
+    my_graph <- ccm_links %>%
+        dplyr::filter(.data$lib_column != .data$target_column) %>%
+        dplyr::arrange(.data$target_column) %>%
+        dplyr::select(c("target_column", "lib_column")) %>%
+        igraph::graph_from_data_frame(vertices = levels(ccm_links$target_column))
+    
+    if (is.null(palette)) {
+        vertices <- igraph::V(my_graph)
+        palette <- viridis::viridis(length(vertices), option = palette_option)
+        names(palette) <- igraph::as_ids(vertices)
+    }
+    
+    my_graph <- create_layout(my_graph, layout = layout)
+    
+    if (!is.null(existing_graph)) {
+        idx <- match(my_graph$name, existing_graph$name)
+        my_graph$x <- existing_graph$x[idx]
+        my_graph$y <- existing_graph$y[idx]
+    }
+    
+    my_plot <- ggraph(my_graph) +
+        geom_edge_link(
+            edge_width = 0.5, start_cap = circle(0.3, "inches"),
+            end_cap = circle(0.3, "inches"),
+            arrow = arrow(angle = 20, type = "closed")
+        ) +
+        geom_node_circle(aes(r = 0.08, fill = .data$name)) +
+        theme_graph(
+            foreground = "black", fg_text_colour = "white",
+            background = "transparent"
+        ) +
+        coord_fixed() +
+        theme(
+            text = element_text(family = "Helvetica"),
+            panel.border = element_rect(color = NA, fill = NA)
+        ) +
+        scale_fill_manual(values = palette) +
+        guides(fill = guide_legend(title = "Species"))
+    
+    return(list(
+        plot = my_plot,
+        palette = palette,
+        graph = my_graph
+    ))
 }
 
 #' @title plot_smap_coeffs
@@ -90,332 +90,248 @@ plot_network <- function(ccm_links,
 #'
 #' @export
 plot_smap_coeffs <- function(smap_matrices, base_size = 16,
-                             plot_file = NULL, width = 6, height = NULL) {
-  # make data.frame of smap coefficients
-  smap_coeff_df <- purrr::map_dfr(seq(smap_matrices), function(i) {
-    m <- smap_matrices[[i]]
-    if (is.null(dim(m))) {
-      return()
-    }
-    row_idx <- grep("_0", rownames(m))
-    out <- reshape2::melt(m[row_idx, ])
-    out$t <- i
-    return(out)
-  }) %>%
-    dplyr::rename(target = .data$Var1, predictor = .data$Var2)
-
-  # identify coefficients that matter
-  to_keep <- smap_coeff_df %>%
-    dplyr::group_by(.data$target, .data$predictor) %>%
-    dplyr::filter(max(abs(.data$value)) > 0) %>%
-    dplyr::mutate(coeff_name = paste0(.data$target, .data$predictor))
-  smap_coeff_df <- smap_coeff_df %>%
-    dplyr::mutate(coeff_name = paste0(.data$target, .data$predictor)) %>%
-    dplyr::filter(.data$coeff_name %in% to_keep$coeff_name)
-
-  # convert time index into dates
-  smap_coeff_df$censusdate <- as.Date(names(smap_matrices)[smap_coeff_df$t])
-
-  # time series plot
-  ts_plot <- ggplot(
-    smap_coeff_df,
-    aes(x = .data$censusdate, y = abs(.data$value), color = .data$predictor)
-  ) +
-    facet_grid(target ~ ., scales = "free_y", switch = "y") +
-    geom_hline(yintercept = 1, size = 1, linetype = 2) +
-    scale_color_viridis_d(option = "E") +
-    scale_x_date(
-      breaks = seq(
-        from = as.Date("1985-01-01"),
-        to = as.Date("2015-01-01"),
-        by = "5 years"
-      ),
-      date_labels = "%Y", expand = c(0.01, 0)
-    ) +
-    geom_line() +
-    labs(x = "censusdate", y = "abs(value)", color = "predictor") +
-    theme_bw(
-      base_size = base_size, base_family = "Helvetica",
-      base_line_size = 1
-    ) +
-    guides(color = FALSE, fill = FALSE)
-
-  # density plot
-  density_plot <- ggplot(
-    smap_coeff_df,
-    aes(x = abs(.data$value), color = .data$predictor)
-  ) +
-    facet_grid(target ~ ., switch = "y") +
-    geom_vline(xintercept = 1, size = 1, linetype = 2) +
-    scale_color_viridis_d(option = "E") +
-    geom_density(fill = NA, weight = 0.5) +
-    coord_flip() +
-    labs(x = "abs(value)", y = "density", color = "predictor") +
-    theme_bw(
-      base_size = base_size, base_family = "Helvetica",
-      base_line_size = 1
-    ) +
-    guides(color = FALSE, fill = FALSE)
-
-  combined_plot <- cowplot::plot_grid(ts_plot, density_plot,
-    nrow = 1,
-    rel_widths = c(3, 1)
-  )
-  if (is.null(height)) {
-    height <- nlevels(smap_coeff_df$target)
-  }
-
-  # save output
-  if (!is.null(plot_file)) {
-    cowplot::ggsave(plot_file, combined_plot,
-      width = width, height = height
+                             plot_file = NULL, width = 6, height = NULL)
+{
+    # make data.frame of smap coefficients
+    smap_coeff_df <- purrr::map_dfr(seq(smap_matrices), function(i) {
+        m <- smap_matrices[[i]]
+        if (is.null(dim(m))) {
+            return()
+        }
+        row_idx <- grep("_0", rownames(m))
+        out <- reshape2::melt(m[row_idx, ])
+        out$t <- i
+        return(out)
+    }) %>%
+        dplyr::rename(target = .data$Var1, predictor = .data$Var2)
+    
+    # identify coefficients that matter
+    to_keep <- smap_coeff_df %>%
+        dplyr::group_by(.data$target, .data$predictor) %>%
+        dplyr::filter(max(abs(.data$value)) > 0) %>%
+        dplyr::mutate(coeff_name = paste0(.data$target, .data$predictor))
+    smap_coeff_df <- smap_coeff_df %>%
+        dplyr::mutate(coeff_name = paste0(.data$target, .data$predictor)) %>%
+        dplyr::filter(.data$coeff_name %in% to_keep$coeff_name)
+    
+    # convert time index into dates
+    smap_coeff_df$censusdate <- as.Date(names(smap_matrices)[smap_coeff_df$t])
+    
+    # time series plot
+    ts_plot <- ggplot(smap_coeff_df,
+                      aes(x = .data$censusdate, y = abs(.data$value), 
+                          color = .data$predictor)) +
+        facet_grid(target ~ ., scales = "free_y", switch = "y") +
+        geom_hline(yintercept = 1, size = 1, linetype = 2) +
+        scale_color_viridis_d(option = "E") +
+        scale_x_date(
+            breaks = seq(
+                from = as.Date("1985-01-01"),
+                to = as.Date("2015-01-01"),
+                by = "5 years"
+            ),
+            date_labels = "%Y", expand = c(0.01, 0)
+        ) +
+        geom_line() +
+        labs(x = "censusdate", y = "abs(value)", color = "predictor") +
+        theme_bw(
+            base_size = base_size, base_family = "Helvetica",
+            base_line_size = 1
+        ) +
+        guides(color = FALSE, fill = FALSE)
+    
+    # density plot
+    density_plot <- ggplot(smap_coeff_df,
+                           aes(x = abs(.data$value), color = .data$predictor)) +
+        facet_grid(target ~ ., switch = "y") +
+        geom_vline(xintercept = 1, size = 1, linetype = 2) +
+        scale_color_viridis_d(option = "E") +
+        geom_density(fill = NA, weight = 0.5) +
+        coord_flip() +
+        labs(x = "abs(value)", y = "density", color = "predictor") +
+        theme_bw(
+            base_size = base_size, base_family = "Helvetica",
+            base_line_size = 1
+        ) +
+        guides(color = FALSE, fill = FALSE)
+    
+    combined_plot <- cowplot::plot_grid(ts_plot, density_plot,
+                                        nrow = 1,
+                                        rel_widths = c(3, 1)
     )
-  }
-  return(combined_plot)
+    if (is.null(height)) {
+        height <- nlevels(smap_coeff_df$target)
+    }
+    
+    if (!is.null(plot_file)) {  cowplot::ggsave(plot_file, combined_plot, width = width, height = height)  }
+    return(combined_plot)
 }
 
 #' @title plot_eigenvalues
-#' @description Visualize the dominant eigenvalue(s) from running the S-map
-#'   model on the community time series as part of the dynamic stability analysis
+#' @aliases plot_svd_values
+#' @description `plot_eigenvalues()` visualizes the dominant eigenvalue(s) from 
+#'   running the S-map model on the community time series
 #' @param eigenvalues a list of vectors for the eigenvalues:
 #'   the number of elements in the list corresponds to the time points of the
 #'   s-map model, and each element is a vector of the eigenvalues, computed
 #'   from the matrix of the s-map coefficients at that time step
 #' @param num_values the number of eigenvalues to plot
+#' @param id_var when constructing the long-format tibble,what should be the 
+#'   variable name containing the time index
 #' @param highlight_complex whether to also draw points to indicate when the
 #'   dominant eigenvalue is complex
 #' @param line_size the line width for the plot
 #' @inheritParams plot_smap_coeffs
 #'
-#' @return A ggplot object of the eigenvalue plot
+#' @return A ggplot object of the plot
 #'
 #' @export
 plot_eigenvalues <- function(eigenvalues, num_values = 1,
-                             highlight_complex = FALSE, line_size = 1,
-                             base_size = 16,
-                             plot_file = NULL, width = 6, height = NULL) {
-  # generate df for plotting
-  eigenvalue_dist <- extract_values(eigenvalues) %>%
-    dplyr::filter(.data$rank <= num_values) %>%
-    dplyr::mutate(value = abs(value))
-  
-  my_plot <- eigenvalue_dist %>%
-    ggplot(aes(
-      x = .data$censusdate, y = .data$value,
-      color = as.factor(.data$rank), group = rev(.data$rank)
-    )) +
-    geom_line(size = line_size) +
-    scale_color_viridis_d(option = "inferno") +
-    geom_hline(yintercept = 1.0, size = 1, linetype = 2) +
-    labs(x = NULL, y = "dynamic stability \n(higher is more unstable)", color = "rank") +
-    theme_bw(
-      base_size = base_size, base_family = "Helvetica",
-      base_line_size = 1
-    ) +
-    theme(panel.grid.minor = element_line(size = 1)) +
-    guides(color = FALSE)
-
-  if (highlight_complex && num_values >= 2) {
-    complex_df <- data.frame(
-      censusdate = eigenvalue_dist %>%
-        tidyr::spread(.data$rank, .data$value) %>%
-        dplyr::filter(.data$`1` < .data$`2` + 0.001) %>%
-        dplyr::select(.data$censusdate),
-      value = min(eigenvalue_dist$value, na.rm = TRUE),
-      rank = 1
-    ) %>%
-      tidyr::complete(censusdate = eigenvalue_dist$censusdate, fill = list(lambda = NA, rank = 1))
-    my_plot <- my_plot +
-      geom_point(data = complex_df, color = "red")
-  }
-
-  # save output
-  if (!is.null(plot_file)) {
-    cowplot::ggsave(plot_file, my_plot,
-      width = width, height = height
-    )
-  }
-  return(my_plot)
-}
-
-extract_values <- function(values_list, id_var = "censusdate")
+                             id_var = "censusdate",
+                             highlight_complex = FALSE, 
+                             line_size = 1, base_size = 16,
+                             plot_file = NULL, width = 6, height = NULL)
 {
-  purrr::map_dfr(values_list, .id = id_var, 
-                 function(vals) {
-                   if (any(is.na(vals))) {
-                     return(data.frame())
-                   }
-                   data.frame(
-                     value = vals, 
-                     rank = seq(-vals)
-                   )
-                 }) %>%
-    dplyr::mutate_at(vars(id_var), as.Date)
+    eigenvalue_dist <- extract_matrix_values(eigenvalues, id_var = id_var) %>%
+        dplyr::filter(.data$rank <= num_values) %>%
+        dplyr::mutate(value = abs(.data$value))
+    
+    my_plot <- make_matrix_value_plot(eigenvalue_dist, 
+                                      id_var = id_var, 
+                                      y_label = "dynamic stability \n(higher is more unstable)", 
+                                      line_size = line_size, 
+                                      base_size = base_size)
+    
+    if (highlight_complex && num_values >= 2) {
+        complex_df <- data.frame(
+            censusdate = eigenvalue_dist %>%
+                tidyr::spread(.data$rank, .data$value) %>%
+                dplyr::filter(.data$`1` < .data$`2` + 0.001) %>%
+                dplyr::select(.data$censusdate),
+            value = min(eigenvalue_dist$value, na.rm = TRUE),
+            rank = 1
+        ) %>%
+            tidyr::complete(censusdate = eigenvalue_dist$censusdate, fill = list(lambda = NA, rank = 1))
+        my_plot <- my_plot +
+            geom_point(data = complex_df, color = "red")
+    }
+    
+    if (!is.null(plot_file)) {  cowplot::ggsave(plot_file, my_plot, width = width, height = height)  }
+    return(my_plot)
 }
 
-#' @title plot_singular_values
-#' @description Visualize the dominant singular value(s) from running the S-map
-#'   model on the community time series as part of the dynamic stability analysis
+#' @rdname plot_eigenvalues
+#' @description `plot_svd_values()` visualizes the dominant singular value(s) 
+#'   from running the S-map model on the community time series
 #' @param singular_values a list of vectors for the singular values:
 #'   the number of elements in the list corresponds to the time points of the
 #'   s-map model, and each element is a vector of the singular values, computed
 #'   from the matrix of the s-map coefficients at that time step
 #' @inheritParams plot_eigenvalues
 #'
-#' @return A ggplot object of the singular values plot
-#'
 #' @export
-plot_singular_values <- function(singular_values, num_values = 1,
-                             line_size = 1,
-                             base_size = 16,
-                             plot_file = NULL, width = 6, height = NULL) {
-  # generate df for plotting
-  sigma_dist <- extract_values(singular_values) %>%
-    dplyr::filter(.data$rank <= num_values)
-  
-  my_plot <- sigma_dist %>%
-    ggplot(aes(
-      x = .data$censusdate, y = .data$value,
-      color = as.factor(.data$rank), group = rev(.data$rank)
-    )) +
-    geom_line(size = line_size) +
-    scale_color_viridis_d(option = "inferno") +
-    geom_hline(yintercept = 1.0, size = 1, linetype = 2) +
-    labs(x = NULL, y = "local convergence \n(higher is more unstable)", color = "rank") +
-    theme_bw(
-      base_size = base_size, base_family = "Helvetica",
-      base_line_size = 1
-    ) +
-    theme(panel.grid.minor = element_line(size = 1)) +
-    guides(color = FALSE)
-  
-  # save output
-  if (!is.null(plot_file)) {
-    cowplot::ggsave(plot_file, my_plot,
-                    width = width, height = height
-    )
-  }
-  return(my_plot)
+plot_svd_values <- function(singular_values, num_values = 1,
+                            id_var = "censusdate",
+                            line_size = 1,
+                            base_size = 16,
+                            plot_file = NULL, width = 6, height = NULL)
+{
+    sigma_dist <- extract_matrix_values(singular_values) %>%
+        dplyr::filter(.data$rank <= num_values)
+    
+    my_plot <- make_matrix_value_plot(sigma_dist, 
+                                      id_var = id_var, 
+                                      y_label = "local convergence \n(higher is more divergence)", 
+                                      line_size = line_size, 
+                                      base_size = base_size)
+    
+    if (!is.null(plot_file)) {  cowplot::ggsave(plot_file, my_plot, width = width, height = height)  }
+    return(my_plot)
 }
 
-#' @title plot_eigenvectors
-#' @description Visualize the dominant eigenvector(s) from running the S-map
-#'   model on the community time series as part of the dynamic stability analysis
+#' @title Plot time-varying vector components
+#' @aliases plot_svd_vectors
+#' @description `plot_eigenvectors()` visualizes the dominant eigenvector(s) 
+#'   from running the S-map model on the community time series
 #' @param eigenvectors a list of matrices for the eigenvectors:
 #'   the number of elements in the list corresponds to the time points of the
 #'   s-map model, and each element is a matrix, where the columns are the
-#'   eigenvectors, in descending order, the rows correspond to the axes of the
-#'   system
+#'   eigenvectors, in descending order according to the eigenvalues
 #' @param num_values the number of eigenvectors to plot
 #' @param add_IPR whether to also plot the Inverse Participation Ratio, a
 #'   numerical quantity that measures how evenly the different components
 #'   contribute to the eigenvector
 #' @param line_size the line width for the plot
+#' @inheritParams plot_eigenvalues
 #' @inheritParams plot_network
 #' @inheritParams plot_smap_coeffs
 #'
-#' @return A ggplot object of the eigenvector plot
+#' @return A ggplot object of the plot
 #'
 #' @export
 plot_eigenvectors <- function(eigenvectors, num_values = 1,
-                              add_IPR = FALSE, line_size = 1,
+                              id_var = "censusdate", 
+                              add_IPR = FALSE, 
                               palette_option = "plasma",
-                              base_size = 16,
-                              plot_file = NULL, width = 6, height = NULL) {
-  # extract vars
-  non_null_idx <- dplyr::first(which(!sapply(eigenvectors, anyNA)))
-  var_names <- rownames(eigenvectors[[non_null_idx]])
-  var_idx <- grep("_0", var_names)
-  var_names <- gsub("_0", "", var_names[var_idx])
+                              line_size = 1, base_size = 16,
+                              plot_file = NULL, width = 6, height = NULL)
+{
+    non_null_idx <- dplyr::first(which(!vapply(eigenvectors, anyNA, FALSE)))
+    var_names <- rownames(eigenvectors[[non_null_idx]])
+    var_idx <- grep("_0", var_names)
+    
+    v_df <- extract_matrix_vectors(eigenvectors, 
+                                   id_var = id_var, 
+                                   rescale = TRUE, 
+                                   row_idx = var_idx, 
+                                   col_idx = seq_len(num_values)) %>%
+        dplyr::mutate(variable = gsub("_0", "", .data$variable))
+    
+    my_plot <- make_matrix_vector_plot(v_df, 
+                                       comp_name = "eigenvector", 
+                                       num_values = num_values, 
+                                       id_var = id_var, 
+                                       add_IPR = add_IPR, 
+                                       palette_option = palette_option, 
+                                       line_size = line_size, 
+                                       base_size = base_size)
+    
+    if (!is.null(plot_file)) {  cowplot::ggsave(plot_file, my_plot, width = width, height = height)  }
+    return(my_plot)
+}
 
-  # normalize eigenvectors so that length = 1
-  vector_scale <- function(v) {
-    sum_sq <- sum(abs(v)^2)
-    v / sqrt(sum_sq)
-  }
-
-  # make data.frame of eigenvector components
-  v_df <- purrr::map_dfr(seq(eigenvectors), function(i) {
-    v <- eigenvectors[[i]]
-    if (anyNA(v) || is.null(v)) {
-      return()
-    }
-    out <- reshape2::melt(v[var_idx, seq_len(num_values), drop = FALSE])
-    out$t <- i
-    return(out)
-  }) %>%
-    dplyr::rename(variable = .data$Var1, rank = .data$Var2) %>%
-    dplyr::mutate(
-      censusdate = as.Date(names(eigenvectors)[t]),
-      variable = as.factor(var_names[.data$variable]),
-      value = abs(Re(.data$value))
-    ) %>%
-    dplyr::group_by(.data$t, .data$rank) %>%
-    dplyr::mutate(value = vector_scale(.data$value)) %>%
-    dplyr::ungroup()
-
-  if (add_IPR) {
-    # compute IPR = Inverse Participation Ratio
-    #   for each eigenvector
-    #     normalize so that sum([v_i]^2) = 1
-    #     IPR = sum([v_i]^4)
-    #     ranges from 1/N (N = length of eigenvector) to 1
-    ipr_df <- v_df %>%
-      dplyr::group_by(.data$t, .data$rank) %>%
-      dplyr::summarize(value = sum(abs(.data$value)^4)) %>%
-      dplyr::ungroup() %>%
-      dplyr::mutate(
-        censusdate = as.Date(names(eigenvectors)[t]),
-        variable = "IPR"
-      )
-
-    v_df$component <- "eigenvector"
-    ipr_df$component <- "IPR"
-
-    dat <- dplyr::bind_rows(v_df, ipr_df)
-    dat$variable <- as.factor(dat$variable)
-    dat$variable <- forcats::fct_relevel(dat$variable, c(var_names, "IPR"))
-
-    my_plot <- dat %>%
-      ggplot(aes(x = .data$censusdate, y = .data$value, color = .data$variable)) +
-      facet_grid(component + rank ~ ., switch = "y") +
-      scale_y_continuous(limits = c(0, 1)) +
-      scale_color_viridis_d(option = palette_option)
-  } else {
-    my_plot <- v_df %>%
-      ggplot(aes(x = .data$censusdate, y = .data$value, color = .data$variable)) +
-      facet_grid(rank ~ ., scales = "free", switch = "y") +
-      scale_color_viridis(discrete = TRUE, option = "plasma")
-  }
-  my_plot <- my_plot +
-    scale_x_date(expand = c(0.01, 0)) +
-    geom_line(size = line_size) +
-    theme_bw(
-      base_size = base_size, base_family = "Helvetica",
-      base_line_size = 1
-    ) +
-    labs(x = "censusdate", y = "value", color = "variable") +
-    theme(
-      panel.background = element_rect(fill = "#AAAABB", color = NA),
-      panel.grid.major = element_line(color = "grey30", size = 1),
-      panel.grid.minor = element_line(color = "grey30", size = 1),
-      legend.key = element_rect(fill = "#AAAABB")
-    ) +
-    guides(color = guide_legend(override.aes = list(size = 1)))
-
-  if (num_values == 1) {
-    my_plot <- my_plot + theme(
-      strip.background = element_blank(),
-      strip.text.y = element_blank()
-    )
-  }
-
-  if (!is.null(plot_file)) {
-    cowplot::ggsave(plot_file, my_plot,
-      width = width, height = height
-    )
-  }
-  return(my_plot)
+#' @rdname plot_eigenvectors
+#' @aliases plot_svd_vectors
+#' @description `plot_svd_vectors()` visualizes the dominant SVD vector(s) 
+#'   from running the S-map model on the community time series
+#' @param svd_vectors a list of matrices for the SVD vectors:
+#'   the number of elements in the list corresponds to the time points of the
+#'   s-map model, and each element is a matrix, where the columns are the
+#'   the SVD vectors, in descending order according to the singular values
+#'
+#' @export
+plot_svd_vectors <- function(svd_vectors, num_values = 1,
+                             id_var = "censusdate", 
+                             add_IPR = FALSE, 
+                             palette_option = "plasma",
+                             line_size = 1, base_size = 16,
+                             plot_file = NULL, width = 6, height = NULL)
+{
+    v_df <- extract_matrix_vectors(svd_vectors, 
+                                   rescale = FALSE, 
+                                   col_idx = seq_len(num_values))
+    
+    my_plot <- make_matrix_vector_plot(v_df, 
+                                       comp_name = "svd vector", 
+                                       num_values = num_values, 
+                                       id_var = id_var, 
+                                       add_IPR = add_IPR, 
+                                       palette_option = palette_option, 
+                                       line_size = line_size, 
+                                       base_size = base_size)
+    
+    if (!is.null(plot_file)) {  cowplot::ggsave(plot_file, my_plot, width = width, height = height)  }
+    return(my_plot)
 }
 
 #' @title plot_time_series
@@ -442,70 +358,36 @@ plot_time_series <- function(block,
                              base_size = 11,
                              base_family = "Helvetica",
                              base_line_size = 1) {
-  time <- dplyr::pull(block, time_column)
-  block <- dplyr::select(block, -time_column)
-
-  y_label <- "abundance"
-  if (is.null(scale) || length(scale) == 0)
-  {
-  } else if (tolower(scale) == "unif") {
-    block <- block %>%
-      dplyr::mutate_all(scales::rescale)
-    y_label <- "relative abundance"
-  } else if (tolower(scale) == "norm") {
-    block <- block %>%
-      dplyr::mutate_all(norm_rescale)
-    y_label <- "scaled abundance"
-  }
-  timeseries <- block %>%
-    dplyr::mutate(time = time) %>%
-    tidyr::gather("species", "abundance", -.data$time)
-
-  palette <- viridis::viridis(length(unique(timeseries$species)),
-    option = palette_option
-  )
-
-  timeseries %>%
-    ggplot(aes(x = .data$time, y = .data$abundance, color = .data$species)) +
-    geom_line(size = 1) +
-    scale_color_manual(values = palette) +
-    labs(x = NULL, y = y_label, color = "species") +
-    theme_bw(
-      base_size = base_size, base_family = base_family,
-      base_line_size = base_line_size
-    ) +
-    theme(panel.grid.minor = element_line(size = 1))
-}
-
-#' @title add_regime_shift_highlight
-#' @description add transparent bars to highlight specific time spans
-#' @param my_plot the original ggplot object
-#' @param lower_date a vector of the beginnings of the time spans
-#' @param upper_date a vector of the ends of the time spans
-#' @param alpha the transparency of the bars to add to the plot
-#' @param fill the fill color of the bars to add to the plot
-#'
-#' @return A ggplot object with the bars added
-#'
-#' @export
-add_regime_shift_highlight <- function(my_plot,
-                                       ## using dates from updated analysis code (weecology/LDA-kratplots)
-                                       lower_date = as.Date(c("1983-11-12", "1990-01-06", "1998-12-22", "2009-05-23")),
-                                       upper_date = as.Date(c("1985-03-16", "1992-04-04", "1999-11-06", "2011-01-05")),
-                                       alpha = 0.5, fill = "grey30") {
-  ## using dates from Christensen et al. 2018
-  # lower_date <- as.Date(c("1983-12-01", "1988-10-01", "1998-09-01", "2009-06-01"))
-  # upper_date <- as.Date(c("1984-07-01", "1996-01-01", "1999-12-01", "2010-09-01"))
-
-  my_plot + geom_rect(
-    data = data.frame(
-      xmin = lower_date, xmax = upper_date,
-      ymin = -Inf, ymax = Inf
-    ),
-    mapping = aes(
-      xmin = .data$xmin, xmax = .data$xmax,
-      ymin = .data$ymin, ymax = .data$ymax
-    ),
-    alpha = alpha, inherit.aes = FALSE, fill = fill
-  )
+    time <- dplyr::pull(block, time_column)
+    block <- dplyr::select(block, -time_column)
+    
+    y_label <- "abundance"
+    if (is.null(scale) || length(scale) == 0)
+    {
+    } else if (tolower(scale) == "unif") {
+        block <- block %>%
+            dplyr::mutate_all(scales::rescale)
+        y_label <- "relative abundance"
+    } else if (tolower(scale) == "norm") {
+        block <- block %>%
+            dplyr::mutate_all(norm_rescale)
+        y_label <- "scaled abundance"
+    }
+    timeseries <- block %>%
+        dplyr::mutate(time = time) %>%
+        tidyr::gather("species", "abundance", -.data$time)
+    
+    palette <- viridis::viridis(length(unique(timeseries$species)),
+                                option = palette_option)
+    
+    timeseries %>%
+        ggplot(aes(x = .data$time, y = .data$abundance, color = .data$species)) +
+        geom_line(size = 1) +
+        scale_color_manual(values = palette) +
+        labs(x = NULL, y = y_label, color = "species") +
+        theme_bw(
+            base_size = base_size, base_family = base_family,
+            base_line_size = base_line_size
+        ) +
+        theme(panel.grid.minor = element_line(size = 1))
 }
