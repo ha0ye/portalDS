@@ -32,8 +32,10 @@
 
 <meta property="og:title" content="plot_eigenvalues — plot_eigenvalues" />
 
-<meta property="og:description" content="Visualize the dominant eigenvalue(s) from running the S-map
-  model on the community time series as part of the dynamic stability analysis" />
+<meta property="og:description" content="`plot_eigenvalues()` visualizes the dominant eigenvalue(s) from 
+  running the S-map model on the community time series
+`plot_svd_values()` visualizes the dominant singular value(s) 
+  from running the S-map model on the community time series" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -119,14 +121,20 @@
 
     <div class="ref-description">
     
-    <p>Visualize the dominant eigenvalue(s) from running the S-map
-  model on the community time series as part of the dynamic stability analysis</p>
+    <p>`plot_eigenvalues()` visualizes the dominant eigenvalue(s) from 
+  running the S-map model on the community time series</p>
+<p>`plot_svd_values()` visualizes the dominant singular value(s) 
+  from running the S-map model on the community time series</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>plot_eigenvalues</span>(<span class='no'>eigenvalues</span>, <span class='kw'>num_values</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+    <pre class="usage"><span class='fu'>plot_eigenvalues</span>(<span class='no'>eigenvalues</span>, <span class='kw'>num_values</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>id_var</span> <span class='kw'>=</span> <span class='st'>"censusdate"</span>,
   <span class='kw'>highlight_complex</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>line_size</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>base_size</span> <span class='kw'>=</span> <span class='fl'>16</span>,
-  <span class='kw'>plot_file</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>6</span>, <span class='kw'>height</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+  <span class='kw'>plot_file</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>6</span>, <span class='kw'>height</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+
+<span class='fu'>plot_svd_values</span>(<span class='no'>singular_values</span>, <span class='kw'>num_values</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>id_var</span> <span class='kw'>=</span> <span class='st'>"censusdate"</span>,
+  <span class='kw'>line_size</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>base_size</span> <span class='kw'>=</span> <span class='fl'>16</span>, <span class='kw'>plot_file</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>6</span>,
+  <span class='kw'>height</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -141,6 +149,11 @@ from the matrix of the s-map coefficients at that time step</p></td>
     <tr>
       <th>num_values</th>
       <td><p>the number of eigenvalues to plot</p></td>
+    </tr>
+    <tr>
+      <th>id_var</th>
+      <td><p>when constructing the long-format tibble,what should be the 
+variable name containing the time index</p></td>
     </tr>
     <tr>
       <th>highlight_complex</th>
@@ -168,11 +181,18 @@ default), then the plot is not saved to a file</p></td>
       <th>height</th>
       <td><p>height of the saved plot</p></td>
     </tr>
+    <tr>
+      <th>singular_values</th>
+      <td><p>a list of vectors for the singular values:
+the number of elements in the list corresponds to the time points of the
+s-map model, and each element is a vector of the singular values, computed
+from the matrix of the s-map coefficients at that time step</p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A ggplot object of the eigenvalue plot</p>
+    <p>A ggplot object of the plot</p>
     
 
   </div>

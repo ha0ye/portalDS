@@ -155,12 +155,16 @@ row is a causal link. The columns are:</p><dl class='dl-horizontal'>
   Let the variables in the system be x^i with i = 1..N.
   For the S-map model predicting x^i_t+1, let the coefficient
   corresponding to variable x^j at lag tau be c^tau_ij.
-  Then the Jacobian is the block matrix:
-  J = [[ C^0 C^1 ... C^K]
-       [ I   0   ... 0  ]
-       [ ... ... ... 0  ]
-       [ ... ... I   0  ]]
-  where K is the maximum lag, and C^tau is the matrix formed by the values
+  Then the Jacobian is the block matrix, J =</p><table class='table'>
+<tr><td></td><td>C^0</td><td>C^1</td><td>...</td><td>C^(d-1)</td></tr>
+<tr><td>C^d</td><td></td><td>I</td><td>0</td><td>...</td></tr>
+<tr><td>0</td><td>0</td><td></td><td>0</td><td>I</td></tr>
+<tr><td>...</td><td>0</td><td>0</td><td></td><td>...</td></tr>
+<tr><td>...</td><td>...</td><td>...</td><td>...</td><td></td></tr>
+<tr><td>0</td><td>0</td><td>...</td><td>I</td><td>0</td></tr>
+<tr><td></td><td></td><td>C^0</td><td>C^1</td><td>...</td></tr>
+</table>
+<p>where d is the maximum lag, and C^tau is the matrix formed by the values
   c^tau_ij. (Note that many of these values will be 0.)</p>
 <p>This function computes J at each time step.</p>
     
