@@ -107,7 +107,7 @@ make_matrix_vector_plot <- function(v_df,
     if (add_IPR)
     {
         v_df <-  add_IPR(v_df, comp_name = comp_name, id_var = id_var)
-        row_facet_groups <- rlang::quos(component, rank)
+        row_facet_groups <- rlang::quos(comp_name, rank)
     } else {
         row_facet_groups <- rlang::quos(rank)
     }
