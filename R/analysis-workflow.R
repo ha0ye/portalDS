@@ -110,7 +110,7 @@ compute_dynamic_stability <- function(block,
   if (!is.null(results_file)) {
     saveRDS(results, file = results_file)
   }
-  return(results)
+  return(invisible(results))
 }
 
 #' @rdname compute_dynamic_stability
