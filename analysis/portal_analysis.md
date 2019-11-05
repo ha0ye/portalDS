@@ -18,8 +18,7 @@ library(ggplot2)
 set.seed(42)
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  fig_width = 7
+  comment = "#>"
 )
 ```
 
@@ -92,7 +91,8 @@ Highlighted segments are the posterior estimates of regime shifts from
 Christensen et al. 2018.
 
 ``` r
-plot_eigenvalues(results$eigenvalues) %>% 
+plot_eigenvalues(results$eigenvalues, 
+                 num_values = 3) %>% 
     add_regime_shift_highlight()
 ```
 
@@ -111,7 +111,8 @@ Again, highlighted segments are the posterior estimates of regime shifts
 from Christensen et al. 2018.
 
 ``` r
-plot_svd_values(results$svd_decomp$d) %>% 
+plot_svd_values(results$svd_decomp$d, 
+                num_values = 3) %>% 
     add_regime_shift_highlight()
 ```
 
