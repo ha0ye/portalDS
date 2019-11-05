@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
   purl = LOCAL,
   collapse = TRUE,
   comment = "#>",
-  fig_width = 6
+  fig.width = 6
 )
 ```
 
