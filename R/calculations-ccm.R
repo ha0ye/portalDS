@@ -15,7 +15,8 @@ compute_ccm <- function(simplex_results,
                         lib_sizes = seq(10, 100, by = 10),
                         random_libs = TRUE, num_samples = 100,
                         replace = TRUE, RNGseed = 42,
-                        silent = TRUE) {
+                        silent = TRUE)
+{
   ccm_func <- function(from_idx, to_idx, E) {
     compute_ccm <- function(df, E) {
       rEDM::ccm(df,

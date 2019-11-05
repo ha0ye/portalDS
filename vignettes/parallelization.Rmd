@@ -1,0 +1,108 @@
+---
+title: "Parallelization"
+author: "Hao Ye"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Parallelization}
+  %\VignetteEngine{knitr::rmarkdown_notangle}
+  %\VignetteEncoding{UTF-8}
+---
+  
+```{r, include = FALSE}
+LOCAL <- identical(Sys.getenv("LOCAL"), "true")
+knitr::opts_chunk$set(
+  purl = LOCAL,
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6
+)
+```
+
+# Introduction
+
+This document discusses parallelization options for this package. Because the full analysis can involve many independent calculations (esp. at the step of identifying the pairwise interactions), taking advantage of the ability to run code in parallel can speed things up.
+
+To facilitate different computer setups, we use the `future` package, which enables the user to define the parallelization setup.
+
+```{r packages, message = FALSE}
+library(portalDS)
+library(drake)
+
+options(drake_make_menu = FALSE)
+```
+
+# Setup
+
+Setup the data and compute simplex results.
+```{r}
+data("block_3sp", package = "rEDM")
+
+block <- setNames(block_3sp[, c("time", "x_t", "y_t", "z_t")],
+                  c("censusdate", "x", "y", "z"))
+
+simplex_results <- compute_simplex(block = block,
+                                   E_list = 3:5,
+                                   surrogate_method = "random_shuffle",
+                                   num_surr = 20)
+
+```
+
+# Calculations
+
+1. No specific plan for parallelization; calculations will be done sequentially.
+
+```{r}
+# future::plan(NULL)
+tictoc::tic()
+ccm_results <- compute_ccm(simplex_results,
+                           lib_sizes = seq(10, 100, by = 10),
+                           random_libs = TRUE, num_samples = 10,
+                           replace = TRUE, RNGseed = 42,
+                           silent = TRUE)
+tictoc::toc()
+```
+
+2. Same calculations as previous, but using asynchronous processes via `future.callr`.
+
+```{r}
+future::plan(future.callr::callr)
+tictoc::tic()
+ccm_results_parallel <- compute_ccm(simplex_results,
+                                    lib_sizes = seq(10, 100, by = 10),
+                                    random_libs = TRUE, num_samples = 10,
+                                    replace = TRUE, RNGseed = 42,
+                                    silent = TRUE)
+tictoc::toc()
+```
+
+3. Same calculations as previous, but setup within a Drake plan, and still allowing parallelization to occur within a single target.
+
+```{r}
+my_plan <- drake_plan(ccm_results_drake = compute_ccm(simplex_results,
+                                                      lib_sizes = seq(10, 100, by = 10),
+                                                      random_libs = TRUE, num_samples = 10,
+                                                      replace = TRUE, RNGseed = 42,
+                                                      silent = TRUE)
+)
+
+future::plan(future.callr::callr)
+tictoc::tic()
+clean()
+make(my_plan)
+tictoc::toc()
+```
+
+# Validation of results
+
+Check that the calculations are the same. (Note that the call to `compute_ccm` is setup to do random subsampling, but we supply a fixed seed so that the random subsamples are selected identically across runs and for each pair of variables.)
+
+```{r}
+identical(ccm_results, ccm_results_parallel)
+```
+
+```{r}
+ccm_results_drake <- readd(ccm_results_drake)
+identical(ccm_results, ccm_results_drake)
+```
+
