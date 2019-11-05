@@ -5,8 +5,7 @@
 \title{plot_time_series}
 \usage{
 plot_time_series(block, time_column = "censusdate", scale = "unif",
-  palette_option = "plasma", base_size = 11,
-  base_family = "Helvetica", base_line_size = 1)
+  palette_option = "plasma", line_size = 1, base_size = 11)
 }
 \arguments{
 \item{block}{A data.frame containing time series for the community. Each
@@ -23,11 +22,9 @@ which could be a numeric or a date/time type}
 \item{palette_option}{the color palette to use (see \code{\link[viridis]{viridis}}
 for more info)}
 
+\item{line_size}{the line width for the plot}
+
 \item{base_size}{base font size}
-
-\item{base_family}{base font family}
-
-\item{base_line_size}{base size for line elements}
 }
 \value{
 A ggplot object of the time series plot

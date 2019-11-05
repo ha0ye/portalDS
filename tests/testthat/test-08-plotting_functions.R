@@ -2,9 +2,6 @@ context("Plotting functions")
 
 # vdiffr::manage_cases(filter = "plotting")
 
-data(maizuru_block)
-var_names <- setdiff(names(maizuru_block), "censusdate")
-
 test_that("check plotting of time series", {
   expect_error(ts_plot <- plot_time_series(maizuru_block), NA)
 
@@ -22,6 +19,7 @@ test_that("check plotting of the interaction network", {
     package = "portalDS", mustWork = TRUE
   )
   maizuru_ccm_links <- readRDS(data_path)
+  var_names <- union(maizuru_ccm_links$lib_column, maizuru_ccm_links$target_column)
 
   expect_error(maizuru_network <- plot_network(maizuru_ccm_links), NA)
 
@@ -29,7 +27,7 @@ test_that("check plotting of the interaction network", {
   expect_setequal(names(palette), var_names)
 
   expect_error(graph <- maizuru_network$graph, NA)
-  expect_s3_class(graph, c("layour_tbl_graph", "layout_ggraph", "data.frame"))
+  expect_s3_class(graph, c("layout_igraph", "layout_ggraph", "data.frame"), exact = TRUE)
   expect_equal(dim(graph), c(length(var_names), 6))
 
   skip_on_travis()
@@ -78,18 +76,17 @@ test_that("check plotting of eigenvalues and eigenvectors", {
 
 test_that("check plotting of SVD values and vectors", {
     svd_decomp <- compute_svd_decomp(maizuru_smap_matrices)
-    
+
     maizuru_svd_values <- svd_decomp$d
-    expect_error(svd_values_plot <- plot_svd_values(maizuru_svd_values, 
+    expect_error(svd_values_plot <- plot_svd_values(maizuru_svd_values,
                                                         num_values = 2), NA)
-    
+
     maizuru_svd_vectors <- svd_decomp$u
     expect_error(svd_vectors_plot <- plot_svd_vectors(maizuru_svd_vectors,
                                                        num_values = 2
     ), NA)
-    
+
     skip_on_travis()
     vdiffr::expect_doppelganger("Maizuru SVD values", svd_values_plot)
     vdiffr::expect_doppelganger("Maizuru SVD vectors", svd_vectors_plot)
 })
-

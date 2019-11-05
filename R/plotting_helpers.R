@@ -26,11 +26,7 @@ make_matrix_value_plot <- function(values_dist, id_var = "censusdate",
         scale_color_viridis_d(option = "inferno") +
         geom_hline(yintercept = 1.0, size = 1, linetype = 2) +
         labs(x = NULL, y = y_label, color = "rank") +
-        theme_bw(
-            base_size = base_size, base_family = "Helvetica",
-            base_line_size = 1
-        ) +
-        theme(panel.grid.minor = element_line(size = 1)) +
+        my_theme(base_size = base_size) +
         guides(color = FALSE)
 }
 
@@ -123,16 +119,12 @@ make_matrix_vector_plot <- function(v_df,
         scale_y_continuous(limits = c(-1, 1)) +
         scale_color_viridis_d(option = palette_option) + 
         geom_line(size = line_size) +
-        theme_bw(
-            base_size = base_size, base_family = "Helvetica",
-            base_line_size = 1
-        ) +
         labs(x = "censusdate", y = "value", color = "variable") +
-        theme(
-            panel.background = element_rect(fill = "#AAAABB", color = NA),
-            panel.grid.major = element_line(color = "grey30", size = 1),
-            panel.grid.minor = element_line(color = "grey30", size = 1),
-            legend.key = element_rect(fill = "#AAAABB")
+        my_theme(base_size = base_size, 
+                 panel.background = element_rect(fill = "#AAAABB", color = NA),
+                 panel.grid.major = element_line(color = "grey30", size = 1),
+                 panel.grid.minor = element_line(color = "grey30", size = 1),
+                 legend.key = element_rect(fill = "#AAAABB")
         ) +
         guides(color = guide_legend(override.aes = list(size = 1)))
     
@@ -176,4 +168,12 @@ add_regime_shift_highlight <- function(my_plot,
         ),
         alpha = alpha, inherit.aes = FALSE, fill = fill
     )
+}
+
+my_theme <- function(base_size, ...)
+{
+    theme_bw(base_size = base_size, base_family = "Helvetica",
+             base_line_size = 1) +
+        theme(panel.grid.minor = element_line(size = 1)) + 
+        theme(...)
 }

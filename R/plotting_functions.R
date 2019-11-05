@@ -134,10 +134,8 @@ plot_smap_coeffs <- function(smap_matrices, base_size = 16,
         ) +
         geom_line() +
         labs(x = "censusdate", y = "abs(value)", color = "predictor") +
-        theme_bw(
-            base_size = base_size, base_family = "Helvetica",
-            base_line_size = 1
-        ) +
+        my_theme(base_size = base_size, 
+                 panel.grid.minor = element_line(size = 0.5)) + 
         guides(color = FALSE, fill = FALSE)
     
     # density plot
@@ -149,10 +147,8 @@ plot_smap_coeffs <- function(smap_matrices, base_size = 16,
         geom_density(fill = NA, weight = 0.5) +
         coord_flip() +
         labs(x = "abs(value)", y = "density", color = "predictor") +
-        theme_bw(
-            base_size = base_size, base_family = "Helvetica",
-            base_line_size = 1
-        ) +
+        my_theme(base_size = base_size, 
+                 panel.grid.minor = element_line(size = 0.5)) + 
         guides(color = FALSE, fill = FALSE)
     
     combined_plot <- cowplot::plot_grid(ts_plot, density_plot,
@@ -261,7 +257,6 @@ plot_svd_values <- function(singular_values, num_values = 1,
 #' @param add_IPR whether to also plot the Inverse Participation Ratio, a
 #'   numerical quantity that measures how evenly the different components
 #'   contribute to the eigenvector
-#' @param line_size the line width for the plot
 #' @inheritParams plot_eigenvalues
 #' @inheritParams plot_network
 #' @inheritParams plot_smap_coeffs
@@ -347,7 +342,8 @@ plot_svd_vectors <- function(svd_vectors, num_values = 1,
 #'   (anything else) -- no scaling
 #' @inheritParams ggplot2::theme_bw
 #' @inheritParams plot_network
-#'
+#' @inheritParams plot_eigenvalues
+#' 
 #' @return A ggplot object of the time series plot
 #'
 #' @export
@@ -355,39 +351,36 @@ plot_time_series <- function(block,
                              time_column = "censusdate",
                              scale = "unif",
                              palette_option = "plasma",
-                             base_size = 11,
-                             base_family = "Helvetica",
-                             base_line_size = 1) {
+                             line_size = 1, base_size = 11)
+{
     time <- dplyr::pull(block, time_column)
-    block <- dplyr::select(block, -time_column)
+    abundances <- dplyr::select(block, -time_column)
     
+    # do scaling and setup y-axis label
     y_label <- "abundance"
     if (is.null(scale) || length(scale) == 0)
     {
     } else if (tolower(scale) == "unif") {
-        block <- block %>%
+        abundances <- abundances %>%
             dplyr::mutate_all(scales::rescale)
         y_label <- "relative abundance"
     } else if (tolower(scale) == "norm") {
-        block <- block %>%
+        abundances <- abundances %>%
             dplyr::mutate_all(norm_rescale)
         y_label <- "scaled abundance"
     }
-    timeseries <- block %>%
-        dplyr::mutate(time = time) %>%
+    
+    # convert to long format
+    to_plot <- abundances %>%
+        tibble::add_column(time = time) %>%
         tidyr::gather("species", "abundance", -.data$time)
-    
-    palette <- viridis::viridis(length(unique(timeseries$species)),
-                                option = palette_option)
-    
-    timeseries %>%
-        ggplot(aes(x = .data$time, y = .data$abundance, color = .data$species)) +
-        geom_line(size = 1) +
-        scale_color_manual(values = palette) +
+
+    # make plot
+    to_plot %>%
+        ggplot(aes(x = .data$time, y = .data$abundance, 
+                   color = .data$species)) +
+        geom_line(size = line_size) +
+        scale_color_viridis_d(option = palette_option) + 
         labs(x = NULL, y = y_label, color = "species") +
-        theme_bw(
-            base_size = base_size, base_family = base_family,
-            base_line_size = base_line_size
-        ) +
-        theme(panel.grid.minor = element_line(size = 1))
+        my_theme(base_size = base_size)
 }
