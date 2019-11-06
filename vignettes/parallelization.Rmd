@@ -29,7 +29,8 @@ To facilitate different computer setups, we use the `future` package, which enab
 library(portalDS)
 library(drake)
 
-options(drake_make_menu = FALSE)
+options(drake_make_menu = FALSE, 
+        drake_clean_recovery_msg = FALSE)
 ```
 
 # Setup
@@ -88,7 +89,7 @@ my_plan <- drake_plan(ccm_results_drake = compute_ccm(simplex_results,
 
 future::plan(future.callr::callr)
 tictoc::tic()
-clean()
+clean(destroy = TRUE, force = TRUE)
 make(my_plan)
 tictoc::toc()
 ```
