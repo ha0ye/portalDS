@@ -40,7 +40,7 @@ I \tab   0 \tab ... \tab       0 \tab   0\cr
 Note that this maps from the column vector \link{N(t) N(t-1) ... N(t-d)}^T to
 the column vector \link{N(t+1) N(t) ... N(t-(d-1))}^T. However, the only
 relevant components for our purposes are the rows which map the column
-vector \link{N(t) N(t-1) ... N(t-d)}^T to \link{N(t+1)}^T, let this be J^\prime.
+vector \link{N(t) N(t-1) ... N(t-d)}^T to \link{N(t+1)}^T, let this be J_s.
 
 Thus, we extract this portion of the Jacobian for applying SVD.
 }

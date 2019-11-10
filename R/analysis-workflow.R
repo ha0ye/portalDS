@@ -14,6 +14,9 @@
 #'     \item{extract out the s-map coefficients from the models and assemble
 #'       matrices for the system}
 #'     \item{perform eigen-decomposition on the s-map coefficient matrices}
+#'     \item{perform singular-value-decomposition on the s-map coefficient matrices}
+#'     \item{compute volume contraction from the s-map coefficient matrices}
+#'     \item{compute total variance from the s-map coefficient matrices}
 #'   }
 #' @param block a data.frame containing time series for the community. Each
 #'   column is a time series of abundances, and a `censusdate` column is used
@@ -107,6 +110,12 @@ compute_dynamic_stability <- function(block,
     results$svd_decomp <- compute_svd_decomp(results$smap_matrices)
   }
 
+  # check for volume contraction and total variance
+  if (is.null(results$volume_contraction) || is.null(results$total_variance)) {
+    results$volume_contraction <- compute_volume_contraction(results$smap_matrices)
+    results$total_variance <- compute_total_variance(results$smap_matrices)
+  }
+  
   if (!is.null(results_file)) {
     saveRDS(results, file = results_file)
   }
@@ -154,6 +163,8 @@ build_dynamic_stability_plan <- function(max_E = 16, E_list = seq(max_E),
     eigen_decomp = compute_eigen_decomp(smap_matrices),
     eigenvalues = eigen_decomp$values,
     eigenvectors = eigen_decomp$vectors, 
-    svd_decomp = compute_svd_decomp(smap_matrices)
+    svd_decomp = compute_svd_decomp(smap_matrices), 
+    volume_contraction = compute_volume_contraction(smap_matrices), 
+    total_variance = compute_total_variance(smap_matrices)
   )
 }

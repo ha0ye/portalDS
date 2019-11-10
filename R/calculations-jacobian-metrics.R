@@ -37,7 +37,7 @@ compute_eigen_decomp <- function(smap_matrices)
 #'   Note that this maps from the column vector [N(t) N(t-1) ... N(t-d)]^T to 
 #'   the column vector [N(t+1) N(t) ... N(t-(d-1))]^T. However, the only 
 #'   relevant components for our purposes are the rows which map the column 
-#'   vector [N(t) N(t-1) ... N(t-d)]^T to [N(t+1)]^T, let this be J^\prime.
+#'   vector [N(t) N(t-1) ... N(t-d)]^T to [N(t+1)]^T, let this be J_s.
 #'   
 #'   Thus, we extract this portion of the Jacobian for applying SVD.
 #' 
@@ -85,7 +85,10 @@ compute_svd_decomp <- function(smap_matrices, s = NULL)
 #' @title Compute volume contraction of the Jacobian matrics
 #' 
 #' @description We define the volume contraction as the rate at which an 
-#'   infinitesimal volume scales through the Jacobian.
+#'   infinitesimal volume scales through the Jacobian. This can be calculated 
+#'   as the determinant of the Jacobian (i.e. the product of the eigenvalues or 
+#'   singular values, which represent the scaling along various directions in 
+#'   the state space).
 #' 
 #' @details See [compute_svd_decomp()] for details on extracting the portion of 
 #'   the Jacobian used for calculating the determinant.
@@ -93,9 +96,9 @@ compute_svd_decomp <- function(smap_matrices, s = NULL)
 #'   We do this in order to account for the low-rank of the full Jacobian, which 
 #'   otherwise results in a determinant of 0.
 #'   
-#'   We then compute the pseudo-determinant as |det(J^\prime %*% t(J^\prime))|.
+#'   We then compute the pseudo-determinant as |det(J_s %*% t(J_s))|.
 #' @inheritParams compute_svd_decomp
-#' @return a Numeric vector of the determinants of the Jacobian
+#' @return a numeric vector of the volume contraction values
 #' 
 compute_volume_contraction <- function(smap_matrices, s = NULL)
 {
@@ -120,4 +123,47 @@ compute_volume_contraction <- function(smap_matrices, s = NULL)
     return(out)
   })
   return(vc_out)
+}
+
+#' @title Compute total variance of the Jacobian matrics
+#' 
+#' @description We define the total variance as the variance that results when 
+#'   applying the Jacobian to a point with zero mean and unit variance. This can 
+#'   be calculated as the trace of the Jacobian multiplied by its transpose. The 
+#'   diagonal elements then represent the variance of each dimension, with off-
+#'   diagonal elements being the covariance.
+#' 
+#' @details See [compute_svd_decomp()] for details on extracting the portion of 
+#'   the Jacobian used for calculating the determinant.
+#'   
+#'   We do this in order to account for the low-rank of the full Jacobian, which 
+#'   otherwise results in a determinant of 0.
+#'   
+#'   We then compute the pseudo-determinant as Tr(J_s %*% t(J_s)).
+#' @inheritParams compute_svd_decomp
+#' @return a numeric vector of the total variance values
+#' 
+compute_total_variance <- function(smap_matrices, s = NULL)
+{
+  if (is.null(s))
+  {
+    # find first full matrix
+    matrix_vars <- lapply(smap_matrices, rownames)
+    idx <- min(which(!vapply(matrix_vars, is.null, FALSE)))
+    
+    # compute s from rownames
+    regex_splits <- stringr::str_match(rownames(smap_matrices[[idx]]), "(.+)_(\\d+)")
+    s <- max(which(regex_splits[, 3] == "0"))
+  }
+  
+  tv_out <- purrr::map_dbl(smap_matrices, function(J) {
+    if (any(is.na(J))) {
+      return(NA_real_)
+    }
+    
+    J_lags_trimmed <- J[seq_len(s), ]
+    out <- sum(diag(J_lags_trimmed %*% t(J_lags_trimmed)))
+    return(out)
+  })
+  return(tv_out)
 }

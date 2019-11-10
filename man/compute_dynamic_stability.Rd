@@ -81,6 +81,9 @@ lags, and including the important interacting variables}
 \item{extract out the s-map coefficients from the models and assemble
 matrices for the system}
 \item{perform eigen-decomposition on the s-map coefficient matrices}
+\item{perform singular-value-decomposition on the s-map coefficient matrices}
+\item{compute volume contraction from the s-map coefficient matrices}
+\item{compute total variance from the s-map coefficient matrices}
 }
 
 \code{\link[=build_dynamic_stability_plan]{build_dynamic_stability_plan()}} creates a drake plan for the
