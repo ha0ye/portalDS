@@ -163,7 +163,7 @@ plot_smap_coeffs <- function(smap_matrices, base_size = 16,
     return(combined_plot)
 }
 
-#' @title plot_eigenvalues
+#' @title Plot eigenvalues of the S-map (coefficient) matrices
 #' @aliases plot_svd_values
 #' @description [plot_eigenvalues()] visualizes the dominant eigenvalue(s) from 
 #'   running the S-map model on the community time series
@@ -243,6 +243,62 @@ plot_svd_values <- function(singular_values, num_values = 1,
     
     if (!is.null(plot_file)) {  cowplot::ggsave(plot_file, my_plot, width = width, height = height)  }
     return(my_plot)
+}
+
+#' @title Plot numerical metrics computed on the S-map (coefficient) matrices
+#' @aliases plot_volume_contraction, plot_total_variance
+#' @param indicator_values a vector of the numerical metric. It is expected 
+#'   that the names are coerciable into Date format
+#' @param y_label The label for the y-axis of the resulting plot
+#' @inheritParams plot_eigenvalues
+#'
+#' @return A ggplot object of the plot
+#'
+#' @export
+plot_indicator_values <- function(indicator_values, 
+                                  y_label = "Volume Contraction", 
+                                  line_size = 1,
+                                  base_size = 16,
+                                  plot_file = NULL, width = 6, height = NULL)
+{
+    values_dist <- indicator_values %>%
+        tibble::enframe(name = "date", value = "value") %>%
+        dplyr::mutate_at("date", as.Date)
+    
+    my_plot <- ggplot(values_dist, 
+                      aes(x = date, y = .data$value)) +
+        geom_line(size = line_size) +
+        labs(x = NULL, y = y_label) +
+        my_theme(base_size = base_size)
+
+    if (!is.null(plot_file)) {  cowplot::ggsave(plot_file, my_plot, width = width, height = height)  }
+    return(my_plot)
+}
+
+#' @rdname plot_indicator_values
+#' @description [plot_volume_contraction()] is a thin wrapper around 
+#'   [plot_indicator_values()], specificying the y-axis label
+#'   
+#' @export
+plot_volume_contraction <- function(volume_contraction, 
+                                    ...)
+{
+    plot_indicator_values(indicator_values = volume_contraction, 
+                          y_label = "Volume Contraction", 
+                          ...)
+}
+
+#' @rdname plot_indicator_values
+#' @description [plot_total_variance()] is a thin wrapper around 
+#'   [plot_indicator_values()], specificying the y-axis label
+#'   
+#' @export
+plot_total_variance <- function(total_variance, 
+                                ...)
+{
+    plot_indicator_values(indicator_values = total_variance, 
+                          y_label = "Total Variance", 
+                          ...)
 }
 
 #' @title Plot time-varying vector components

@@ -87,3 +87,17 @@ plot_svd_values(results$svd_decomp$d,
 plot_svd_vectors(results$svd_decomp$u) %>% 
     add_regime_shift_highlight()
 ```
+
+## Volume contraction and total variance
+
+```{r}
+plot_volume_contraction(results$volume_contraction) %>%
+  add_regime_shift_highlight()
+```
+
+```{r}
+plot_total_variance(results$total_variance) %>%
+  add_regime_shift_highlight()
+```
+
+

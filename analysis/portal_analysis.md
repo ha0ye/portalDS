@@ -1,7 +1,7 @@
 Portal Dynamic Stability Analysis
 ================
 Hao Ye
-2019-11-05
+2019-11-10
 
 # Introduction
 
@@ -64,15 +64,19 @@ computed.
 results_file <- here::here("output/portal_ds_results_50.RDS")
 results <- compute_dynamic_stability(block, results_file)
 str(results, max.level = 1)
-#> List of 8
-#>  $ block          :Classes 'tbl_df', 'tbl' and 'data.frame': 440 obs. of  8 variables:
-#>  $ simplex_results:Classes 'tbl_df', 'tbl' and 'data.frame': 7 obs. of  5 variables:
-#>  $ ccm_results    :'data.frame': 88641 obs. of  9 variables:
-#>  $ smap_matrices  :List of 440
-#>  $ ccm_links      :Classes 'tbl_df', 'tbl' and 'data.frame': 35 obs. of  5 variables:
-#>  $ svd_decomp     :List of 3
-#>  $ eigenvalues    :List of 440
-#>  $ eigenvectors   :List of 440
+#> List of 10
+#>  $ block             :Classes 'tbl_df', 'tbl' and 'data.frame':  440 obs. of  8 variables:
+#>  $ simplex_results   :Classes 'tbl_df', 'tbl' and 'data.frame':  7 obs. of  5 variables:
+#>  $ ccm_results       :'data.frame':  88641 obs. of  9 variables:
+#>  $ smap_matrices     :List of 440
+#>  $ ccm_links         :Classes 'tbl_df', 'tbl' and 'data.frame':  35 obs. of  5 variables:
+#>  $ svd_decomp        :List of 3
+#>  $ eigenvalues       :List of 440
+#>  $ eigenvectors      :List of 440
+#>  $ volume_contraction: Named num [1:440] NA NA NA NA NA NA NA NA NA NA ...
+#>   ..- attr(*, "names")= chr [1:440] "1979-09-22" "1979-10-24" "1979-11-17" "1979-12-16" ...
+#>  $ total_variance    : Named num [1:440] NA NA NA NA NA NA NA NA NA NA ...
+#>   ..- attr(*, "names")= chr [1:440] "1979-09-22" "1979-10-24" "1979-11-17" "1979-12-16" ...
 ```
 
 # Results
@@ -124,3 +128,21 @@ plot_svd_vectors(results$svd_decomp$u) %>%
 ```
 
 ![](portal_analysis_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+## Volume contraction and total variance
+
+``` r
+plot_volume_contraction(results$volume_contraction) %>%
+  add_regime_shift_highlight()
+#> Warning: Removed 11 rows containing missing values (geom_path).
+```
+
+![](portal_analysis_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+``` r
+plot_total_variance(results$total_variance) %>%
+  add_regime_shift_highlight()
+#> Warning: Removed 11 rows containing missing values (geom_path).
+```
+
+![](portal_analysis_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->

@@ -3,7 +3,7 @@
 \name{plot_eigenvalues}
 \alias{plot_eigenvalues}
 \alias{plot_svd_values}
-\title{plot_eigenvalues}
+\title{Plot eigenvalues of the S-map (coefficient) matrices}
 \usage{
 plot_eigenvalues(eigenvalues, num_values = 1, id_var = "censusdate",
   highlight_complex = FALSE, line_size = 1, base_size = 16,

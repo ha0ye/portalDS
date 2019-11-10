@@ -98,8 +98,10 @@ compute_svd_decomp <- function(smap_matrices, s = NULL)
 #'   
 #'   We then compute the pseudo-determinant as |det(J_s %*% t(J_s))|.
 #' @inheritParams compute_svd_decomp
+#' 
 #' @return a numeric vector of the volume contraction values
 #' 
+#' @export
 compute_volume_contraction <- function(smap_matrices, s = NULL)
 {
   if (is.null(s))
@@ -141,8 +143,10 @@ compute_volume_contraction <- function(smap_matrices, s = NULL)
 #'   
 #'   We then compute the pseudo-determinant as Tr(J_s %*% t(J_s)).
 #' @inheritParams compute_svd_decomp
+#' 
 #' @return a numeric vector of the total variance values
 #' 
+#' @export
 compute_total_variance <- function(smap_matrices, s = NULL)
 {
   if (is.null(s))
