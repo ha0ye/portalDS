@@ -8,7 +8,7 @@ compute_eigen_decomp(smap_matrices)
 }
 \arguments{
 \item{smap_matrices}{A list with the Jacobian matrix (of smap-coefficients)
-at each time point, resulting from \code{\link{compute_smap_matrices}}}
+at each time point, resulting from \code{\link[=compute_smap_matrices]{compute_smap_matrices()}}}
 }
 \value{
 A list with two elements:

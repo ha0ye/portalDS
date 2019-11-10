@@ -1,7 +1,7 @@
 #' @title Compute eigen-decompositions of the Jacobian matrices
 #' 
 #' @param smap_matrices A list with the Jacobian matrix (of smap-coefficients) 
-#'   at each time point, resulting from \code{\link{compute_smap_matrices}}
+#'   at each time point, resulting from [compute_smap_matrices()]
 #' @return A list with two elements:
 #'   \describe{
 #'     \item{`values`}{a list of the eigenvalues (a vector) for each time point}
@@ -25,8 +25,8 @@ compute_eigen_decomp <- function(smap_matrices)
 
 #' @title Compute singular value decompositions of the Jacobian matrics
 #' 
-#' @details The full Jacobian resulting from \code{\link{compute_smap_matrices}}
-#'   is of the form, J = 
+#' @details The full Jacobian resulting from [compute_smap_matrices()] is of 
+#'   the form, J = 
 #'   \tabular{rrrrr}{
 #'     C^0 \tab C^1 \tab ... \tab C^(d-1) \tab C^d\cr
 #'       I \tab   0 \tab ... \tab       0 \tab   0\cr
@@ -36,10 +36,10 @@ compute_eigen_decomp <- function(smap_matrices)
 #'    }
 #'   Note that this maps from the column vector [N(t) N(t-1) ... N(t-d)]^T to 
 #'   the column vector [N(t+1) N(t) ... N(t-(d-1))]^T. However, the only 
-#'   relevant componets for our purposes are the rows which map the column 
-#'   vector [N(t) N(t-1) ... N(t-d)]^T to [N(t+1)]^T.
+#'   relevant components for our purposes are the rows which map the column 
+#'   vector [N(t) N(t-1) ... N(t-d)]^T to [N(t+1)]^T, let this be J^\prime.
 #'   
-#'   Thus, we extract this portion of the Jacobian for applying SVD
+#'   Thus, we extract this portion of the Jacobian for applying SVD.
 #' 
 #' @inheritParams compute_eigen_decomp
 #' @param s the number of species in the system (optional parameter to restrict 
@@ -82,18 +82,42 @@ compute_svd_decomp <- function(smap_matrices, s = NULL)
   return(purrr::transpose(svd_out, .names = c("d", "u", "v")))
 }
 
-# compute_volume_contraction <- function(eigenvalues, )
-# {
-#   {
-#     vc_out <- purrr::map(eigenvalues, function(lambda) {
-#       if (any(is.na(lambda))) {
-#         return(NA)
-#       }
-#       out <- svd(J
-#       rownames(out$vectors) <- rownames(J)
-#       return(out)
-#     })
-#     return(purrr::transpose(svd_out, .names = c("d", "u", "v")))
-#   }
-#   
-# }
+#' @title Compute volume contraction of the Jacobian matrics
+#' 
+#' @description We define the volume contraction as the rate at which an 
+#'   infinitesimal volume scales through the Jacobian.
+#' 
+#' @details See [compute_svd_decomp()] for details on extracting the portion of 
+#'   the Jacobian used for calculating the determinant.
+#'   
+#'   We do this in order to account for the low-rank of the full Jacobian, which 
+#'   otherwise results in a determinant of 0.
+#'   
+#'   We then compute the pseudo-determinant as |det(J^\prime %*% t(J^\prime))|.
+#' @inheritParams compute_svd_decomp
+#' @return a Numeric vector of the determinants of the Jacobian
+#' 
+compute_volume_contraction <- function(smap_matrices, s = NULL)
+{
+  if (is.null(s))
+  {
+    # find first full matrix
+    matrix_vars <- lapply(smap_matrices, rownames)
+    idx <- min(which(!vapply(matrix_vars, is.null, FALSE)))
+    
+    # compute s from rownames
+    regex_splits <- stringr::str_match(rownames(smap_matrices[[idx]]), "(.+)_(\\d+)")
+    s <- max(which(regex_splits[, 3] == "0"))
+  }
+  
+  vc_out <- purrr::map_dbl(smap_matrices, function(J) {
+    if (any(is.na(J))) {
+      return(NA_real_)
+    }
+    
+    J_lags_trimmed <- J[seq_len(s), ]
+    out <- sqrt(det(J_lags_trimmed %*% t(J_lags_trimmed)))
+    return(out)
+  })
+  return(vc_out)
+}

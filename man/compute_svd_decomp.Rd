@@ -8,7 +8,7 @@ compute_svd_decomp(smap_matrices, s = NULL)
 }
 \arguments{
 \item{smap_matrices}{A list with the Jacobian matrix (of smap-coefficients)
-at each time point, resulting from \code{\link{compute_smap_matrices}}}
+at each time point, resulting from \code{\link[=compute_smap_matrices]{compute_smap_matrices()}}}
 
 \item{s}{the number of species in the system (optional parameter to restrict
 the analysis just to the portions of the Jacobian that are relevant for the
@@ -28,8 +28,8 @@ is an axis in the input space) for each time point}
 Compute singular value decompositions of the Jacobian matrics
 }
 \details{
-The full Jacobian resulting from \code{\link{compute_smap_matrices}}
-is of the form, J =
+The full Jacobian resulting from \code{\link[=compute_smap_matrices]{compute_smap_matrices()}} is of
+the form, J =
 \tabular{rrrrr}{
 C^0 \tab C^1 \tab ... \tab C^(d-1) \tab C^d\cr
 I \tab   0 \tab ... \tab       0 \tab   0\cr
@@ -39,8 +39,8 @@ I \tab   0 \tab ... \tab       0 \tab   0\cr
 }
 Note that this maps from the column vector \link{N(t) N(t-1) ... N(t-d)}^T to
 the column vector \link{N(t+1) N(t) ... N(t-(d-1))}^T. However, the only
-relevant componets for our purposes are the rows which map the column
-vector \link{N(t) N(t-1) ... N(t-d)}^T to \link{N(t+1)}^T.
+relevant components for our purposes are the rows which map the column
+vector \link{N(t) N(t-1) ... N(t-d)}^T to \link{N(t+1)}^T, let this be J^\prime.
 
-Thus, we extract this portion of the Jacobian for applying SVD
+Thus, we extract this portion of the Jacobian for applying SVD.
 }
