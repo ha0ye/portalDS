@@ -13,7 +13,7 @@ test_that("check full dynamic stability plan using block_3sp example data", {
     "ccm_results", "ccm_links",
     "smap_coeffs", "smap_matrices",
     "eigen_decomp", "eigenvalues", "eigenvectors", 
-    "svd_decomp"
+    "svd_decomp", "volume_contraction", "total_variance"
   )
 
   # check plan
@@ -31,14 +31,13 @@ test_that("check full dynamic stability plan using block_3sp example data", {
   seq_along(targets),
   check.names = FALSE
   )
-  expect_known_hash(as.character(my_plan$command), "3cd57e66a2")
+  expect_known_hash(as.character(my_plan$command), "c9df706f3a")
 })
 
 test_that("running full dynamic stability plan using block_3sp example data", {
   data("block_3sp", package = "rEDM")
-  block <- setNames(
-    block_3sp[, c("time", "x_t", "y_t", "z_t")],
-    c("censusdate", "x", "y", "z")
+  block <- setNames(block_3sp[, c("time", "x_t", "y_t", "z_t")],
+                    c("censusdate", "x", "y", "z")
   )
   targets <- c(
     "simplex_results",
@@ -57,14 +56,15 @@ test_that("running full dynamic stability plan using block_3sp example data", {
   )
 
   # run plan
+  my_cache <- drake::drake_cache(path = tempdir())
   future::plan(future.callr::callr)
   drake::clean(destroy = TRUE)
-  expect_error(drake::make(my_plan, seed = 42), NA)
+  expect_error(drake::make(my_plan, seed = 42, cache = my_cache), NA)
 
   # inspect targets and check seed
-  expect_error(drake::loadd(), NA)
+  expect_error(drake::loadd(cache = my_cache), NA)
   expect_true(all(targets %in% ls()))
-  expect_equal(diagnose(simplex_results)$seed, 616382247)
+  expect_equal(drake::diagnose(simplex_results, cache = my_cache)$seed, 616382247)
 
   # check targets
   simplex_results$simplex_out <- lapply(simplex_results$simplex_out, round, 4)
