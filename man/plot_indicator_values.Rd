@@ -31,6 +31,10 @@ default), then the plot is not saved to a file}
 \item{width}{width of the saved plot}
 
 \item{height}{height of the saved plot}
+
+\item{volume_contraction}{the volume contraction values to plot}
+
+\item{total_variance}{the total variance values to plot}
 }
 \value{
 A ggplot object of the plot

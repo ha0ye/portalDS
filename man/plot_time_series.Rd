@@ -15,7 +15,7 @@ column is a time series of abundances.}
 which could be a numeric or a date/time type}
 
 \item{scale}{How to scale the time series:
-\code{unif} -- scale each time series to be on \link{0, 1}
+\code{unif} -- scale each time series to be on [0, 1]
 \code{norm} -- scale each time series to have mean 0 and variance 1
 (anything else) -- no scaling}
 

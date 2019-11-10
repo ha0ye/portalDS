@@ -278,7 +278,8 @@ plot_indicator_values <- function(indicator_values,
 #' @rdname plot_indicator_values
 #' @description [plot_volume_contraction()] is a thin wrapper around 
 #'   [plot_indicator_values()], specificying the y-axis label
-#'   
+#' @param volume_contraction the volume contraction values to plot
+#' 
 #' @export
 plot_volume_contraction <- function(volume_contraction, 
                                     ...)
@@ -291,7 +292,8 @@ plot_volume_contraction <- function(volume_contraction,
 #' @rdname plot_indicator_values
 #' @description [plot_total_variance()] is a thin wrapper around 
 #'   [plot_indicator_values()], specificying the y-axis label
-#'   
+#' @param total_variance the total variance values to plot
+#' 
 #' @export
 plot_total_variance <- function(total_variance, 
                                 ...)
@@ -393,7 +395,7 @@ plot_svd_vectors <- function(svd_vectors, num_values = 1,
 #' @param time_column The name of the column in the block that has the time,
 #'   which could be a numeric or a date/time type
 #' @param scale How to scale the time series:
-#'   `unif` -- scale each time series to be on [0, 1]
+#'   `unif` -- scale each time series to be on \[0, 1\]
 #'   `norm` -- scale each time series to have mean 0 and variance 1
 #'   (anything else) -- no scaling
 #' @inheritParams ggplot2::theme_bw
