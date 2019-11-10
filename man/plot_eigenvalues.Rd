@@ -21,7 +21,7 @@ from the matrix of the s-map coefficients at that time step}
 
 \item{num_values}{the number of eigenvalues to plot}
 
-\item{id_var}{when constructing the long-format tibble,what should be the 
+\item{id_var}{when constructing the long-format tibble,what should be the
 variable name containing the time index}
 
 \item{highlight_complex}{whether to also draw points to indicate when the
@@ -31,7 +31,7 @@ dominant eigenvalue is complex}
 
 \item{base_size}{the base font size}
 
-\item{plot_file}{the filepath to where to save the plot; if `NULL` (the
+\item{plot_file}{the filepath to where to save the plot; if \code{NULL} (the
 default), then the plot is not saved to a file}
 
 \item{width}{width of the saved plot}
@@ -47,9 +47,9 @@ from the matrix of the s-map coefficients at that time step}
 A ggplot object of the plot
 }
 \description{
-`plot_eigenvalues()` visualizes the dominant eigenvalue(s) from 
-  running the S-map model on the community time series
+\code{\link[=plot_eigenvalues]{plot_eigenvalues()}} visualizes the dominant eigenvalue(s) from
+running the S-map model on the community time series
 
-`plot_svd_values()` visualizes the dominant singular value(s) 
-  from running the S-map model on the community time series
+\code{\link[=plot_svd_values]{plot_svd_values()}} visualizes the dominant singular value(s)
+from running the S-map model on the community time series
 }

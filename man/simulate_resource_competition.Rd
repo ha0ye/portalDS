@@ -41,21 +41,21 @@ sim_resource_competition_12sp(params = list(r = rep.int(1, 12), m =
 
 \item{sample_times}{the time values at which to make observations}
 
-\item{...}{remaining arguments to be passed to \code{\link[deSolve]{ode}}}
+\item{...}{remaining arguments to be passed to \code{\link[deSolve:ode]{deSolve::ode()}}}
 
 \item{events}{the data.frame describing the introductions of later species}
 }
 \value{
-a matrix (and `deSolve`) object with the observations (and times)
+a matrix (and \code{deSolve}) object with the observations (and times)
 }
 \description{
 Simulate time series from the resource competition model of
-  Huisman & Weissing (1999) <\url{https://doi.org/10.1038/46540}>. The
-  initial state, parameters, and perturbations are for the 5-species system
-  competing on 3 resources as described in Huisman & Weissing (2001)
-  <\url{https://doi.org/10.1086/319929}>.
+Huisman & Weissing (1999) <\url{https://doi.org/10.1038/46540}>. The
+initial state, parameters, and perturbations are for the 5-species system
+competing on 3 resources as described in Huisman & Weissing (2001)
+<\url{https://doi.org/10.1086/319929}>.
 
-`simulate_resource_competition_12sp()` is a simulation with the same
-  structure, but is the 12-species system competing on 5 resources, with
-  introductions of species 6-12 at later times.
+\code{\link[=simulate_resource_competition_12sp]{simulate_resource_competition_12sp()}} is a simulation with the same
+structure, but is the 12-species system competing on 5 resources, with
+introductions of species 6-12 at later times.
 }

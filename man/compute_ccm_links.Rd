@@ -8,11 +8,11 @@ compute_ccm_links(ccm_results, null_quantile = 0.975,
   delta_rho_threshold = 0.1)
 }
 \arguments{
-\item{ccm_results}{the output from `compute_ccm` that we generate the links
+\item{ccm_results}{the output from \code{\link[=compute_ccm]{compute_ccm()}} that we generate the links
 for}
 
 \item{null_quantile}{the quantile of the surrogate which we desire the actual
-ccm rho to exceed (the default value of `0.975` corresponds to the upper
+ccm rho to exceed (the default value of \code{0.975} corresponds to the upper
 cutoff of a 95\% CI)}
 
 \item{delta_rho_threshold}{the absolute increase which we desire the actual
@@ -21,16 +21,16 @@ sizes}
 }
 \value{
 A tibble with the filtered significant links, along with the values
-  of the test statistics that were computed (`delta_rho` and
-  `rho_minus_upper_q_null`)
+of the test statistics that were computed (\code{delta_rho} and
+\code{rho_minus_upper_q_null})
 }
 \description{
-Using the output of \code{\link{compute_ccm}}, determine which
-  links are significant. Significant links (`x`` "causes" `y``) are where:
-  \itemize{
-    \item ccm rho for the actual time series `x` and `y`` is greater than the
-      `null_quantile` level of the surrogate data (at the largest library size)
-    \item the increase in rho for the actual time series `x`` and `y`` between the
-      smallest and largest library sizes is greater than `delta_rho_threshold`
-  }
+Using the output of \code{\link[=compute_ccm]{compute_ccm()}}, determine which
+links are significant. Significant links (\code{x} "causes" \code{y}) are where:
+\itemize{
+\item ccm rho for the actual time series \code{x} and \code{y} is greater than the
+\code{null_quantile} level of the surrogate data (at the largest library size)
+\item the increase in rho for the actual time series \code{x} and \code{y} between the
+smallest and largest library sizes is greater than \code{delta_rho_threshold}
+}
 }

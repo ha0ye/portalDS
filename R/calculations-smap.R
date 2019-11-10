@@ -1,10 +1,10 @@
 #' @title Compute S-map coefficients for a given target variable
 #' @description This function is meant to be called from within
-#'   \code{\link{compute_smap_coeffs}}, which also pre-generates the block so
-#'   that the first variable is to be predicted, and the remaining columns are
-#'   the causal variables and lags of the predicted variable. This function
-#'   searches over the values of theta for the best fit (by lowest MAE), and then
-#'   returns the data.frame with the s-map coefficients
+#'   [compute_smap_coeffs()], which also pre-generates the block so that the 
+#'   first variable is to be predicted, and the remaining columns are the causal 
+#'   variables and lags of the predicted variable. This function searches over 
+#'   the values of theta for the best fit (by lowest MAE), and then returns the 
+#'   data.frame with the s-map coefficients
 #' @param block the input data with time delays already generated
 #' @inheritParams rEDM::block_lnlp
 #'
@@ -178,7 +178,7 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
 #' @title Generate the matrices of S-map coefficients
 #' @description Using the S-map coefficients, assemble the appropriate
 #'   Jacobian matrices for each time point
-#' @details See \code{\link{compute_smap_coeffs}} for details on the input data.
+#' @details See [compute_smap_coeffs()] for details on the input data.
 #'   Let the variables in the system be x^{i} with i = 1..N.
 #'   For the S-map model predicting x^{i}_{t+1}, let the coefficient
 #'   corresponding to variable x^{j} at lag tau be c^{tau}_{ij}.
@@ -195,7 +195,7 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
 #'
 #'   This function computes J at each time step.
 #' @param smap_coeffs A list of the S-map coefficients for each predictor
-#'   variable (as returned from \code{\link{compute_smap_coeffs}}
+#'   variable (as returned from [compute_smap_coeffs()])
 #' @param ccm_links A data.frame containing the significant causal links. Each
 #'   row is a causal link. The columns are:
 #'   \describe{

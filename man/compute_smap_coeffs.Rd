@@ -14,9 +14,9 @@ column is a time series of abundances.}
 \item{ccm_links}{A data.frame containing the significant causal links. Each
 row is a causal link. The columns are:
 \describe{
-\item{`xmap_from`}{the column index of the predictor variable in CCM}
-\item{`xmap_to`}{the column index of the predicted variable in CCM}
-\item{`best_E`}{the best embedding dimension for CCM}
+\item{\code{xmap_from}}{the column index of the predictor variable in CCM}
+\item{\code{xmap_to}}{the column index of the predicted variable in CCM}
+\item{\code{best_E}}{the best embedding dimension for CCM}
 }}
 
 \item{rescale}{A logical, indicating whether to rescale each time series}
@@ -26,24 +26,24 @@ rolling forecasts for the second half of the time series.}
 }
 \value{
 A list with the matrix smap-coefficients for each predictor variable
-  identified in CCM (these are the affected variables). The names in the list
-  and the column names of the matrices use the variable names in the block.
+identified in CCM (these are the affected variables). The names in the list
+and the column names of the matrices use the variable names in the block.
 }
 \description{
-Compute S-map models for each time series in the `block` and
-  save out the coefficients. The coefficients represent the local linear
-  model and can be used to infer properties of the system dynamics.
+Compute S-map models for each time series in the \code{block} and
+save out the coefficients. The coefficients represent the local linear
+model and can be used to infer properties of the system dynamics.
 }
 \details{
 Suppose that there are causal links as follows:
-  `x --> y`
-  `x --> z`
-  where `-->` indicates "cross-maps to". Then the interpretation from CCM is
-  that `x` is affected by causes `y` and `z`. Thus, the predictive model for
-  `x` should include `y` and `z` as predictors.
+\code{x --> y}
+\code{x --> z}
+where \code{-->} indicates "cross-maps to". Then the interpretation from CCM is
+that \code{x} is affected by causes \code{y} and \code{z}. Thus, the predictive model for
+\code{x} should include \code{y} and \code{z} as predictors.
 
-  The S-map model is then setup as
-  x_{t+1} = F(x_t, y_t, z_t, x_{t-1}, x_{t-2}, ...)
-  where the number of predictors is equal to the best embedding dimension for
-  `x`.
+The S-map model is then setup as
+x_{t+1} = F(x_t, y_t, z_t, x_{t-1}, x_{t-2}, ...)
+where the number of predictors is equal to the best embedding dimension for
+\code{x}.
 }

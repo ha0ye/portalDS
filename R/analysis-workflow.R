@@ -1,6 +1,6 @@
-#' @title compute_dynamic_stability
-#' @description `compute_dynamic_stability` runs the full dynamic stability
-#'   analysis for community time series. The analysis has multiple steps:
+#' @title Dynamic stability analysis for community time series
+#' @description [compute_dynamic_stability()] runs the full dynamic stability
+#'   analysis. The analysis has multiple steps:
 #'   \enumerate{
 #'     \item{run simplex projection on each time series to identify the optimal
 #'       embedding dimension}
@@ -115,7 +115,7 @@ compute_dynamic_stability <- function(block,
 
 #' @rdname compute_dynamic_stability
 #' @title Create a drake plan for dynamic stability analysis
-#' @description `build_dynamic_stability_plan` creates a drake plan for the
+#' @description [build_dynamic_stability_plan()] creates a drake plan for the
 #'   dynamic stability analysis.
 
 #' @inheritParams compute_dynamic_stability

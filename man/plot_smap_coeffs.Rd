@@ -15,7 +15,7 @@ that time step}
 
 \item{base_size}{the base font size}
 
-\item{plot_file}{the filepath to where to save the plot; if `NULL` (the
+\item{plot_file}{the filepath to where to save the plot; if \code{NULL} (the
 default), then the plot is not saved to a file}
 
 \item{width}{width of the saved plot}
@@ -27,5 +27,5 @@ A ggplot object of the smap coefficients plot
 }
 \description{
 Visualize the smap-coefficients from running the S-map model on
-  the community time series as part of the dynamic stability analysis
+the community time series as part of the dynamic stability analysis
 }

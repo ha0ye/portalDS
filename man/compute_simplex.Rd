@@ -17,7 +17,7 @@ search over.}
 
 \item{surrogate_method}{which surrogate method to use:
 options are "annual_spline" or methods available in
-\code{\link[rEDM]{make_surrogate_data}}}
+\code{\link[rEDM:make_surrogate_data]{rEDM::make_surrogate_data()}}}
 
 \item{num_surr}{number of surrogates to compute}
 
@@ -26,12 +26,12 @@ surrogate data function}
 }
 \value{
 A tibble with columns for the species name (taken from the original
-  column names), the abundance time series for each species, the output from
-  \code{\link[rEDM]{simplex}}, the best embedding dimension, as determined by 
-  the E that minimizes MAE, and surrogate time series
+column names), the abundance time series for each species, the output from
+\code{\link[rEDM:simplex]{rEDM::simplex()}}, the best embedding dimension, as determined by
+the E that minimizes MAE, and surrogate time series
 }
 \description{
 Run simplex projection models for each time series in the
-  `block` and save the output, to determine the best embedding dimension for
-  each column.
+\code{block} and save the output, to determine the best embedding dimension for
+each column.
 }

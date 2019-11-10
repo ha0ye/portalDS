@@ -1,14 +1,14 @@
 #' @title Run CCM on each pair of time series
-#' @description `compute_ccm` runs pairwise CCM based on the simplex_output -
-#'   using the best embedding dimension from the simplex results, and computed
-#'   for both the real data and the surrogate data. The calculations run using
-#'   \code{\link[furrr]{future_pmap}}. Thus, parallelization should be set by
-#'   the user, if desired, using \code{\link[future]{plan}}, prior to running.
-#' @param simplex_results the output of \code{\link{compute_simplex}}
+#' @description Runs pairwise CCM based on the simplex_output - using the best 
+#'   embedding dimension from the simplex results, and computed for both the 
+#'   real data and the surrogate data. The calculations run using
+#'   [furrr::future_pmap()]. Thus, parallelization should be set by the user, 
+#'   if desired, using [future::plan()], prior to running.
+#' @param simplex_results the output of [compute_simplex()]
 #' @inheritParams rEDM::ccm
-#' @return `compute_ccm` returns a tibble with columns for the variables that we
-#'   use in CCM, the data type (whether it's the "actual" time series or
-#'   "surrogate"), the library size, and the results from CCM
+#' @return A tibble with columns for the variables that we use in CCM, the data 
+#'   type (whether it's the "actual" time series or "surrogate"), the library 
+#'   size, and the results from CCM
 #'
 #' @export
 compute_ccm <- function(simplex_results,
@@ -68,15 +68,15 @@ compute_ccm <- function(simplex_results,
 }
 
 #' @title Identify the significant CCM links
-#' @description Using the output of \code{\link{compute_ccm}}, determine which
-#'   links are significant. Significant links (`x`` "causes" `y``) are where:
+#' @description Using the output of [compute_ccm()], determine which
+#'   links are significant. Significant links (`x` "causes" `y`) are where:
 #'   \itemize{
-#'     \item ccm rho for the actual time series `x` and `y`` is greater than the
+#'     \item ccm rho for the actual time series `x` and `y` is greater than the
 #'       `null_quantile` level of the surrogate data (at the largest library size)
-#'     \item the increase in rho for the actual time series `x`` and `y`` between the
+#'     \item the increase in rho for the actual time series `x` and `y` between the
 #'       smallest and largest library sizes is greater than `delta_rho_threshold`
 #'   }
-#' @param ccm_results the output from `compute_ccm` that we generate the links
+#' @param ccm_results the output from [compute_ccm()] that we generate the links
 #'   for
 #' @param null_quantile the quantile of the surrogate which we desire the actual
 #'   ccm rho to exceed (the default value of `0.975` corresponds to the upper

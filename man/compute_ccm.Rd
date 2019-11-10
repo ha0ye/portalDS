@@ -9,7 +9,7 @@ compute_ccm(simplex_results, lib_sizes = seq(10, 100, by = 10),
   RNGseed = 42, silent = TRUE)
 }
 \arguments{
-\item{simplex_results}{the output of \code{\link{compute_simplex}}}
+\item{simplex_results}{the output of \code{\link[=compute_simplex]{compute_simplex()}}}
 
 \item{lib_sizes}{the vector of library sizes to try}
 
@@ -26,14 +26,14 @@ reproducible runs of ccm with randomly generated libraries}
 \item{silent}{prevents warning messages from being printed to the R console}
 }
 \value{
-`compute_ccm` returns a tibble with columns for the variables that we
-  use in CCM, the data type (whether it's the "actual" time series or
-  "surrogate"), the library size, and the results from CCM
+A tibble with columns for the variables that we use in CCM, the data
+type (whether it's the "actual" time series or "surrogate"), the library
+size, and the results from CCM
 }
 \description{
-`compute_ccm` runs pairwise CCM based on the simplex_output -
-  using the best embedding dimension from the simplex results, and computed
-  for both the real data and the surrogate data. The calculations run using
-  \code{\link[furrr]{future_pmap}}. Thus, parallelization should be set by
-  the user, if desired, using \code{\link[future]{plan}}, prior to running.
+Runs pairwise CCM based on the simplex_output - using the best
+embedding dimension from the simplex results, and computed for both the
+real data and the surrogate data. The calculations run using
+\code{\link[furrr:future_pmap]{furrr::future_pmap()}}. Thus, parallelization should be set by the user,
+if desired, using \code{\link[future:plan]{future::plan()}}, prior to running.
 }

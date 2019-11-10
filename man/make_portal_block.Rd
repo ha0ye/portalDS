@@ -13,7 +13,7 @@ make_portal_block(path = portalr::get_default_data_path(),
 "repo", which then pulls data from the PortalData GitHub repository}
 
 \item{filter_q}{the numerical quantile by which to filter species. Only
-species that are present at least `filter_q` fraction of the time are
+species that are present at least \code{filter_q} fraction of the time are
 included; default (NULL) keeps all species.}
 
 \item{output}{specify whether to return "abundance", or "biomass", or
@@ -26,10 +26,10 @@ treatment for the entire time series)}
 \item{...}{arguments passed to \code{\link{summarize_rodent_data}}}
 }
 \value{
-a data.frame with columns for `censusdate`, and each species
+a data.frame with columns for \code{censusdate}, and each species
 }
 \description{
 Create a data.frame from the Portal rodent data with specified
-  arguments, each row corresponds to a newmmoonnumber, and missing data are
-  interpolated.
+arguments, each row corresponds to a newmmoonnumber, and missing data are
+interpolated.
 }

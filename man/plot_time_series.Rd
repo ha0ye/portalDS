@@ -15,12 +15,12 @@ column is a time series of abundances.}
 which could be a numeric or a date/time type}
 
 \item{scale}{How to scale the time series:
-`unif` -- scale each time series to be on [0, 1]
-`norm` -- scale each time series to have mean 0 and variance 1
+\code{unif} -- scale each time series to be on \link{0, 1}
+\code{norm} -- scale each time series to have mean 0 and variance 1
 (anything else) -- no scaling}
 
-\item{palette_option}{the color palette to use (see \code{\link[viridis]{viridis}}
-for more info)}
+\item{palette_option}{the color palette to use (see \code{\link[viridis:viridis]{viridis::viridis()}} for
+more info)}
 
 \item{line_size}{the line width for the plot}
 
@@ -30,6 +30,6 @@ for more info)}
 A ggplot object of the time series plot
 }
 \description{
-plot the time series in `block`, using the appropriate rescaling
-  of the data
+plot the time series in \code{block}, using the appropriate rescaling
+of the data
 }

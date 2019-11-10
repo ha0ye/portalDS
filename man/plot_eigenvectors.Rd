@@ -21,21 +21,21 @@ eigenvectors, in descending order according to the eigenvalues}
 
 \item{num_values}{the number of eigenvectors to plot}
 
-\item{id_var}{when constructing the long-format tibble,what should be the 
+\item{id_var}{when constructing the long-format tibble,what should be the
 variable name containing the time index}
 
 \item{add_IPR}{whether to also plot the Inverse Participation Ratio, a
 numerical quantity that measures how evenly the different components
 contribute to the eigenvector}
 
-\item{palette_option}{the color palette to use (see \code{\link[viridis]{viridis}}
-for more info)}
+\item{palette_option}{the color palette to use (see \code{\link[viridis:viridis]{viridis::viridis()}} for
+more info)}
 
 \item{line_size}{the line width for the plot}
 
 \item{base_size}{the base font size}
 
-\item{plot_file}{the filepath to where to save the plot; if `NULL` (the
+\item{plot_file}{the filepath to where to save the plot; if \code{NULL} (the
 default), then the plot is not saved to a file}
 
 \item{width}{width of the saved plot}
@@ -51,9 +51,9 @@ the SVD vectors, in descending order according to the singular values}
 A ggplot object of the plot
 }
 \description{
-`plot_eigenvectors()` visualizes the dominant eigenvector(s) 
-  from running the S-map model on the community time series
+\code{\link[=plot_eigenvectors]{plot_eigenvectors()}} visualizes the dominant eigenvector(s)
+from running the S-map model on the community time series
 
-`plot_svd_vectors()` visualizes the dominant SVD vector(s) 
-  from running the S-map model on the community time series
+\code{\link[=plot_svd_vectors]{plot_svd_vectors()}} visualizes the dominant SVD vector(s)
+from running the S-map model on the community time series
 }

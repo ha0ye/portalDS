@@ -7,40 +7,40 @@
 compute_svd_decomp(smap_matrices, s = NULL)
 }
 \arguments{
-\item{smap_matrices}{A list with the Jacobian matrix (of smap-coefficients) 
+\item{smap_matrices}{A list with the Jacobian matrix (of smap-coefficients)
 at each time point, resulting from \code{\link{compute_smap_matrices}}}
 
-\item{s}{the number of species in the system (optional parameter to restrict 
-the analysis just to the portions of the Jacobian that are relevant for the 
+\item{s}{the number of species in the system (optional parameter to restrict
+the analysis just to the portions of the Jacobian that are relevant for the
 forecasts)}
 }
 \value{
 A list with three elements:
-  \describe{
-    \item{`d`}{a list of the singular values (a vector) for each time point}
-    \item{`u`}{a list of the left singular vectors (a matrix, each column is 
-      an axis in the output space) for each time point}
-    \item{`v`}{a list of the right singular vectors (a matrix, each column 
-      is an axis in the input space) for each time point}
-  }
+\describe{
+\item{\code{d}}{a list of the singular values (a vector) for each time point}
+\item{\code{u}}{a list of the left singular vectors (a matrix, each column is
+an axis in the output space) for each time point}
+\item{\code{v}}{a list of the right singular vectors (a matrix, each column
+is an axis in the input space) for each time point}
+}
 }
 \description{
 Compute singular value decompositions of the Jacobian matrics
 }
 \details{
 The full Jacobian resulting from \code{\link{compute_smap_matrices}}
-  is of the form, J = 
-  \tabular{rrrrr}{
-    C^0 \tab C^1 \tab ... \tab C^(d-1) \tab C^d\cr
-      I \tab   0 \tab ... \tab       0 \tab   0\cr
-      0 \tab   I \tab ... \tab       0 \tab   0\cr
-    ... \tab ... \tab ... \tab     ... \tab ...\cr
-      0 \tab   0 \tab ... \tab       I \tab   0
-   }
-  Note that this maps from the column vector [N(t) N(t-1) ... N(t-d)]^T to 
-  the column vector [N(t+1) N(t) ... N(t-(d-1))]^T. However, the only 
-  relevant componets for our purposes are the rows which map the column 
-  vector [N(t) N(t-1) ... N(t-d)]^T to [N(t+1)]^T.
-  
-  Thus, we extract this portion of the Jacobian for applying SVD
+is of the form, J =
+\tabular{rrrrr}{
+C^0 \tab C^1 \tab ... \tab C^(d-1) \tab C^d\cr
+I \tab   0 \tab ... \tab       0 \tab   0\cr
+0 \tab   I \tab ... \tab       0 \tab   0\cr
+... \tab ... \tab ... \tab     ... \tab ...\cr
+0 \tab   0 \tab ... \tab       I \tab   0
+}
+Note that this maps from the column vector \link{N(t) N(t-1) ... N(t-d)}^T to
+the column vector \link{N(t+1) N(t) ... N(t-(d-1))}^T. However, the only
+relevant componets for our purposes are the rows which map the column
+vector \link{N(t) N(t-1) ... N(t-d)}^T to \link{N(t+1)}^T.
+
+Thus, we extract this portion of the Jacobian for applying SVD
 }

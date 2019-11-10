@@ -17,12 +17,12 @@ think it should have a large effect)}
 }
 \value{
 A matrix where each column is a separate surrogate with the same
-  length as `ts`.
+length as \code{ts}.
 }
 \description{
 Generate surrogate time series by computing a mean seasonal
-  trend for each year, and shuffling the residuals. This differs from
-  \code{\link[rEDM]{make_surrogate_seasonal}} in that the data are not
-  sampled uniformly at the same time each year. Thus, we also ask for the
-  `day_of_year` as input, in order to compute the mean seasonal trend.
+trend for each year, and shuffling the residuals. This differs from
+\code{\link[rEDM]{make_surrogate_seasonal}} in that the data are not
+sampled uniformly at the same time each year. Thus, we also ask for the
+\code{day_of_year} as input, in order to compute the mean seasonal trend.
 }

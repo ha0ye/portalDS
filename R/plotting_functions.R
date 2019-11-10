@@ -7,9 +7,9 @@
 #'   it should have a `lib_column` and `target_column` to specify the causal
 #'   links (where directed edges are from `target_column` to `lib_column`)
 #' @param palette a data.frame with the colors for each vertex; if NULL, one
-#'   will be created using \code{\link[viridis]{viridis}}
-#' @param palette_option the color palette to use (see \code{\link[viridis]{viridis}}
-#'   for more info)
+#'   will be created using [viridis::viridis()]
+#' @param palette_option the color palette to use (see [viridis::viridis()] for
+#'   more info)
 #' @param existing_graph a data.frame specifying the layout of nodes (e.g. from a
 #'   previous call to plot_network); if NULL, one will be created
 #' @inheritParams ggraph::ggraph
@@ -165,7 +165,7 @@ plot_smap_coeffs <- function(smap_matrices, base_size = 16,
 
 #' @title plot_eigenvalues
 #' @aliases plot_svd_values
-#' @description `plot_eigenvalues()` visualizes the dominant eigenvalue(s) from 
+#' @description [plot_eigenvalues()] visualizes the dominant eigenvalue(s) from 
 #'   running the S-map model on the community time series
 #' @param eigenvalues a list of vectors for the eigenvalues:
 #'   the number of elements in the list corresponds to the time points of the
@@ -217,7 +217,7 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
 }
 
 #' @rdname plot_eigenvalues
-#' @description `plot_svd_values()` visualizes the dominant singular value(s) 
+#' @description [plot_svd_values()] visualizes the dominant singular value(s) 
 #'   from running the S-map model on the community time series
 #' @param singular_values a list of vectors for the singular values:
 #'   the number of elements in the list corresponds to the time points of the
@@ -247,7 +247,7 @@ plot_svd_values <- function(singular_values, num_values = 1,
 
 #' @title Plot time-varying vector components
 #' @aliases plot_svd_vectors
-#' @description `plot_eigenvectors()` visualizes the dominant eigenvector(s) 
+#' @description [plot_eigenvectors()] visualizes the dominant eigenvector(s) 
 #'   from running the S-map model on the community time series
 #' @param eigenvectors a list of matrices for the eigenvectors:
 #'   the number of elements in the list corresponds to the time points of the
@@ -297,7 +297,7 @@ plot_eigenvectors <- function(eigenvectors, num_values = 1,
 
 #' @rdname plot_eigenvectors
 #' @aliases plot_svd_vectors
-#' @description `plot_svd_vectors()` visualizes the dominant SVD vector(s) 
+#' @description [plot_svd_vectors()] visualizes the dominant SVD vector(s) 
 #'   from running the S-map model on the community time series
 #' @param svd_vectors a list of matrices for the SVD vectors:
 #'   the number of elements in the list corresponds to the time points of the

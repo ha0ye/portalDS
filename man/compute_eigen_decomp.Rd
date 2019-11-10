@@ -7,16 +7,16 @@
 compute_eigen_decomp(smap_matrices)
 }
 \arguments{
-\item{smap_matrices}{A list with the Jacobian matrix (of smap-coefficients) 
+\item{smap_matrices}{A list with the Jacobian matrix (of smap-coefficients)
 at each time point, resulting from \code{\link{compute_smap_matrices}}}
 }
 \value{
 A list with two elements:
-  \describe{
-    \item{`values`}{a list of the eigenvalues (a vector) for each time point}
-    \item{`vectors`}{a list of the eigenvectors (a matrix, each column is an
-      eigenvector) for each time point}
-  }
+\describe{
+\item{\code{values}}{a list of the eigenvalues (a vector) for each time point}
+\item{\code{vectors}}{a list of the eigenvectors (a matrix, each column is an
+eigenvector) for each time point}
+}
 }
 \description{
 Compute eigen-decompositions of the Jacobian matrices

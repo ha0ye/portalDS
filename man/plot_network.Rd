@@ -9,16 +9,16 @@ plot_network(ccm_links, layout = "circle", palette = NULL,
 }
 \arguments{
 \item{ccm_links}{a data.frame containing the inferred interactions from CCM,
-it should have a `lib_column` and `target_column` to specify the causal
-links (where directed edges are from `target_column` to `lib_column`)}
+it should have a \code{lib_column} and \code{target_column} to specify the causal
+links (where directed edges are from \code{target_column} to \code{lib_column})}
 
 \item{layout}{The type of layout to create.}
 
 \item{palette}{a data.frame with the colors for each vertex; if NULL, one
-will be created using \code{\link[viridis]{viridis}}}
+will be created using \code{\link[viridis:viridis]{viridis::viridis()}}}
 
-\item{palette_option}{the color palette to use (see \code{\link[viridis]{viridis}}
-for more info)}
+\item{palette_option}{the color palette to use (see \code{\link[viridis:viridis]{viridis::viridis()}} for
+more info)}
 
 \item{existing_graph}{a data.frame specifying the layout of nodes (e.g. from a
 previous call to plot_network); if NULL, one will be created}
@@ -26,12 +26,12 @@ previous call to plot_network); if NULL, one will be created}
 \value{
 a list with three elements:
 \tabular{ll}{
-  \code{plot} \tab the ggraph object to plot or save\cr
-  \code{palette} \tab the palette (for a future `plot_network` call)\cr
-  \code{graph} \tab the graph (for a future `plot_network` call)\cr
+\code{plot} \tab the ggraph object to plot or save\cr
+\code{palette} \tab the palette (for a future \code{plot_network} call)\cr
+\code{graph} \tab the graph (for a future \code{plot_network} call)\cr
 }
 }
 \description{
 Visualize the network of interactions, created from running CCM
-  on community time series as part of the dynamic stability analysis
+on community time series as part of the dynamic stability analysis
 }

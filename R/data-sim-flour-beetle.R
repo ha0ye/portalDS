@@ -8,7 +8,7 @@
 #' @param params model parameters
 #' @param initial_state initial conditions
 #' @param sample_times the time values at which to make observations
-#' @param ... remaining arguments to be passed to \code{\link[deSolve]{ode}}
+#' @param ... remaining arguments to be passed to [deSolve::ode()]
 #'
 #' @return a matrix (and `deSolve`) object with the observations (and times)
 #'

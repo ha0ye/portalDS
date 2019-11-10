@@ -8,13 +8,13 @@
 #'   search over.
 #' @param surrogate_method which surrogate method to use:
 #'   options are "annual_spline" or methods available in
-#'   \code{\link[rEDM]{make_surrogate_data}}
+#'   [rEDM::make_surrogate_data()]
 #' @param num_surr number of surrogates to compute
 #' @param surr_params a list of named optional arguments to be passed into the
 #'   surrogate data function
 #' @return A tibble with columns for the species name (taken from the original
 #'   column names), the abundance time series for each species, the output from
-#'   \code{\link[rEDM]{simplex}}, the best embedding dimension, as determined by 
+#'   [rEDM::simplex()], the best embedding dimension, as determined by 
 #'   the E that minimizes MAE, and surrogate time series
 #'
 #' @export

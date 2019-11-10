@@ -15,16 +15,16 @@ simulate_LPA_flour_beetles(params = c(b = 10.67, u_l = 0.1955, u_a =
 
 \item{sample_times}{the time values at which to make observations}
 
-\item{...}{remaining arguments to be passed to \code{\link[deSolve]{ode}}}
+\item{...}{remaining arguments to be passed to \code{\link[deSolve:ode]{deSolve::ode()}}}
 }
 \value{
-a matrix (and `deSolve`) object with the observations (and times)
+a matrix (and \code{deSolve}) object with the observations (and times)
 }
 \description{
 Simulate time series from the LPA (larvae-pupae-adults) flour
-  beetle model of Dennis et al. (2001) <\url{https://doi.org/10.1890/0012-9615(2001)071[0277:ECACDI]2.0.CO;2}>
-  . The initial conditions follow the experimental setup of Dennis et al.
-  (2001) and the parameters are the maximum-likelihood estimates from Table 1
-  of the same, with u_a and c_pa adjusted according to the description so as
-  to give chaotic behavior.
+beetle model of Dennis et al. (2001) <\url{https://doi.org/10.1890/0012-9615(2001)071[0277:ECACDI]2.0.CO;2}>
+. The initial conditions follow the experimental setup of Dennis et al.
+(2001) and the parameters are the maximum-likelihood estimates from Table 1
+of the same, with u_a and c_pa adjusted according to the description so as
+to give chaotic behavior.
 }

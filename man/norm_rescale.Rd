@@ -12,7 +12,7 @@ norm_rescale(x, na.rm = TRUE)
 \item{na.rm}{A logical (default = TRUE) that affects how NAs are dealt with}
 }
 \value{
-A rescaled vector the same length as `x`
+A rescaled vector the same length as \code{x}
 }
 \description{
 rescale the input vector to mean = 0, variance = 1

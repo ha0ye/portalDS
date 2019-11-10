@@ -6,13 +6,13 @@
 #'   competing on 3 resources as described in Huisman & Weissing (2001)
 #'   <\url{https://doi.org/10.1086/319929}>.
 #'
-#' `simulate_resource_competition_12sp()` is a simulation with the same
+#' [simulate_resource_competition_12sp()] is a simulation with the same
 #'   structure, but is the 12-species system competing on 5 resources, with
 #'   introductions of species 6-12 at later times.
 #' @param params model parameters
 #' @param initial_state initial conditions
 #' @param sample_times the time values at which to make observations
-#' @param ... remaining arguments to be passed to \code{\link[deSolve]{ode}}
+#' @param ... remaining arguments to be passed to [deSolve::ode()]
 #'
 #' @return a matrix (and `deSolve`) object with the observations (and times)
 #'
