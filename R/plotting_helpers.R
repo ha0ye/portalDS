@@ -97,17 +97,17 @@ add_IPR <- function(v_df, comp_name = "eigenvector", id_var = "censusdate")
 }
 
 make_matrix_vector_plot <- function(v_df, 
-                                comp_name = "eigenvector", 
-                                num_values = 1, 
-                                id_var = "censusdate", 
-                                add_IPR = FALSE, 
-                                palette_option = "plasma", 
-                                line_size = 1, base_size = 16)
+                                    comp_name = "eigenvector", 
+                                    num_values = 1, 
+                                    id_var = "censusdate", 
+                                    add_IPR = FALSE, 
+                                    palette_option = "plasma", 
+                                    line_size = 1, base_size = 16)
 {
     if (add_IPR)
     {
         v_df <-  add_IPR(v_df, comp_name = comp_name, id_var = id_var)
-        row_facet_groups <- rlang::quos(comp_name, rank)
+        row_facet_groups <- rlang::quos(component, rank)
     } else {
         row_facet_groups <- rlang::quos(rank)
     }

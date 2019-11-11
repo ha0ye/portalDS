@@ -282,11 +282,17 @@ plot_indicator_values <- function(indicator_values,
 #' 
 #' @export
 plot_volume_contraction <- function(volume_contraction, 
-                                    ...)
+                                    line_size = 1,
+                                    base_size = 16,
+                                    plot_file = NULL, width = 6, height = NULL)
 {
     plot_indicator_values(indicator_values = volume_contraction, 
                           y_label = "Volume Contraction", 
-                          ...)
+                          line_size = line_size, 
+                          base_size = base_size, 
+                          plot_file = plot_file, 
+                          width = width, 
+                          height = height)
 }
 
 #' @rdname plot_indicator_values
@@ -296,11 +302,17 @@ plot_volume_contraction <- function(volume_contraction,
 #' 
 #' @export
 plot_total_variance <- function(total_variance, 
-                                ...)
+                                line_size = 1,
+                                base_size = 16,
+                                plot_file = NULL, width = 6, height = NULL)
 {
     plot_indicator_values(indicator_values = total_variance, 
                           y_label = "Total Variance", 
-                          ...)
+                          line_size = line_size, 
+                          base_size = base_size, 
+                          plot_file = plot_file, 
+                          width = width, 
+                          height = height)
 }
 
 #' @title Plot time-varying vector components

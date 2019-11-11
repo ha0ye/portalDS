@@ -11,9 +11,11 @@ plot_indicator_values(indicator_values, y_label = "Volume Contraction",
   line_size = 1, base_size = 16, plot_file = NULL, width = 6,
   height = NULL)
 
-plot_volume_contraction(volume_contraction, ...)
+plot_volume_contraction(volume_contraction, line_size = 1,
+  base_size = 16, plot_file = NULL, width = 6, height = NULL)
 
-plot_total_variance(total_variance, ...)
+plot_total_variance(total_variance, line_size = 1, base_size = 16,
+  plot_file = NULL, width = 6, height = NULL)
 }
 \arguments{
 \item{indicator_values}{a vector of the numerical metric. It is expected
