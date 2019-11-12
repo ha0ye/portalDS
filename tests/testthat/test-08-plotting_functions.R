@@ -67,11 +67,17 @@ test_that("check plotting of eigenvalues and eigenvectors", {
     add_IPR = TRUE
   ), NA)
 
+  expect_error(eigenvector_plot_highlight <- plot_eigenvectors(maizuru_eigenvectors) %>% 
+                 add_regime_shift_highlight(lower_date = as.Date("1999-01-01"), 
+                                            upper_date = as.Date("2005-05-05")), 
+               NA)
+  
   skip_on_travis()
   vdiffr::expect_doppelganger("Maizuru Eigenvalues", eigenvalue_plot)
   vdiffr::expect_doppelganger("Maizuru Eigenvalues (complex)", eigenvalue_plot_complex)
   vdiffr::expect_doppelganger("Maizuru Eigenvectors", eigenvector_plot)
   vdiffr::expect_doppelganger("Maizuru Eigenvectors (IPR)", eigenvector_plot_IPR)
+  vdiffr::expect_doppelganger("Maizuru Eigenvectors (highlight)", eigenvector_plot_highlight)
 })
 
 test_that("check plotting of SVD values and vectors", {

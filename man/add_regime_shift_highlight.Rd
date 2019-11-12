@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting_helpers.R
 \name{add_regime_shift_highlight}
 \alias{add_regime_shift_highlight}
-\title{add_regime_shift_highlight}
+\title{Highlight specific time spans}
 \usage{
 add_regime_shift_highlight(my_plot, lower_date = as.Date(c("1983-11-12",
   "1990-01-06", "1998-12-22", "2009-05-23")),
@@ -24,5 +24,14 @@ add_regime_shift_highlight(my_plot, lower_date = as.Date(c("1983-11-12",
 A ggplot object with the bars added
 }
 \description{
-add transparent bars to highlight specific time spans
+Add transparent vertical slices, with boundaries specified by
+the \code{lower_date} and \code{upper_date} arguments.
+}
+\details{
+The default values for the time spans correspond to the 0.90
+credibility intervals estimated from
+\link{https://weecology.github.io/LDATS/paper-comparison.html}. An alternative
+default are the values from Christensen et al. 2018:
+\code{lower_date = as.Date(c("1983-12-01", "1988-10-01", "1998-09-01", "2009-06-01"))}
+\code{upper_date = as.Date(c("1984-07-01", "1996-01-01", "1999-12-01", "2010-09-01"))}
 }

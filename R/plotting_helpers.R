@@ -31,7 +31,8 @@ make_matrix_value_plot <- function(values_dist, id_var = "censusdate",
 }
 
 # normalize vectors so that length = 1
-vector_scale <- function(v) {
+vector_scale <- function(v)
+{
     sum_sq <- sum(abs(v)^2)
     v / sqrt(sum_sq)
 }
@@ -137,8 +138,15 @@ make_matrix_vector_plot <- function(v_df,
     return(my_plot)
 }
 
-#' @title add_regime_shift_highlight
-#' @description add transparent bars to highlight specific time spans
+#' @title Highlight specific time spans
+#' @description Add transparent vertical slices, with boundaries specified by 
+#'   the `lower_date` and `upper_date` arguments.
+#' @details The default values for the time spans correspond to the 0.90 
+#'   credibility intervals estimated from 
+#'   [https://weecology.github.io/LDATS/paper-comparison.html]. An alternative 
+#'   default are the values from Christensen et al. 2018:
+#'   `lower_date = as.Date(c("1983-12-01", "1988-10-01", "1998-09-01", "2009-06-01"))`
+#'   `upper_date = as.Date(c("1984-07-01", "1996-01-01", "1999-12-01", "2010-09-01"))`
 #' @param my_plot the original ggplot object
 #' @param lower_date a vector of the beginnings of the time spans
 #' @param upper_date a vector of the ends of the time spans
@@ -149,19 +157,23 @@ make_matrix_vector_plot <- function(v_df,
 #'
 #' @export
 add_regime_shift_highlight <- function(my_plot,
-                                       ## using dates from updated analysis code (weecology/LDA-kratplots)
                                        lower_date = as.Date(c("1983-11-12", "1990-01-06", "1998-12-22", "2009-05-23")),
                                        upper_date = as.Date(c("1985-03-16", "1992-04-04", "1999-11-06", "2011-01-05")),
-                                       alpha = 0.5, fill = "grey30") {
-    ## using dates from Christensen et al. 2018
-    # lower_date <- as.Date(c("1983-12-01", "1988-10-01", "1998-09-01", "2009-06-01"))
-    # upper_date <- as.Date(c("1984-07-01", "1996-01-01", "1999-12-01", "2010-09-01"))
+                                       alpha = 0.5, fill = "grey30")
+{
+    highlight_df <- data.frame(
+        xmin = lower_date, xmax = upper_date,
+        ymin = -Inf, ymax = Inf
+    )
+    
+    plot_data <- ggplot_build(my_plot)$data[[1]]
+    if ("PANEL" %in% names(plot_data))
+    {
+        highlight_df <- tidyr::expand_grid(highlight_df, rank = unique(plot_data$PANEL))
+    }
     
     my_plot + geom_rect(
-        data = data.frame(
-            xmin = lower_date, xmax = upper_date,
-            ymin = -Inf, ymax = Inf
-        ),
+        data = highlight_df,
         mapping = aes(
             xmin = .data$xmin, xmax = .data$xmax,
             ymin = .data$ymin, ymax = .data$ymax
