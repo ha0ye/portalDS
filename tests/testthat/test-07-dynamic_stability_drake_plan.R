@@ -57,21 +57,16 @@ test_that("running full dynamic stability plan using block_3sp example data", {
     lib_sizes = seq(10, 100, 10),
     num_samples = 10
   )
-
-  # setup cache
-  cache_path <- file.path(tempdir(), ".drake")
-  expect_error(dir.create(cache_path), NA)
-  expect_error(my_cache <- drake::drake_cache(path = cache_path), NA)
   
   # run plan
   future::plan(future.callr::callr)
   drake::clean(destroy = TRUE)
-  expect_error(drake::make(my_plan, seed = 42, cache = my_cache), NA)
+  expect_error(drake::make(my_plan, seed = 42), NA)
 
   # inspect targets and check seed
-  expect_error(drake::loadd(cache = my_cache), NA)
+  expect_error(drake::loadd(), NA)
   expect_true(all(targets %in% ls()))
-  expect_equal(drake::diagnose(simplex_results, cache = my_cache)$seed, 616382247)
+  expect_equal(drake::diagnose(simplex_results)$seed, 616382247)
 
   # check targets
   simplex_results$simplex_out <- lapply(simplex_results$simplex_out, round, 4)
