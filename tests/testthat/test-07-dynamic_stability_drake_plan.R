@@ -1,5 +1,8 @@
 context("Check functions to build plans for dynamic stability workflow")
 
+options(drake_make_menu = FALSE, 
+        drake_clean_recovery_msg = FALSE)
+
 test_that("check full dynamic stability plan using block_3sp example data", {
   skip_on_covr()
   # setup
@@ -55,8 +58,12 @@ test_that("running full dynamic stability plan using block_3sp example data", {
     num_samples = 10
   )
 
+  # setup cache
+  cache_path <- file.path(tempdir(), ".drake")
+  expect_error(dir.create(cache_path), NA)
+  expect_error(my_cache <- drake::drake_cache(path = cache_path), NA)
+  
   # run plan
-  my_cache <- drake::drake_cache(path = tempdir())
   future::plan(future.callr::callr)
   drake::clean(destroy = TRUE)
   expect_error(drake::make(my_plan, seed = 42, cache = my_cache), NA)
