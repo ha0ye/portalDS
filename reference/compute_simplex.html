@@ -33,8 +33,8 @@
 <meta property="og:title" content="Run univariate analysis on each time series — compute_simplex" />
 
 <meta property="og:description" content="Run simplex projection models for each time series in the
-  `block` and save the output, to determine the best embedding dimension for
-  each column." />
+block and save the output, to determine the best embedding dimension for
+each column." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -65,7 +65,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">portalDS</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -124,8 +124,8 @@
     <div class="ref-description">
     
     <p>Run simplex projection models for each time series in the
-  `block` and save the output, to determine the best embedding dimension for
-  each column.</p>
+<code>block</code> and save the output, to determine the best embedding dimension for
+each column.</p>
     
     </div>
 
@@ -150,7 +150,7 @@ search over.</p></td>
       <th>surrogate_method</th>
       <td><p>which surrogate method to use:
 options are "annual_spline" or methods available in
-<code><a href='https://www.rdocumentation.org/packages/rEDM/topics/make_surrogate_data'>make_surrogate_data</a></code></p></td>
+<code><a href='https://www.rdocumentation.org/packages/rEDM/topics/make_surrogate_data'>rEDM::make_surrogate_data()</a></code></p></td>
     </tr>
     <tr>
       <th>num_surr</th>
@@ -166,9 +166,9 @@ surrogate data function</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A tibble with columns for the species name (taken from the original
-  column names), the abundance time series for each species, the output from
-  <code><a href='https://www.rdocumentation.org/packages/rEDM/topics/simplex'>simplex</a></code>, the best embedding dimension, as determined by 
-  the E that minimizes MAE, and surrogate time series</p>
+column names), the abundance time series for each species, the output from
+<code><a href='https://www.rdocumentation.org/packages/rEDM/topics/simplex'>rEDM::simplex()</a></code>, the best embedding dimension, as determined by
+the E that minimizes MAE, and surrogate time series</p>
     
 
   </div>

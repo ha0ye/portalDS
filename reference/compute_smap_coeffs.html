@@ -32,9 +32,9 @@
 
 <meta property="og:title" content="Compute S-map coefficients for a community — compute_smap_coeffs" />
 
-<meta property="og:description" content="Compute S-map models for each time series in the `block` and
-  save out the coefficients. The coefficients represent the local linear
-  model and can be used to infer properties of the system dynamics." />
+<meta property="og:description" content="Compute S-map models for each time series in the block and
+save out the coefficients. The coefficients represent the local linear
+model and can be used to infer properties of the system dynamics." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -65,7 +65,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">portalDS</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -123,9 +123,9 @@
 
     <div class="ref-description">
     
-    <p>Compute S-map models for each time series in the `block` and
-  save out the coefficients. The coefficients represent the local linear
-  model and can be used to infer properties of the system dynamics.</p>
+    <p>Compute S-map models for each time series in the <code>block</code> and
+save out the coefficients. The coefficients represent the local linear
+model and can be used to infer properties of the system dynamics.</p>
     
     </div>
 
@@ -144,9 +144,9 @@ column is a time series of abundances.</p></td>
       <th>ccm_links</th>
       <td><p>A data.frame containing the significant causal links. Each
 row is a causal link. The columns are:</p><dl class='dl-horizontal'>
-<dt>`xmap_from`</dt><dd><p>the column index of the predictor variable in CCM</p></dd>
-<dt>`xmap_to`</dt><dd><p>the column index of the predicted variable in CCM</p></dd>
-<dt>`best_E`</dt><dd><p>the best embedding dimension for CCM</p></dd>
+<dt><code>xmap_from</code></dt><dd><p>the column index of the predictor variable in CCM</p></dd>
+<dt><code>xmap_to</code></dt><dd><p>the column index of the predicted variable in CCM</p></dd>
+<dt><code>best_E</code></dt><dd><p>the best embedding dimension for CCM</p></dd>
 </dl></td>
     </tr>
     <tr>
@@ -163,21 +163,21 @@ rolling forecasts for the second half of the time series.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A list with the matrix smap-coefficients for each predictor variable
-  identified in CCM (these are the affected variables). The names in the list
-  and the column names of the matrices use the variable names in the block.</p>
+identified in CCM (these are the affected variables). The names in the list
+and the column names of the matrices use the variable names in the block.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Suppose that there are causal links as follows:
-  `x --&gt; y`
-  `x --&gt; z`
-  where `--&gt;` indicates "cross-maps to". Then the interpretation from CCM is
-  that `x` is affected by causes `y` and `z`. Thus, the predictive model for
-  `x` should include `y` and `z` as predictors.</p>
+<code>x --&gt; y</code>
+<code>x --&gt; z</code>
+where <code>--&gt;</code> indicates "cross-maps to". Then the interpretation from CCM is
+that <code>x</code> is affected by causes <code>y</code> and <code>z</code>. Thus, the predictive model for
+<code>x</code> should include <code>y</code> and <code>z</code> as predictors.</p>
 <p>The S-map model is then setup as
-  x_t+1 = F(x_t, y_t, z_t, x_t-1, x_t-2, ...)
-  where the number of predictors is equal to the best embedding dimension for
-  `x`.</p>
+x_t+1 = F(x_t, y_t, z_t, x_t-1, x_t-2, ...)
+where the number of predictors is equal to the best embedding dimension for
+<code>x</code>.</p>
     
 
   </div>

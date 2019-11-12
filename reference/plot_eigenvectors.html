@@ -32,10 +32,10 @@
 
 <meta property="og:title" content="Plot time-varying vector components — plot_eigenvectors" />
 
-<meta property="og:description" content="`plot_eigenvectors()` visualizes the dominant eigenvector(s) 
-  from running the S-map model on the community time series
-`plot_svd_vectors()` visualizes the dominant SVD vector(s) 
-  from running the S-map model on the community time series" />
+<meta property="og:description" content="plot_eigenvectors() visualizes the dominant eigenvector(s)
+from running the S-map model on the community time series
+plot_svd_vectors() visualizes the dominant SVD vector(s)
+from running the S-map model on the community time series" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -66,7 +66,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">portalDS</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -124,10 +124,10 @@
 
     <div class="ref-description">
     
-    <p>`plot_eigenvectors()` visualizes the dominant eigenvector(s) 
-  from running the S-map model on the community time series</p>
-<p>`plot_svd_vectors()` visualizes the dominant SVD vector(s) 
-  from running the S-map model on the community time series</p>
+    <p><code>plot_eigenvectors()</code> visualizes the dominant eigenvector(s)
+from running the S-map model on the community time series</p>
+<p><code>plot_svd_vectors()</code> visualizes the dominant SVD vector(s)
+from running the S-map model on the community time series</p>
     
     </div>
 
@@ -155,7 +155,7 @@ eigenvectors, in descending order according to the eigenvalues</p></td>
     </tr>
     <tr>
       <th>id_var</th>
-      <td><p>when constructing the long-format tibble,what should be the 
+      <td><p>when constructing the long-format tibble,what should be the
 variable name containing the time index</p></td>
     </tr>
     <tr>
@@ -166,8 +166,8 @@ contribute to the eigenvector</p></td>
     </tr>
     <tr>
       <th>palette_option</th>
-      <td><p>the color palette to use (see <code><a href='https://www.rdocumentation.org/packages/viridis/topics/reexports'>viridis</a></code>
-for more info)</p></td>
+      <td><p>the color palette to use (see <code><a href='https://www.rdocumentation.org/packages/viridis/topics/reexports'>viridis::viridis()</a></code> for
+more info)</p></td>
     </tr>
     <tr>
       <th>line_size</th>
@@ -179,7 +179,7 @@ for more info)</p></td>
     </tr>
     <tr>
       <th>plot_file</th>
-      <td><p>the filepath to where to save the plot; if `NULL` (the
+      <td><p>the filepath to where to save the plot; if <code>NULL</code> (the
 default), then the plot is not saved to a file</p></td>
     </tr>
     <tr>

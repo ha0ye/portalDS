@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>compute_dynamic_stability — compute_dynamic_stability • portalDS</title>
+<title>Dynamic stability analysis for community time series — compute_dynamic_stability • portalDS</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,26 +30,29 @@
 
 
 
-<meta property="og:title" content="compute_dynamic_stability — compute_dynamic_stability" />
+<meta property="og:title" content="Dynamic stability analysis for community time series — compute_dynamic_stability" />
 
-<meta property="og:description" content="`compute_dynamic_stability` runs the full dynamic stability
-  analysis for community time series. The analysis has multiple steps:
+<meta property="og:description" content="compute_dynamic_stability() runs the full dynamic stability
+analysis. The analysis has multiple steps:
 run simplex projection on each time series to identify the optimal
-      embedding dimension
+embedding dimension
 generate surrogate time series, assumming that the data have just a
-      seasonal pattern
+seasonal pattern
 run ccm on each pairwise interaction, including the surrogate data
 identify the significant interactions by comparing the CCM for the
-      real time series against the calculations for the surrogate data
+real time series against the calculations for the surrogate data
 run S-map models for each time series, using the appropriate number of
-      lags, and including the important interacting variables
+lags, and including the important interacting variables
 extract out the s-map coefficients from the models and assemble
-      matrices for the system
+matrices for the system
 perform eigen-decomposition on the s-map coefficient matrices
+perform singular-value-decomposition on the s-map coefficient matrices
+compute volume contraction from the s-map coefficient matrices
+compute total variance from the s-map coefficient matrices
 " />
 
-<meta property="og:description" content="`build_dynamic_stability_plan` creates a drake plan for the
-  dynamic stability analysis." />
+<meta property="og:description" content="build_dynamic_stability_plan() creates a drake plan for the
+dynamic stability analysis." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -80,7 +83,7 @@ perform eigen-decomposition on the s-map coefficient matrices
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">portalDS</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -131,31 +134,34 @@ perform eigen-decomposition on the s-map coefficient matrices
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>compute_dynamic_stability</h1>
+    <h1>Dynamic stability analysis for community time series</h1>
     <small class="dont-index">Source: <a href='https://github.com/ha0ye/portalDS/blob/master/R/analysis-workflow.R'><code>R/analysis-workflow.R</code></a></small>
     <div class="hidden name"><code>compute_dynamic_stability.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>`compute_dynamic_stability` runs the full dynamic stability
-  analysis for community time series. The analysis has multiple steps:</p><ol>
+    <p><code>compute_dynamic_stability()</code> runs the full dynamic stability
+analysis. The analysis has multiple steps:</p><ol>
 <li><p>run simplex projection on each time series to identify the optimal
-      embedding dimension</p></li>
+embedding dimension</p></li>
 <li><p>generate surrogate time series, assumming that the data have just a
-      seasonal pattern</p></li>
+seasonal pattern</p></li>
 <li><p>run ccm on each pairwise interaction, including the surrogate data</p></li>
 <li><p>identify the significant interactions by comparing the CCM for the
-      real time series against the calculations for the surrogate data</p></li>
+real time series against the calculations for the surrogate data</p></li>
 <li><p>run S-map models for each time series, using the appropriate number of
-      lags, and including the important interacting variables</p></li>
+lags, and including the important interacting variables</p></li>
 <li><p>extract out the s-map coefficients from the models and assemble
-      matrices for the system</p></li>
+matrices for the system</p></li>
 <li><p>perform eigen-decomposition on the s-map coefficient matrices</p></li>
+<li><p>perform singular-value-decomposition on the s-map coefficient matrices</p></li>
+<li><p>compute volume contraction from the s-map coefficient matrices</p></li>
+<li><p>compute total variance from the s-map coefficient matrices</p></li>
 </ol>
 
-    <p>`build_dynamic_stability_plan` creates a drake plan for the
-  dynamic stability analysis.</p>
+    <p><code>build_dynamic_stability_plan()</code> creates a drake plan for the
+dynamic stability analysis.</p>
     
     </div>
 
@@ -179,7 +185,7 @@ perform eigen-decomposition on the s-map coefficient matrices
     <tr>
       <th>block</th>
       <td><p>a data.frame containing time series for the community. Each
-column is a time series of abundances, and a `censusdate` column is used
+column is a time series of abundances, and a <code>censusdate</code> column is used
 as the column containing the time value.</p></td>
     </tr>
     <tr>
@@ -189,8 +195,8 @@ as the column containing the time value.</p></td>
     <tr>
       <th>max_E</th>
       <td><p>largest E to examine using simplex projection; this sets the
-default range for `E_list`, but any setting for `E_list` will override the
-value for `max_E`</p></td>
+default range for <code>E_list</code>, but any setting for <code>E_list</code> will override the
+value for <code>max_E</code></p></td>
     </tr>
     <tr>
       <th>E_list</th>
@@ -201,7 +207,7 @@ search over.</p></td>
       <th>surrogate_method</th>
       <td><p>which surrogate method to use:
 options are "annual_spline" or methods available in
-<code><a href='https://www.rdocumentation.org/packages/rEDM/topics/make_surrogate_data'>make_surrogate_data</a></code></p></td>
+<code><a href='https://www.rdocumentation.org/packages/rEDM/topics/make_surrogate_data'>rEDM::make_surrogate_data()</a></code></p></td>
     </tr>
     <tr>
       <th>num_surr</th>

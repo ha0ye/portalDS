@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>plot_eigenvalues — plot_eigenvalues • portalDS</title>
+<title>Plot eigenvalues of the S-map (coefficient) matrices — plot_eigenvalues • portalDS</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,12 +30,12 @@
 
 
 
-<meta property="og:title" content="plot_eigenvalues — plot_eigenvalues" />
+<meta property="og:title" content="Plot eigenvalues of the S-map (coefficient) matrices — plot_eigenvalues" />
 
-<meta property="og:description" content="`plot_eigenvalues()` visualizes the dominant eigenvalue(s) from 
-  running the S-map model on the community time series
-`plot_svd_values()` visualizes the dominant singular value(s) 
-  from running the S-map model on the community time series" />
+<meta property="og:description" content="plot_eigenvalues() visualizes the dominant eigenvalue(s) from
+running the S-map model on the community time series
+plot_svd_values() visualizes the dominant singular value(s)
+from running the S-map model on the community time series" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -66,7 +66,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">portalDS</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -117,17 +117,17 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>plot_eigenvalues</h1>
+    <h1>Plot eigenvalues of the S-map (coefficient) matrices</h1>
     <small class="dont-index">Source: <a href='https://github.com/ha0ye/portalDS/blob/master/R/plotting_functions.R'><code>R/plotting_functions.R</code></a></small>
     <div class="hidden name"><code>plot_eigenvalues.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>`plot_eigenvalues()` visualizes the dominant eigenvalue(s) from 
-  running the S-map model on the community time series</p>
-<p>`plot_svd_values()` visualizes the dominant singular value(s) 
-  from running the S-map model on the community time series</p>
+    <p><code>plot_eigenvalues()</code> visualizes the dominant eigenvalue(s) from
+running the S-map model on the community time series</p>
+<p><code>plot_svd_values()</code> visualizes the dominant singular value(s)
+from running the S-map model on the community time series</p>
     
     </div>
 
@@ -155,7 +155,7 @@ from the matrix of the s-map coefficients at that time step</p></td>
     </tr>
     <tr>
       <th>id_var</th>
-      <td><p>when constructing the long-format tibble,what should be the 
+      <td><p>when constructing the long-format tibble,what should be the
 variable name containing the time index</p></td>
     </tr>
     <tr>
@@ -173,7 +173,7 @@ dominant eigenvalue is complex</p></td>
     </tr>
     <tr>
       <th>plot_file</th>
-      <td><p>the filepath to where to save the plot; if `NULL` (the
+      <td><p>the filepath to where to save the plot; if <code>NULL</code> (the
 default), then the plot is not saved to a file</p></td>
     </tr>
     <tr>

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute singular value decompositions of the Jacobian matrics — compute_svd_decomp • portalDS</title>
+<title>Plot numerical metrics computed on the S-map (coefficient) matrices — plot_indicator_values • portalDS</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,9 +30,12 @@
 
 
 
-<meta property="og:title" content="Compute singular value decompositions of the Jacobian matrics — compute_svd_decomp" />
+<meta property="og:title" content="Plot numerical metrics computed on the S-map (coefficient) matrices — plot_indicator_values" />
 
-<meta property="og:description" content="Compute singular value decompositions of the Jacobian matrics" />
+<meta property="og:description" content="plot_volume_contraction() is a thin wrapper around
+plot_indicator_values(), specificying the y-axis label
+plot_total_variance() is a thin wrapper around
+plot_indicator_values(), specificying the y-axis label" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -114,62 +117,76 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compute singular value decompositions of the Jacobian matrics</h1>
-    <small class="dont-index">Source: <a href='https://github.com/ha0ye/portalDS/blob/master/R/calculations-jacobian-metrics.R'><code>R/calculations-jacobian-metrics.R</code></a></small>
-    <div class="hidden name"><code>compute_svd_decomp.Rd</code></div>
+    <h1>Plot numerical metrics computed on the S-map (coefficient) matrices</h1>
+    <small class="dont-index">Source: <a href='https://github.com/ha0ye/portalDS/blob/master/R/plotting_functions.R'><code>R/plotting_functions.R</code></a></small>
+    <div class="hidden name"><code>plot_indicator_values.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Compute singular value decompositions of the Jacobian matrics</p>
+    <p><code>plot_volume_contraction()</code> is a thin wrapper around
+<code>plot_indicator_values()</code>, specificying the y-axis label</p>
+<p><code>plot_total_variance()</code> is a thin wrapper around
+<code>plot_indicator_values()</code>, specificying the y-axis label</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>compute_svd_decomp</span>(<span class='no'>smap_matrices</span>, <span class='kw'>s</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>plot_indicator_values</span>(<span class='no'>indicator_values</span>, <span class='kw'>y_label</span> <span class='kw'>=</span> <span class='st'>"Volume Contraction"</span>,
+  <span class='kw'>line_size</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>base_size</span> <span class='kw'>=</span> <span class='fl'>16</span>, <span class='kw'>plot_file</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>6</span>,
+  <span class='kw'>height</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+
+<span class='fu'>plot_volume_contraction</span>(<span class='no'>volume_contraction</span>, <span class='kw'>line_size</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>base_size</span> <span class='kw'>=</span> <span class='fl'>16</span>, <span class='kw'>plot_file</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>6</span>, <span class='kw'>height</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+
+<span class='fu'>plot_total_variance</span>(<span class='no'>total_variance</span>, <span class='kw'>line_size</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>base_size</span> <span class='kw'>=</span> <span class='fl'>16</span>,
+  <span class='kw'>plot_file</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>6</span>, <span class='kw'>height</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>smap_matrices</th>
-      <td><p>A list with the Jacobian matrix (of smap-coefficients)
-at each time point, resulting from <code><a href='compute_smap_matrices.html'>compute_smap_matrices()</a></code></p></td>
+      <th>indicator_values</th>
+      <td><p>a vector of the numerical metric. It is expected
+that the names are coerciable into Date format</p></td>
     </tr>
     <tr>
-      <th>s</th>
-      <td><p>the number of species in the system (optional parameter to restrict
-the analysis just to the portions of the Jacobian that are relevant for the
-forecasts)</p></td>
+      <th>y_label</th>
+      <td><p>The label for the y-axis of the resulting plot</p></td>
+    </tr>
+    <tr>
+      <th>line_size</th>
+      <td><p>the line width for the plot</p></td>
+    </tr>
+    <tr>
+      <th>base_size</th>
+      <td><p>the base font size</p></td>
+    </tr>
+    <tr>
+      <th>plot_file</th>
+      <td><p>the filepath to where to save the plot; if <code>NULL</code> (the
+default), then the plot is not saved to a file</p></td>
+    </tr>
+    <tr>
+      <th>width</th>
+      <td><p>width of the saved plot</p></td>
+    </tr>
+    <tr>
+      <th>height</th>
+      <td><p>height of the saved plot</p></td>
+    </tr>
+    <tr>
+      <th>volume_contraction</th>
+      <td><p>the volume contraction values to plot</p></td>
+    </tr>
+    <tr>
+      <th>total_variance</th>
+      <td><p>the total variance values to plot</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list with three elements:</p><dl class='dl-horizontal'>
-<dt><code>d</code></dt><dd><p>a list of the singular values (a vector) for each time point</p></dd>
-<dt><code>u</code></dt><dd><p>a list of the left singular vectors (a matrix, each column is
-an axis in the output space) for each time point</p></dd>
-<dt><code>v</code></dt><dd><p>a list of the right singular vectors (a matrix, each column
-is an axis in the input space) for each time point</p></dd>
-</dl>
-
-    
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>The full Jacobian resulting from <code><a href='compute_smap_matrices.html'>compute_smap_matrices()</a></code> is of
-the form, J =</p><table class='table'>
-<tr><td></td><td>C^0</td><td>C^1</td><td>...</td><td>C^(d-1)</td></tr>
-<tr><td>C^d</td><td></td><td>I</td><td>0</td><td>...</td></tr>
-<tr><td>0</td><td>0</td><td></td><td>0</td><td>I</td></tr>
-<tr><td>...</td><td>0</td><td>0</td><td></td><td>...</td></tr>
-<tr><td>...</td><td>...</td><td>...</td><td>...</td><td></td></tr>
-<tr><td>0</td><td>0</td><td>...</td><td>I</td><td>0</td></tr>
-</table>
-<p>Note that this maps from the column vector [N(t) N(t-1) ... N(t-d)]^T to
-the column vector [N(t+1) N(t) ... N(t-(d-1))]^T. However, the only
-relevant components for our purposes are the rows which map the column
-vector [N(t) N(t-1) ... N(t-d)]^T to [N(t+1)]^T, let this be J_s.</p>
-<p>Thus, we extract this portion of the Jacobian for applying SVD.</p>
+    <p>A ggplot object of the plot</p>
     
 
   </div>
@@ -179,8 +196,6 @@ vector [N(t) N(t-1) ... N(t-d)]^T to [N(t+1)]^T, let this be J_s.</p>
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
-
-      <li><a href="#details">Details</a></li>
           </ul>
 
   </div>

@@ -32,11 +32,11 @@
 
 <meta property="og:title" content="Run CCM on each pair of time series — compute_ccm" />
 
-<meta property="og:description" content="`compute_ccm` runs pairwise CCM based on the simplex_output -
-  using the best embedding dimension from the simplex results, and computed
-  for both the real data and the surrogate data. The calculations run using
-  future_pmap. Thus, parallelization should be set by
-  the user, if desired, using plan, prior to running." />
+<meta property="og:description" content="Runs pairwise CCM based on the simplex_output - using the best
+embedding dimension from the simplex results, and computed for both the
+real data and the surrogate data. The calculations run using
+furrr::future_pmap(). Thus, parallelization should be set by the user,
+if desired, using future::plan(), prior to running." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -67,7 +67,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">portalDS</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -125,11 +125,11 @@
 
     <div class="ref-description">
     
-    <p>`compute_ccm` runs pairwise CCM based on the simplex_output -
-  using the best embedding dimension from the simplex results, and computed
-  for both the real data and the surrogate data. The calculations run using
-  <code><a href='https://www.rdocumentation.org/packages/furrr/topics/future_map2'>future_pmap</a></code>. Thus, parallelization should be set by
-  the user, if desired, using <code><a href='https://www.rdocumentation.org/packages/future/topics/plan'>plan</a></code>, prior to running.</p>
+    <p>Runs pairwise CCM based on the simplex_output - using the best
+embedding dimension from the simplex results, and computed for both the
+real data and the surrogate data. The calculations run using
+<code><a href='https://www.rdocumentation.org/packages/furrr/topics/future_map2'>furrr::future_pmap()</a></code>. Thus, parallelization should be set by the user,
+if desired, using <code><a href='https://www.rdocumentation.org/packages/future/topics/plan'>future::plan()</a></code>, prior to running.</p>
     
     </div>
 
@@ -142,7 +142,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>simplex_results</th>
-      <td><p>the output of <code><a href='compute_simplex.html'>compute_simplex</a></code></p></td>
+      <td><p>the output of <code><a href='compute_simplex.html'>compute_simplex()</a></code></p></td>
     </tr>
     <tr>
       <th>lib_sizes</th>
@@ -174,9 +174,9 @@ reproducible runs of ccm with randomly generated libraries</p></td>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>`compute_ccm` returns a tibble with columns for the variables that we
-  use in CCM, the data type (whether it's the "actual" time series or
-  "surrogate"), the library size, and the results from CCM</p>
+    <p>A tibble with columns for the variables that we use in CCM, the data
+type (whether it's the "actual" time series or "surrogate"), the library
+size, and the results from CCM</p>
     
 
   </div>

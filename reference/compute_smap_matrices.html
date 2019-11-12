@@ -33,7 +33,7 @@
 <meta property="og:title" content="Generate the matrices of S-map coefficients — compute_smap_matrices" />
 
 <meta property="og:description" content="Using the S-map coefficients, assemble the appropriate
-  Jacobian matrices for each time point" />
+Jacobian matrices for each time point" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -64,7 +64,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">portalDS</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -123,7 +123,7 @@
     <div class="ref-description">
     
     <p>Using the S-map coefficients, assemble the appropriate
-  Jacobian matrices for each time point</p>
+Jacobian matrices for each time point</p>
     
     </div>
 
@@ -135,15 +135,15 @@
     <tr>
       <th>smap_coeffs</th>
       <td><p>A list of the S-map coefficients for each predictor
-variable (as returned from <code><a href='compute_smap_coeffs.html'>compute_smap_coeffs</a></code></p></td>
+variable (as returned from <code><a href='compute_smap_coeffs.html'>compute_smap_coeffs()</a></code>)</p></td>
     </tr>
     <tr>
       <th>ccm_links</th>
       <td><p>A data.frame containing the significant causal links. Each
 row is a causal link. The columns are:</p><dl class='dl-horizontal'>
-<dt>`xmap_from`</dt><dd><p>the column index of the predictor variable in CCM</p></dd>
-<dt>`xmap_to`</dt><dd><p>the column index of the predicted variable in CCM</p></dd>
-<dt>`best_E`</dt><dd><p>the best embedding dimension for CCM</p></dd>
+<dt><code>xmap_from</code></dt><dd><p>the column index of the predictor variable in CCM</p></dd>
+<dt><code>xmap_to</code></dt><dd><p>the column index of the predicted variable in CCM</p></dd>
+<dt><code>best_E</code></dt><dd><p>the best embedding dimension for CCM</p></dd>
 </dl></td>
     </tr>
     </table>
@@ -154,21 +154,20 @@ row is a causal link. The columns are:</p><dl class='dl-horizontal'>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>See <code><a href='compute_smap_coeffs.html'>compute_smap_coeffs</a></code> for details on the input data.
-  Let the variables in the system be x^i with i = 1..N.
-  For the S-map model predicting x^i_t+1, let the coefficient
-  corresponding to variable x^j at lag tau be c^tau_ij.
-  Then the Jacobian is the block matrix, J =</p><table class='table'>
+    <p>See <code><a href='compute_smap_coeffs.html'>compute_smap_coeffs()</a></code> for details on the input data.
+Let the variables in the system be x^i with i = 1..N.
+For the S-map model predicting x^i<em>t+1, let the coefficient
+corresponding to variable x^j at lag tau be c^tau</em>ij.
+Then the Jacobian is the block matrix, J =</p><table class='table'>
 <tr><td></td><td>C^0</td><td>C^1</td><td>...</td><td>C^(d-1)</td></tr>
 <tr><td>C^d</td><td></td><td>I</td><td>0</td><td>...</td></tr>
 <tr><td>0</td><td>0</td><td></td><td>0</td><td>I</td></tr>
 <tr><td>...</td><td>0</td><td>0</td><td></td><td>...</td></tr>
 <tr><td>...</td><td>...</td><td>...</td><td>...</td><td></td></tr>
 <tr><td>0</td><td>0</td><td>...</td><td>I</td><td>0</td></tr>
-<tr><td></td><td></td><td>C^0</td><td>C^1</td><td>...</td></tr>
 </table>
 <p>where d is the maximum lag, and C^tau is the matrix formed by the values
-  c^tau_ij. (Note that many of these values will be 0.)</p>
+c^tau_ij. (Note that many of these values will be 0.)</p>
 <p>This function computes J at each time step.</p>
     
 
