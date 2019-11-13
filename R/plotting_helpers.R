@@ -143,7 +143,7 @@ make_matrix_vector_plot <- function(v_df,
 #'   the `lower_date` and `upper_date` arguments.
 #' @details The default values for the time spans correspond to the 0.90 
 #'   credibility intervals estimated from 
-#'   [https://weecology.github.io/LDATS/paper-comparison.html]. An alternative 
+#'   <https://weecology.github.io/LDATS/paper-comparison.html>. An alternative 
 #'   default are the values from Christensen et al. 2018:
 #'   `lower_date = as.Date(c("1983-12-01", "1988-10-01", "1998-09-01", "2009-06-01"))`
 #'   `upper_date = as.Date(c("1984-07-01", "1996-01-01", "1999-12-01", "2010-09-01"))`
