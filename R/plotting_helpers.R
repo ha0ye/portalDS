@@ -1,17 +1,24 @@
 extract_matrix_values <- function(values_list, id_var = "censusdate")
 {
+    # check if we need to convert to complex
+    types <- vapply(values_list, class, "")
+    any_complex <- any(types == "complex")
+    
     purrr::map_dfr(values_list, 
                    .id = id_var, 
                    function(vals) {
                        if (any(is.na(vals))) {
                            return(data.frame())
                        }
+                       if (any_complex)
+                       {
+                           vals <- as.complex(vals)
+                       }
                        data.frame(
                            value = vals, 
-                           rank = seq(-vals)
+                           rank = seq_along(vals)
                        )
-                   }) %>%
-        dplyr::mutate_at(vars(id_var), as.Date)
+                   })
 }
 
 make_matrix_value_plot <- function(values_dist, id_var = "censusdate", 

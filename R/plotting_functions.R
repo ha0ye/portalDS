@@ -190,7 +190,8 @@ plot_eigenvalues <- function(eigenvalues, num_values = 1,
 {
     eigenvalue_dist <- extract_matrix_values(eigenvalues, id_var = id_var) %>%
         dplyr::filter(.data$rank <= num_values) %>%
-        dplyr::mutate(value = abs(.data$value))
+        dplyr::mutate(value = abs(.data$value), 
+                      censusdate = lubridate::parse_date_time(censusdate, orders = "ymd"))
     
     my_plot <- make_matrix_value_plot(eigenvalue_dist, 
                                       id_var = id_var, 
