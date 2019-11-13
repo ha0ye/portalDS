@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>add_regime_shift_highlight — add_regime_shift_highlight • portalDS</title>
+<title>Highlight specific time spans — add_regime_shift_highlight • portalDS</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,9 +30,10 @@
 
 
 
-<meta property="og:title" content="add_regime_shift_highlight — add_regime_shift_highlight" />
+<meta property="og:title" content="Highlight specific time spans — add_regime_shift_highlight" />
 
-<meta property="og:description" content="add transparent bars to highlight specific time spans" />
+<meta property="og:description" content="Add transparent vertical slices, with boundaries specified by
+the lower_date and upper_date arguments." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -114,14 +115,15 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>add_regime_shift_highlight</h1>
+    <h1>Highlight specific time spans</h1>
     <small class="dont-index">Source: <a href='https://github.com/ha0ye/portalDS/blob/master/R/plotting_helpers.R'><code>R/plotting_helpers.R</code></a></small>
     <div class="hidden name"><code>add_regime_shift_highlight.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>add transparent bars to highlight specific time spans</p>
+    <p>Add transparent vertical slices, with boundaries specified by
+the <code>lower_date</code> and <code>upper_date</code> arguments.</p>
     
     </div>
 
@@ -159,6 +161,15 @@
 
     <p>A ggplot object with the bars added</p>
     
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>The default values for the time spans correspond to the 0.90
+credibility intervals estimated from
+<a href='https://weecology.github.io/LDATS/paper-comparison.html'>https://weecology.github.io/LDATS/paper-comparison.html</a>. An alternative
+default are the values from Christensen et al. 2018:
+<code>lower_date = as.Date(c("1983-12-01", "1988-10-01", "1998-09-01", "2009-06-01"))</code>
+<code>upper_date = as.Date(c("1984-07-01", "1996-01-01", "1999-12-01", "2010-09-01"))</code></p>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -167,6 +178,8 @@
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
+
+      <li><a href="#details">Details</a></li>
           </ul>
 
   </div>
