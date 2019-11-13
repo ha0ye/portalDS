@@ -35,6 +35,7 @@
 #' @export
 compute_dynamic_stability <- function(block,
                                       results_file = NULL,
+                                      id_var = "censudate", 
                                       max_E = 16, E_list = seq(max_E),
                                       surrogate_method = "annual_spline",
                                       num_surr = 200, surr_params = list(),
@@ -94,8 +95,11 @@ compute_dynamic_stability <- function(block,
     )
 
     # add date labels for each matrix in list
-    # stopifnot(length(results$smap_matrices) == NROW(results$block))
-    # names(results$smap_matrices) <- results$block$censusdate
+    if (id_var %in% names(results$block))
+    {
+      stopifnot(length(results$smap_matrices) == NROW(results$block))
+      names(results$smap_matrices) <- results$block[[id_var]]
+    }
   }
 
   # check for eigenvalues

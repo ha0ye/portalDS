@@ -4,7 +4,7 @@ extract_matrix_values <- function(values_list, id_var = "censusdate")
     types <- vapply(values_list, class, "")
     any_complex <- any(types == "complex")
     
-    purrr::map_dfr(values_list, 
+    out <- purrr::map_dfr(values_list, 
                    .id = id_var, 
                    function(vals) {
                        if (any(is.na(vals))) {
@@ -19,6 +19,16 @@ extract_matrix_values <- function(values_list, id_var = "censusdate")
                            rank = seq_along(vals)
                        )
                    })
+    
+    id <- out %>% 
+        dplyr::pull(id_var) %>%
+        lubridate::ymd()
+    
+    if (!anyNA(id))
+    {
+        out[[id_var]] <- id
+    }
+    return(out)
 }
 
 make_matrix_value_plot <- function(values_dist, id_var = "censusdate", 
@@ -65,7 +75,8 @@ extract_matrix_vectors <- function(vectors_list, id_var = "censusdate",
                               if (anyNA(v) || is.null(v)) {
                                   return()
                               }
-                              reshape2::melt(v[row_idx, col_idx, drop = FALSE], as.is = TRUE)
+                              reshape2::melt(v[row_idx, col_idx, drop = FALSE], as.is = TRUE) %>%
+                                  dplyr::mutate_at("value", as.complex)
                           }) %>% 
         dplyr::mutate_at(vars(id_var), as.Date) %>%
         dplyr::rename(variable = .data$Var1, rank = .data$Var2) %>%

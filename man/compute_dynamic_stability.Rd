@@ -5,10 +5,11 @@
 \alias{build_dynamic_stability_plan}
 \title{Dynamic stability analysis for community time series}
 \usage{
-compute_dynamic_stability(block, results_file = NULL, max_E = 16,
-  E_list = seq(max_E), surrogate_method = "annual_spline",
-  num_surr = 200, surr_params = list(), lib_sizes = seq(10, 100, by =
-  10), random_libs = TRUE, num_samples = 100, replace = TRUE,
+compute_dynamic_stability(block, results_file = NULL,
+  id_var = "censudate", max_E = 16, E_list = seq(max_E),
+  surrogate_method = "annual_spline", num_surr = 200,
+  surr_params = list(), lib_sizes = seq(10, 100, by = 10),
+  random_libs = TRUE, num_samples = 100, replace = TRUE,
   RNGseed = 42, silent = TRUE, rescale = TRUE,
   rolling_forecast = FALSE)
 
