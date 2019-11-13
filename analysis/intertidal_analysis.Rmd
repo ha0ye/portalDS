@@ -1,0 +1,97 @@
+---
+title: "Rocky Intertidal Dynamic Stability Analysis"
+author: "Hao Ye"
+date: "`r Sys.Date()`"
+output: github_document
+bibliography: ../vignettes/my_lib.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+This report documents applying the dynamic stability analysis to the rocky intertidal system reported on in [@Beninca_2015]
+
+First, some setup for the environment:
+
+```{r packages, message = FALSE}
+library(portalDS)
+library(dplyr)
+library(ggplot2)
+
+set.seed(42)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Workflow
+
+## Data
+
+We use the interpolated data, as these methods also require regular sampling in time.
+
+```{r, collapse = TRUE}
+block <- readxl::read_excel(here::here("inst/extdata/pnas.1421968112.sd01.xlsx"), 
+                            sheet = 2, 
+                            col_types = c("text", "numeric", "numeric", "numeric", "numeric", "guess", "guess", "guess")) %>%
+  mutate(Date = as.Date(as.numeric(Date) - 366, origin = "0000-12-31")) %>%
+  select(1:5)
+names(block) <- c("censusdate", "barnacles", "crustose_algae", "mussels", "bare_rock")
+```
+
+## Analysis
+
+We do not go through the full analysis here. Instead, see the [Maizuru Dynamic Stability vignette](https://ha0ye.github.io/portalDS/articles/maizuru-dynamic-stability.html) or (eventual methdos write-up).
+
+```{r}
+results_file <- here::here("output/rocky_intertidal_ds_results.RDS")
+results <- compute_dynamic_stability(block, results_file)
+str(results, max.level = 1)
+```
+
+# Results
+
+## Abundance time series
+
+```{r, fig.width = 10}
+plot_time_series(results$block)
+```
+
+## Eigenvalues & Eigenvectors
+
+```{r}
+plot_eigenvalues(results$eigenvalues, 
+                 num_values = 3)
+```
+
+```{r, fig.width = 10}
+plot_eigenvectors(results$eigenvectors)
+```
+
+## Singular values and SVD vectors
+
+```{r}
+plot_svd_values(results$svd_decomp$d, 
+                num_values = 3)
+```
+
+```{r, fig.width = 10}
+plot_svd_vectors(results$svd_decomp$u)
+```
+
+## Volume contraction and total variance
+
+```{r}
+plot_volume_contraction(results$volume_contraction)
+```
+
+```{r}
+plot_total_variance(results$total_variance)
+```
+
+# References
+
