@@ -131,7 +131,7 @@ each column.</p>
 
     <pre class="usage"><span class='fu'>compute_simplex</span>(<span class='no'>block</span>, <span class='kw'>E_list</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>10</span>,
   <span class='kw'>surrogate_method</span> <span class='kw'>=</span> <span class='st'>"annual_spline"</span>, <span class='kw'>num_surr</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>surr_params</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+  <span class='kw'>surr_params</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>id_var</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -160,6 +160,11 @@ options are "annual_spline" or methods available in
       <th>surr_params</th>
       <td><p>a list of named optional arguments to be passed into the
 surrogate data function</p></td>
+    </tr>
+    <tr>
+      <th>id_var</th>
+      <td><p>the name of the index variable of <code>block</code> that is useful for
+labeling the time-varying output, if it exists</p></td>
     </tr>
     </table>
     

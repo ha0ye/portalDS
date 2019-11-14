@@ -83,7 +83,7 @@
       <h1>Compute Dynamic Stability for the Maizuru Bay Fish Community</h1>
                         <h4 class="author">Hao Ye</h4>
             
-            <h4 class="date">2019-11-13</h4>
+            <h4 class="date">2019-11-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ha0ye/portalDS/blob/master/vignettes/maizuru-dynamic-stability.Rmd"><code>vignettes/maizuru-dynamic-stability.Rmd</code></a></small>
       <div class="hidden name"><code>maizuru-dynamic-stability.Rmd</code></div>
@@ -144,7 +144,9 @@
 <a class="sourceLine" id="cb3-10" data-line-number="10">      <span class="fl">0.82</span>, <span class="fl">0.81</span>, <span class="fl">0.80</span>, <span class="fl">0.96</span></a>
 <a class="sourceLine" id="cb3-11" data-line-number="11">    )</a>
 <a class="sourceLine" id="cb3-12" data-line-number="12">  )</a>
-<a class="sourceLine" id="cb3-13" data-line-number="13">)</a></code></pre></div>
+<a class="sourceLine" id="cb3-13" data-line-number="13">)</a>
+<a class="sourceLine" id="cb3-14" data-line-number="14"><span class="co">#&gt; Warning: attributes are not identical across measure variables;</span></a>
+<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="co">#&gt; they will be dropped</span></a></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
 <li>Run ccm on each pairwise interaction, including the surrogate data, and using the embedding dimension identified previously. Since this takes a while to run, we’ve commented out the actual code, and instead load a pre-generated results file.</li>
 </ol>
@@ -164,20 +166,15 @@
 <ol start="4" style="list-style-type: decimal">
 <li>run S-map models for each time series, using the appropriate number of lags, and including the important interacting variables (we rescale the time series to each have mean = 0, variance = 1)</li>
 </ol>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">smap_coeffs &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compute_smap_coeffs.html">compute_smap_coeffs</a></span>(maizuru_block, ccm_links,</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2">  <span class="dt">rescale =</span> <span class="ot">TRUE</span></a>
-<a class="sourceLine" id="cb6-3" data-line-number="3">)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">smap_coeffs &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compute_smap_coeffs.html">compute_smap_coeffs</a></span>(maizuru_block, </a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">                                   ccm_links,</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">                                   <span class="dt">rescale =</span> <span class="ot">TRUE</span>, </a>
+<a class="sourceLine" id="cb6-4" data-line-number="4">                                   <span class="dt">id_var =</span> <span class="st">"censusdate"</span>)</a></code></pre></div>
 <ol start="5" style="list-style-type: decimal">
 <li>extract out the s-map coefficients from the models and assemble matrices for the system</li>
 </ol>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">smap_matrices &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compute_smap_matrices.html">compute_smap_matrices</a></span>(</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">  smap_coeffs,</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">  ccm_links</a>
-<a class="sourceLine" id="cb7-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co"># add date labels for each matrix in list</span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/stopifnot">stopifnot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(smap_matrices) <span class="op">==</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NROW</a></span>(maizuru_block))</a>
-<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(smap_matrices) &lt;-<span class="st"> </span>maizuru_block<span class="op">$</span>censusdate</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">smap_matrices &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compute_smap_matrices.html">compute_smap_matrices</a></span>(smap_coeffs,</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">                                       ccm_links)</a></code></pre></div>
 <ol start="6" style="list-style-type: decimal">
 <li>perform eigen-decomposition on the s-map coefficient matrices</li>
 </ol>

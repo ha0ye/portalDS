@@ -165,17 +165,18 @@ dynamic stability analysis.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>compute_dynamic_stability</span>(<span class='no'>block</span>, <span class='kw'>results_file</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>max_E</span> <span class='kw'>=</span> <span class='fl'>16</span>,
-  <span class='kw'>E_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='no'>max_E</span>), <span class='kw'>surrogate_method</span> <span class='kw'>=</span> <span class='st'>"annual_spline"</span>,
-  <span class='kw'>num_surr</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>surr_params</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>lib_sizes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>10</span>, <span class='fl'>100</span>, <span class='kw'>by</span> <span class='kw'>=</span>
-  <span class='fl'>10</span>), <span class='kw'>random_libs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>num_samples</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>replace</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>RNGseed</span> <span class='kw'>=</span> <span class='fl'>42</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>rescale</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>rolling_forecast</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-
-<span class='fu'>build_dynamic_stability_plan</span>(<span class='kw'>max_E</span> <span class='kw'>=</span> <span class='fl'>16</span>, <span class='kw'>E_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='no'>max_E</span>),
+    <pre class="usage"><span class='fu'>compute_dynamic_stability</span>(<span class='no'>block</span>, <span class='kw'>results_file</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>id_var</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>max_E</span> <span class='kw'>=</span> <span class='fl'>16</span>, <span class='kw'>E_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='no'>max_E</span>),
   <span class='kw'>surrogate_method</span> <span class='kw'>=</span> <span class='st'>"annual_spline"</span>, <span class='kw'>num_surr</span> <span class='kw'>=</span> <span class='fl'>200</span>,
   <span class='kw'>surr_params</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>lib_sizes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>10</span>, <span class='fl'>100</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fl'>10</span>),
   <span class='kw'>random_libs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>num_samples</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>replace</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>RNGseed</span> <span class='kw'>=</span> <span class='fl'>42</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>rescale</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>rolling_forecast</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+
+<span class='fu'>build_dynamic_stability_plan</span>(<span class='kw'>id_var</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>max_E</span> <span class='kw'>=</span> <span class='fl'>16</span>,
+  <span class='kw'>E_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='no'>max_E</span>), <span class='kw'>surrogate_method</span> <span class='kw'>=</span> <span class='st'>"annual_spline"</span>,
+  <span class='kw'>num_surr</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>surr_params</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>lib_sizes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>10</span>, <span class='fl'>100</span>, <span class='kw'>by</span> <span class='kw'>=</span>
+  <span class='fl'>10</span>), <span class='kw'>random_libs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>num_samples</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>replace</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>RNGseed</span> <span class='kw'>=</span> <span class='fl'>42</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>rescale</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>rolling_forecast</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
@@ -191,6 +192,11 @@ as the column containing the time value.</p></td>
     <tr>
       <th>results_file</th>
       <td><p>the location of the results to be stored on disk.</p></td>
+    </tr>
+    <tr>
+      <th>id_var</th>
+      <td><p>the name of the index variable of <code>block</code> that is useful for
+labeling the time-varying output, if it exists</p></td>
     </tr>
     <tr>
       <th>max_E</th>
