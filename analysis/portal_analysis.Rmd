@@ -47,7 +47,7 @@ We specify a results file for storing the outputs of the analysis. The `compute_
 
 ```{r}
 results_file <- here::here("output/portal_ds_results_50.RDS")
-results <- compute_dynamic_stability(block, results_file)
+results <- compute_dynamic_stability(block, results_file, id_var = "censusdate")
 str(results, max.level = 1)
 ```
 

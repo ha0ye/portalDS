@@ -1,6 +1,6 @@
 Package: portalDS
 Title: Compute Dynamic Stability for Rodents at Portal
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: 
     person(given = "Hao",
            family = "Ye",

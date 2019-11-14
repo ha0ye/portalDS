@@ -138,7 +138,7 @@ make_matrix_vector_plot <- function(v_df,
         scale_y_continuous(limits = c(-1, 1)) +
         scale_color_viridis_d(option = palette_option) + 
         geom_line(size = line_size) +
-        labs(x = "censusdate", y = "value", color = "variable") +
+        labs(x = NULL, y = "value", color = "variable") +
         my_theme(base_size = base_size, 
                  panel.background = element_rect(fill = "#AAAABB", color = NA),
                  panel.grid.major = element_line(color = "grey30", size = 1),
