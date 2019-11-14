@@ -40,12 +40,13 @@ Setup the data and compute simplex results.
 data("block_3sp", package = "rEDM")
 
 block <- setNames(block_3sp[, c("time", "x_t", "y_t", "z_t")],
-                  c("censusdate", "x", "y", "z"))
+                  c("time", "x", "y", "z"))
 
 simplex_results <- compute_simplex(block = block,
                                    E_list = 3:5,
                                    surrogate_method = "random_shuffle",
-                                   num_surr = 20)
+                                   num_surr = 20, 
+                                   id_var = "time")
 
 ```
 
