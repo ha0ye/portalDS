@@ -12,6 +12,8 @@
 #' @param num_surr number of surrogates to compute
 #' @param surr_params a list of named optional arguments to be passed into the
 #'   surrogate data function
+#' @param id_var the name of the index variable of `block` that is useful for 
+#'   labeling the time-varying output, if it exists
 #' @return A tibble with columns for the species name (taken from the original
 #'   column names), the abundance time series for each species, the output from
 #'   [rEDM::simplex()], the best embedding dimension, as determined by 
@@ -21,9 +23,17 @@
 compute_simplex <- function(block, E_list = 1:10,
                             surrogate_method = "annual_spline",
                             num_surr = 100,
-                            surr_params = NULL) {
-  simplex_results <- block %>%
-    dplyr::select(-.data$censusdate) %>%
+                            surr_params = NULL, 
+                            id_var = NULL)
+{
+  abundances <- block
+  if (!is.null(id_var))
+  {
+    abundances <- block %>%
+      dplyr::select_at(dplyr::vars(-id_var))
+  }
+  
+  simplex_results <- abundances %>%
     tidyr::gather("species", "abundance") %>%
     dplyr::group_by(.data$species) %>%
     tidyr::nest() %>%

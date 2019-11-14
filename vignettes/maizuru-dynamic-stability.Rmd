@@ -102,22 +102,17 @@ ccm_links <- compute_ccm_links(ccm_results)
 4. run S-map models for each time series, using the appropriate number of lags, and including the important interacting variables (we rescale the time series to each have mean = 0, variance = 1)
 
 ```{r smap coeffs}
-smap_coeffs <- compute_smap_coeffs(maizuru_block, ccm_links,
-  rescale = TRUE
-)
+smap_coeffs <- compute_smap_coeffs(maizuru_block, 
+                                   ccm_links,
+                                   rescale = TRUE, 
+                                   id_var = "censusdate")
 ```
 
 5. extract out the s-map coefficients from the models and assemble matrices for the system
 
 ```{r smap matrices}
-smap_matrices <- compute_smap_matrices(
-  smap_coeffs,
-  ccm_links
-)
-
-# add date labels for each matrix in list
-stopifnot(length(smap_matrices) == NROW(maizuru_block))
-names(smap_matrices) <- maizuru_block$censusdate
+smap_matrices <- compute_smap_matrices(smap_coeffs,
+                                       ccm_links)
 ```
 
 6. perform eigen-decomposition on the s-map coefficient matrices

@@ -5,10 +5,10 @@
 \title{Compute S-map coefficients for a community}
 \usage{
 compute_smap_coeffs(block, ccm_links, rescale = TRUE,
-  rolling_forecast = FALSE)
+  rolling_forecast = FALSE, id_var = NULL)
 }
 \arguments{
-\item{block}{A data.frame containing time series for the community. Each
+\item{block}{a data.frame containing time series for the community. Each
 column is a time series of abundances.}
 
 \item{ccm_links}{A data.frame containing the significant causal links. Each
@@ -23,6 +23,9 @@ row is a causal link. The columns are:
 
 \item{rolling_forecast}{A logical, indicating whether to make individual
 rolling forecasts for the second half of the time series.}
+
+\item{id_var}{the name of the index variable of \code{block} that is useful for
+labeling the time-varying output, if it exists}
 }
 \value{
 A list with the matrix smap-coefficients for each predictor variable

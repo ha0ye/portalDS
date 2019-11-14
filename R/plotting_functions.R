@@ -172,7 +172,7 @@ plot_smap_coeffs <- function(smap_matrices, base_size = 16,
 #'   s-map model, and each element is a vector of the eigenvalues, computed
 #'   from the matrix of the s-map coefficients at that time step
 #' @param num_values the number of eigenvalues to plot
-#' @param id_var when constructing the long-format tibble,what should be the 
+#' @param id_var when constructing the long-format tibble, what should be the 
 #'   variable name containing the time index
 #' @param highlight_complex whether to also draw points to indicate when the
 #'   dominant eigenvalue is complex

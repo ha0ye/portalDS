@@ -6,7 +6,7 @@
 \usage{
 compute_simplex(block, E_list = 1:10,
   surrogate_method = "annual_spline", num_surr = 100,
-  surr_params = NULL)
+  surr_params = NULL, id_var = NULL)
 }
 \arguments{
 \item{block}{a data.frame containing time series for the community. Each
@@ -23,6 +23,9 @@ options are "annual_spline" or methods available in
 
 \item{surr_params}{a list of named optional arguments to be passed into the
 surrogate data function}
+
+\item{id_var}{the name of the index variable of \code{block} that is useful for
+labeling the time-varying output, if it exists}
 }
 \value{
 A tibble with columns for the species name (taken from the original

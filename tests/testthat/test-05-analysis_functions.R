@@ -7,12 +7,12 @@ test_that("compute_simplex works as expected", {
   E_list <- 3:5
   num_surr <- 4
   expect_error(simplex_out <- compute_simplex(maizuru_block,
-    E_list = E_list,
-    num_surr = num_surr
-  ), NA)
+                                              E_list = E_list,
+                                              num_surr = num_surr, 
+                                              id_var = "censusdate"), NA)
   # check columns
   expect_setequal(c("species", "data", "simplex_out", "best_E", "surrogate_data"), names(simplex_out))
-
+  
   # check species values
   expect_setequal(simplex_out$species, var_names)
 
@@ -47,18 +47,18 @@ test_that("twin surrogate option for compute_simplex works as expected", {
 
   expect_error(
     simplex_out <- compute_simplex(maizuru_block,
-      E_list = 1:24,
-      surrogate_method = "twin",
-      num_surr = num_surr,
-      surr_params = list(
-        T_period = 24,
-        quantile_vec = c(
-          0.875, 0.88, 0.89, 0.90, 0.91, 0.92,
-          0.93, 0.94, 0.95, 0.85, 0.84, 0.83,
-          0.82, 0.81, 0.80, 0.96
-        )
-      )
-    ),
+                                   E_list = 1:24,
+                                   surrogate_method = "twin",
+                                   num_surr = num_surr,
+                                   surr_params = list(
+                                     T_period = 24,
+                                     quantile_vec = c(
+                                       0.875, 0.88, 0.89, 0.90, 0.91, 0.92,
+                                       0.93, 0.94, 0.95, 0.85, 0.84, 0.83,
+                                       0.82, 0.81, 0.80, 0.96
+                                     )
+                                   ), 
+                                   id_var = "censusdate"), 
     NA
   )
   expect_equal(
@@ -69,10 +69,10 @@ test_that("twin surrogate option for compute_simplex works as expected", {
 
 test_that("compute_ccm_links works as expected", {
   data_path <- system.file("extdata", "maizuru_ccm_results.RDS",
-    package = "portalDS", mustWork = TRUE
+                           package = "portalDS", mustWork = TRUE
   )
   maizuru_ccm_results <- readRDS(data_path)
-
+  
   expect_error(ccm_links <- compute_ccm_links(maizuru_ccm_results), NA)
   expect_equal(dim(ccm_links), c(32, 5))
   expect_setequal(var_names, as.character(ccm_links$lib_column))
@@ -89,8 +89,10 @@ test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
     package = "portalDS", mustWork = TRUE
   )
   maizuru_ccm_links <- readRDS(data_path)
-
-  expect_error(smap_coeffs <- compute_smap_coeffs(maizuru_block, maizuru_ccm_links), NA)
+  
+  expect_error(smap_coeffs <- compute_smap_coeffs(maizuru_block, 
+                                                  maizuru_ccm_links, 
+                                                  id_var = "censusdate"), NA)
   expect_equal(length(smap_coeffs), length(var_names))
   best_E <- maizuru_ccm_links %>%
     dplyr::select(lib_column, E) %>%
@@ -107,18 +109,20 @@ test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
     )
   )
   smap_coeffs <- lapply(smap_coeffs, round, 4)
-  expect_known_hash(smap_coeffs, "1c7a16172f")
-
-  expect_error(smap_matrices <- compute_smap_matrices(smap_coeffs, maizuru_ccm_links), NA)
+  expect_known_hash(smap_coeffs, "aa30c22ec8")
+  
+  expect_error(smap_matrices <- compute_smap_matrices(smap_coeffs, 
+                                                      maizuru_ccm_links), NA)
   expect_type(smap_matrices, "list")
   expect_equal(length(smap_matrices), NROW(maizuru_block))
   expect_error(matrix_sizes <- lapply(smap_matrices, dim), NA)
   expect_error(idx <- vapply(matrix_sizes, is.null, TRUE), NA)
   expect_equal(
     do.call(rbind, matrix_sizes[!idx]),
-    matrix(312, nrow = sum(!idx), ncol = 2)
+    matrix(312, nrow = sum(!idx), ncol = 2), 
+    check.attributes = FALSE
   )
-  expect_known_hash(smap_matrices, "ca491bb58d")
+  expect_known_hash(smap_matrices, "c2dfbf4bb2")
 })
 
 data_path <- system.file("extdata", "maizuru_smap_matrices.RDS",

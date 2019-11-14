@@ -28,7 +28,6 @@
 #' @inheritParams compute_simplex
 #' @inheritParams compute_ccm
 #' @inheritParams compute_smap_coeffs
-#' @inheritParams plot_eigenvalues
 #'
 #' @return a list with named components for the individual output objects
 #' XXX
@@ -36,7 +35,7 @@
 #' @export
 compute_dynamic_stability <- function(block,
                                       results_file = NULL,
-                                      id_var = "censudate", 
+                                      id_var = NULL, 
                                       max_E = 16, E_list = seq(max_E),
                                       surrogate_method = "annual_spline",
                                       num_surr = 200, surr_params = list(),
@@ -60,22 +59,23 @@ compute_dynamic_stability <- function(block,
   # check for simplex results, compute if missing
   if (is.null(results$simplex_results)) {
     results$simplex_results <- compute_simplex(block,
-      E_list = E_list,
-      surrogate_method = surrogate_method,
-      num_surr = num_surr,
-      surr_params = surr_params
+                                               E_list = E_list,
+                                               surrogate_method = surrogate_method,
+                                               num_surr = num_surr,
+                                               surr_params = surr_params, 
+                                               id_var = id_var
     )
   }
-
+  
   # check for ccm results, compute if missing
   if (is.null(results$ccm_results)) {
     results$ccm_results <- compute_ccm(results$simplex_results,
-      lib_sizes = lib_sizes,
-      random_libs = random_libs,
-      num_samples = num_samples,
-      replace = replace,
-      RNGseed = RNGseed,
-      silent = silent
+                                       lib_sizes = lib_sizes,
+                                       random_libs = random_libs,
+                                       num_samples = num_samples,
+                                       replace = replace,
+                                       RNGseed = RNGseed,
+                                       silent = silent
     )
   }
 
@@ -83,21 +83,17 @@ compute_dynamic_stability <- function(block,
   if (is.null(results$ccm_links)) {
     results$ccm_links <- compute_ccm_links(results$ccm_results)
   }
-
+  
   # check for smap matrices, compute if missing
   if (is.null(results$smap_matrices)) {
     results$smap_coeffs <- compute_smap_coeffs(results$block, results$ccm_links,
-      rescale = rescale,
-      rolling_forecast = rolling_forecast
-    )
-    results$smap_matrices <- compute_smap_matrices(
-      results$smap_coeffs,
-      results$ccm_links
-    ) %>%
-      add_date_labels(block = results$block, 
-                      id_var = id_var)
+                                               rescale = rescale,
+                                               rolling_forecast = rolling_forecast, 
+                                               id_var = id_var)
+    results$smap_matrices <- compute_smap_matrices(results$smap_coeffs,
+                                                   results$ccm_links)
   }
-
+  
   # check for eigenvalues
   if (is.null(results$eigenvalues) || is.null(results$eigenvectors)) {
     eigen_decomp <- compute_eigen_decomp(results$smap_matrices)
@@ -109,7 +105,7 @@ compute_dynamic_stability <- function(block,
   if (is.null(results$singular_values) || is.null(results$singular_vectors_left)) {
     results$svd_decomp <- compute_svd_decomp(results$smap_matrices)
   }
-
+  
   # check for volume contraction and total variance
   if (is.null(results$volume_contraction) || is.null(results$total_variance)) {
     results$volume_contraction <- compute_volume_contraction(results$smap_matrices)
@@ -129,7 +125,7 @@ compute_dynamic_stability <- function(block,
 
 #' @inheritParams compute_dynamic_stability
 #' @export
-build_dynamic_stability_plan <- function(id_var = "censusdate", 
+build_dynamic_stability_plan <- function(id_var = NULL, 
                                          max_E = 16, E_list = seq(max_E),
                                          surrogate_method = "annual_spline",
                                          num_surr = 200, surr_params = list(),
@@ -139,30 +135,26 @@ build_dynamic_stability_plan <- function(id_var = "censusdate",
                                          silent = TRUE, rescale = TRUE,
                                          rolling_forecast = FALSE) {
   drake::drake_plan(
-    simplex_results = compute_simplex(
-      block = block,
-      E_list = !!E_list,
-      surrogate_method = !!surrogate_method,
-      num_surr = !!num_surr,
-      surr_params = !!surr_params
-    ),
-    ccm_results = compute_ccm(
-      simplex_results = simplex_results,
-      lib_sizes = !!lib_sizes,
-      random_libs = !!random_libs,
-      num_samples = !!num_samples,
-      replace = !!replace,
-      RNGseed = !!RNGseed,
-      silent = !!silent
-    ),
+    simplex_results = compute_simplex(block = block,
+                                      E_list = !!E_list,
+                                      surrogate_method = !!surrogate_method,
+                                      num_surr = !!num_surr,
+                                      surr_params = !!surr_params, 
+                                      id_var = !!id_var), 
+    ccm_results = compute_ccm(simplex_results = simplex_results,
+                              lib_sizes = !!lib_sizes,
+                              random_libs = !!random_libs,
+                              num_samples = !!num_samples,
+                              replace = !!replace,
+                              RNGseed = !!RNGseed,
+                              silent = !!silent), 
     ccm_links = compute_ccm_links(ccm_results),
-    smap_coeffs = compute_smap_coeffs(block, ccm_links,
-      rescale = !!rescale,
-      rolling_forecast = !!rolling_forecast
-    ),
-    smap_matrices = compute_smap_matrices(smap_coeffs, ccm_links) %>%
-      add_date_labels(block = block, 
-                      id_var = id_var),
+    smap_coeffs = compute_smap_coeffs(block, 
+                                      ccm_links,
+                                      rescale = !!rescale,
+                                      rolling_forecast = !!rolling_forecast, 
+                                      id_var = !!id_var),
+    smap_matrices = compute_smap_matrices(smap_coeffs, ccm_links), 
     eigen_decomp = compute_eigen_decomp(smap_matrices),
     eigenvalues = eigen_decomp$values,
     eigenvectors = eigen_decomp$vectors, 
@@ -170,17 +162,4 @@ build_dynamic_stability_plan <- function(id_var = "censusdate",
     volume_contraction = compute_volume_contraction(smap_matrices), 
     total_variance = compute_total_variance(smap_matrices)
   )
-}
-
-add_date_labels <- function(smap_matrices, 
-                            block, 
-                            id_var = "censusdate")
-{
-  # add date labels for each matrix in list
-  if (id_var %in% names(block))
-  {
-    stopifnot(length(smap_matrices) == NROW(block))
-    names(smap_matrices) <- block[[id_var]]
-  }
-  return(smap_matrices)
 }

@@ -8,20 +8,21 @@ test_that("Compute dynamic stability using block_3sp example data", {
   var_names <- c("x", "y", "z")
   block <- setNames(
     block_3sp[, c("time", "x_t", "y_t", "z_t")],
-    c("censusdate", var_names)
+    c("time", var_names)
   )
 
   # simplex results
   expect_error(simplex_results <- compute_simplex(block,
-    E_list = 3:5,
-    num_surr = 4,
-    surrogate_method = "random_shuffle"
+                                                  E_list = 3:5,
+                                                  num_surr = 4,
+                                                  surrogate_method = "random_shuffle", 
+                                                  id_var = "time"
   ), NA)
   
   # round simplex outputs for hash
   simplex_results$simplex_out <- lapply(simplex_results$simplex_out, round, 4)
   expect_known_hash(simplex_results, "b00009fc2d")
-
+  
   # ccm results
   expect_error(ccm_results <- compute_ccm(simplex_results,
     num_samples = 10
@@ -42,18 +43,18 @@ test_that("Compute dynamic stability using block_3sp example data", {
   expect_known_hash(ccm_links, "70474772ed")
 
   # s-map coefficients
-  expect_error(smap_coeffs <- compute_smap_coeffs(block, ccm_links), NA)
-  expect_known_hash(lapply(smap_coeffs, round, 4), "3f88e8ddf9")
+  expect_error(smap_coeffs <- compute_smap_coeffs(block, ccm_links, id_var = "time"), NA)
+  expect_known_hash(lapply(smap_coeffs, round, 4), "c86a8cb782")
 
   expect_error(smap_matrices <- compute_smap_matrices(smap_coeffs, ccm_links), NA)
-  expect_known_hash(lapply(smap_matrices, round, 4), "5393993b55")
+  expect_known_hash(lapply(smap_matrices, round, 4), "f837843845")
 
   expect_error(eigen_decomp <- compute_eigen_decomp(smap_matrices), NA)
   expect_error(eigenvalues <- eigen_decomp$values, NA)
-  expect_known_hash(lapply(eigenvalues, round, 4), "c5a2f2aaca")
+  expect_known_hash(lapply(eigenvalues, round, 4), "0710a023e3")
 
   expect_error(eigenvectors <- eigen_decomp$vectors, NA)
-  expect_known_hash(which(is.na(eigenvectors)), "ac6cf5b073")
+  expect_known_hash(which(is.na(eigenvectors)), "bf89101447")
   expect_error(ev <- eigenvectors[!is.na(eigenvectors)], NA)
   expect_known_hash(
     lapply(ev, function(x) {
@@ -61,7 +62,7 @@ test_that("Compute dynamic stability using block_3sp example data", {
       s <- matrix(s, nrow = nrow(x), ncol = ncol(x), byrow = TRUE)
       round(s * x, 4)
     }),
-    "68244b7ef9"
+    "c26e2df6f9"
   )
 })
 
@@ -73,23 +74,23 @@ test_that("Verify compute_dynamic_stability function", {
   var_names <- c("x", "y", "z")
   block <- setNames(
     block_3sp[, c("time", "x_t", "y_t", "z_t")],
-    c("censusdate", var_names)
+    c("time", var_names)
   )
 
   # simplex results
   expect_error(results <- compute_dynamic_stability(block,
-    E_list = 3:5,
-    surrogate_method = "random_shuffle",
-    num_surr = 4,
-    num_samples = 10
-  ), NA)
+                                                    id_var = "time", 
+                                                    E_list = 3:5,
+                                                    surrogate_method = "random_shuffle",
+                                                    num_surr = 4,
+                                                    num_samples = 10), 
+               NA)
   expect_is(results, "list")
-  expect_true(all(c(
-    "block", "simplex_results", "ccm_results",
-    "ccm_links", "smap_matrices", "eigenvalues",
-    "eigenvectors"
-  ) %in% names(results)))
-
+  expect_true(all(c("block", "simplex_results", "ccm_results",
+                    "ccm_links", "smap_matrices", "eigenvalues",
+                    "eigenvectors") %in% 
+                    names(results)))
+  
   simplex_results <- results$simplex_results
   ccm_results <- results$ccm_results
   ccm_links <- results$ccm_links
@@ -97,7 +98,7 @@ test_that("Verify compute_dynamic_stability function", {
   smap_matrices <- results$smap_matrices
   eigenvalues <- results$eigenvalues
   eigenvectors <- results$eigenvectors
-
+  
   simplex_results$simplex_out <- lapply(simplex_results$simplex_out, round, 4)
   expect_known_hash(simplex_results, "b00009fc2d")
   expect_known_hash(
@@ -105,10 +106,10 @@ test_that("Verify compute_dynamic_stability function", {
     "40a8eb1668"
   )
   expect_known_hash(ccm_links, "70474772ed")
-  expect_known_hash(lapply(smap_coeffs, round, 4), "3f88e8ddf9")
-  expect_known_hash(lapply(smap_matrices, round, 4), "5393993b55")
-  expect_known_hash(lapply(eigenvalues, round, 4), "c5a2f2aaca")
-  expect_known_hash(which(is.na(eigenvectors)), "ac6cf5b073")
+  expect_known_hash(lapply(smap_coeffs, round, 4), "c86a8cb782")
+  expect_known_hash(lapply(smap_matrices, round, 4), "f837843845")
+  expect_known_hash(lapply(eigenvalues, round, 4), "0710a023e3")
+  expect_known_hash(which(is.na(eigenvectors)), "bf89101447")
   expect_error(ev <- eigenvectors[!is.na(eigenvectors)], NA)
   expect_known_hash(
     lapply(ev, function(x) {
@@ -116,6 +117,6 @@ test_that("Verify compute_dynamic_stability function", {
       s <- matrix(s, nrow = nrow(x), ncol = ncol(x), byrow = TRUE)
       round(s * x, 4)
     }),
-    "68244b7ef9"
+    "c26e2df6f9"
   )
 })

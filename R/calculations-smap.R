@@ -16,18 +16,18 @@ get_smap_coefficients <- function(block,
                                   theta = c(seq(0, 1, by = 0.1), seq(1.5, 10, by = 0.5))) {
   # determine best theta
   theta_test <- rEDM::block_lnlp(block,
-    lib = lib, pred = pred,
-    method = "s-map", tp = 1,
-    theta = theta, silent = TRUE
+                                 lib = lib, pred = pred,
+                                 method = "s-map", tp = 1,
+                                 theta = theta, silent = TRUE
   )
   best_theta <- theta_test$theta[which.min(theta_test$mae)]
-
+  
   # re-run to get s-map coefficients
   smap_out <- rEDM::block_lnlp(block,
-    lib = lib, pred = pred,
-    method = "s-map", tp = 1,
-    theta = best_theta, silent = TRUE,
-    save_smap_coefficients = TRUE
+                               lib = lib, pred = pred,
+                               method = "s-map", tp = 1,
+                               theta = best_theta, silent = TRUE,
+                               save_smap_coefficients = TRUE
   )
   return(smap_out$smap_coefficients[[1]])
 }
@@ -47,8 +47,6 @@ get_smap_coefficients <- function(block,
 #'   x_{t+1} = F(x_t, y_t, z_t, x_{t-1}, x_{t-2}, ...)
 #'   where the number of predictors is equal to the best embedding dimension for
 #'   `x`.
-#' @param block A data.frame containing time series for the community. Each
-#'   column is a time series of abundances.
 #' @param ccm_links A data.frame containing the significant causal links. Each
 #'   row is a causal link. The columns are:
 #'   \describe{
@@ -59,46 +57,54 @@ get_smap_coefficients <- function(block,
 #' @param rescale A logical, indicating whether to rescale each time series
 #' @param rolling_forecast A logical, indicating whether to make individual
 #'   rolling forecasts for the second half of the time series.
-#'
+#' @inheritParams compute_simplex
 #' @return A list with the matrix smap-coefficients for each predictor variable
 #'   identified in CCM (these are the affected variables). The names in the list
 #'   and the column names of the matrices use the variable names in the block.
 #'
 #' @export
-compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
-                                rolling_forecast = FALSE) {
+compute_smap_coeffs <- function(block, ccm_links, 
+                                rescale = TRUE,
+                                rolling_forecast = FALSE, 
+                                id_var = NULL)
+{
   # rescale all the variables
-  block <- block %>%
-    dplyr::select(-.data$censusdate)
-  if (rescale) {
-    block <- dplyr::mutate_all(block, norm_rescale)
+  abundances <- block
+  if (!is.null(id_var))
+  {
+    abundances <- block %>%
+      dplyr::select_at(dplyr::vars(-id_var))
   }
-
+  if (rescale)
+  {
+    abundances <- dplyr::mutate_all(abundances, norm_rescale)
+  }
+  
   if (is.factor(ccm_links$lib_column)) {
     ccm_links$lib_column <- as.character(ccm_links$lib_column)
   }
   if (is.factor(ccm_links$target_column)) {
     ccm_links$target_column <- as.character(ccm_links$target_column)
   }
-
+  
   # check if column names are present or are valid indices
   if (is.numeric(ccm_links$lib_column)) {
     stopifnot(
       min(ccm_links$lib_column) >= 1,
-      max(ccm_links$lib_column) <= NCOL(block)
+      max(ccm_links$lib_column) <= NCOL(abundances)
     )
   } else {
-    stopifnot(ccm_links$lib_column %in% colnames(block))
+    stopifnot(ccm_links$lib_column %in% colnames(abundances))
   }
   if (is.numeric(ccm_links$target_column)) {
     stopifnot(
       min(ccm_links$target_column) >= 1,
-      max(ccm_links$target_column) <= NCOL(block)
+      max(ccm_links$target_column) <= NCOL(abundances)
     )
   } else {
-    stopifnot(ccm_links$target_column %in% colnames(block))
+    stopifnot(ccm_links$target_column %in% colnames(abundances))
   }
-
+  
   effect_variables <- union(
     unique(ccm_links$lib_column),
     unique(ccm_links$target_column)
@@ -114,11 +120,11 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
     links <- ccm_links %>% dplyr::filter(.data$lib_column == !!effect_var)
     stopifnot(length(unique(links$E)) == 1) # check for unique best_E
     stopifnot(effect_var %in% links$target_column) # check for self-interaction
-
+    
     E <- links$E[1]
     causal_var <- links$target_column
     causal_var <- c(effect_var, setdiff(causal_var, effect_var)) # reorder so effect_var is first
-
+    
     # create temp_block
     #   how many total lags of effect_var do we need?
     num_effect_lags <- E - length(causal_var) + 1
@@ -131,39 +137,39 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
       E <- length(causal_var)
       num_effect_lags <- 0
     }
-
+    
     #   any causal vars and
     #   pad with lags of effect_var (dropping time and 0 lag columns)
     if (num_effect_lags == 0) {
-      temp_block <- block[, causal_var, drop = FALSE]
+      temp_block <- abundances[, causal_var, drop = FALSE]
     } else {
       temp_block <- cbind(
-        block[, causal_var, drop = FALSE],
-        rEDM::make_block(block[, effect_var, drop = FALSE],
-          max_lag = num_effect_lags
+        abundances[, causal_var, drop = FALSE],
+        rEDM::make_block(abundances[, effect_var, drop = FALSE],
+                         max_lag = num_effect_lags
         )[, -c(1, 2), drop = FALSE]
       )
     }
-
+    
     if (!rolling_forecast) {
       smap_coeff <- get_smap_coefficients(temp_block)
     } else {
-      n <- NROW(block)
+      n <- NROW(abundances)
       lib <- c(1, floor(n / 2))
       # initialize smap_coeff
       smap_coeff <- get_smap_coefficients(temp_block,
-        lib = lib, pred = lib
+                                          lib = lib, pred = lib
       )
       to_fill <- data.frame(matrix(NA, nrow = n - NROW(smap_coeff), ncol = NCOL(smap_coeff)))
       names(to_fill) <- names(smap_coeff)
       smap_coeff <- rbind(smap_coeff, to_fill)
-
+      
       # loop and generate new smap_coeff at each row
       for (lib_end in seq(floor(n / 2) + 1, n))
       {
         lib <- c(1, lib_end)
         temp_smap_coeff <- get_smap_coefficients(temp_block,
-          lib = lib, pred = lib
+                                                 lib = lib, pred = lib
         )
         smap_coeff[lib_end - 1, ] <- temp_smap_coeff[lib_end - 1, ]
       }
@@ -171,6 +177,18 @@ compute_smap_coeffs <- function(block, ccm_links, rescale = TRUE,
     names(smap_coeff) <- c(names(temp_block), "const")
     return(smap_coeff)
   })
+  
+  # add index labels for each matrix in list
+  if (!is.null(id_var) && id_var %in% names(block))
+  {
+    labels <- block[[id_var]]
+    smap_coeffs <- lapply(smap_coeffs, function(smap_coeff) {
+      stopifnot(length(labels) == NROW(smap_coeff))
+      rownames(smap_coeff) <- labels
+      return(smap_coeff)
+    })
+  }
+  
   names(smap_coeffs) <- effect_variables
   return(smap_coeffs)
 }
@@ -211,23 +229,23 @@ compute_smap_matrices <- function(smap_coeffs, ccm_links) {
   # identify only connected nodes
   ccm_links$lib_column <- as.factor(ccm_links$lib_column)
   ccm_links$target_column <- as.factor(ccm_links$target_column)
-
+  
   vars <- union(
     levels(ccm_links$lib_column)[tabulate(ccm_links$lib_column) > 1],
     levels(ccm_links$target_column)[tabulate(ccm_links$target_column) > 1]
   )
-
+  
   # get maximum E value (so we know size of the Jacobian matrix)
   max_E <- ccm_links %>%
     dplyr::filter(.data$lib_column %in% vars) %>%
     dplyr::pull(.data$E) %>%
     max()
   jacobian_dim <- max_E * length(vars)
-
+  
   # check number of time points
   ts_length <- unique(purrr::map_dbl(smap_coeffs, NROW))
   stopifnot(length(ts_length) == 1)
-
+  
   # for each predicted variable,
   #   convert the time-indexed data.frame of coefficients into the
   #   time-indexed matrix of coefficients
@@ -235,10 +253,10 @@ compute_smap_matrices <- function(smap_coeffs, ccm_links) {
     # get s-map coefficients without const column
     smap_df <- smap_coeffs[[var_name]] %>%
       dplyr::select(-.data$const)
-
+    
     # output matrix (each row is 1 time step, each col is a var x lag)
     out <- matrix(0, nrow = ts_length, ncol = jacobian_dim)
-
+    
     # find the correct column locations for the s-map coefficients
     regex_splits <- stringr::str_match(colnames(smap_df), "(.+)_(\\d+)|(.+)")
     regex_splits[is.na(regex_splits[, 2]), 2] <- "" # convert NA into ""
@@ -250,48 +268,58 @@ compute_smap_matrices <- function(smap_coeffs, ccm_links) {
     )
     col_lookup$col_idx <- match(col_lookup$var, vars) +
       col_lookup$lag * length(vars)
-
+    
     # check for NAs
     if (any(is.na(col_lookup$col_idx))) {
       warning("Computing column locations and found NAs for variable ", colnames(smap_df)[1])
     }
-
+    
     # populate s-map coefficients into output matrix
     smap_mat <- as.matrix(smap_df)
     out[, col_lookup$col_idx] <- smap_mat
-
+    
     colnames(out) <- paste0(rep(vars, max_E), "_", rep(seq(max_E), each = length(vars)) - 1)
     return(out)
   })
-
+  
   # for each time step
   #   create the matrix of smap_coeffs, check for NAs
   #   otherwise, fill the rest of the matrix accordingly, and compute the largest eigenvalue
-
+  
   smap_matrices <- purrr::map(seq(ts_length), function(t) {
     # initialize J
     J <- matrix(0, nrow = jacobian_dim, ncol = jacobian_dim)
-
+    
     # fill in rows for each predicted variable
     for (i in seq(smap_matrix_rows)) {
       J[i, ] <- (smap_matrix_rows[[i]])[t, ]
     }
-
+    
     # if there are NA values, then return NA
     if (any(is.na(J))) {
       return(NA)
     }
-
+    
     # fill in identity matrix for lag relationships
     I_row_idx <- length(vars) + seq(length(vars) * (max_E - 1))
     I_col_idx <- seq(length(vars) * (max_E - 1))
     J[cbind(I_row_idx, I_col_idx)] <- 1
-
+    
     colnames(J) <- colnames(smap_matrix_rows[[1]])
     rownames(J) <- colnames(J)
-
+    
     return(J)
   })
-
+  
+  # propagate list labels from `smap_coeffs`
+  n <- length(smap_matrices)
+  stopifnot(all(vapply(smap_coeffs, NROW, 0) == n))
+  smap_coeff_names <- vapply(smap_coeffs, rownames, rep.int("", n))
+  stopifnot(all(vapply(seq_len(NCOL(smap_coeff_names)), 
+                       function(j) {identical(smap_coeff_names[,1], smap_coeff_names[,j])}, 
+                       FALSE)
+  ))
+  names(smap_matrices) <- smap_coeff_names[, 1]
+  
   return(smap_matrices)
 }
