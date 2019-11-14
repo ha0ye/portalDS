@@ -1,7 +1,7 @@
 Rocky Intertidal Dynamic Stability Analysis
 ================
 Hao Ye
-2019-11-13
+2019-11-14
 
 # Introduction
 
@@ -40,7 +40,7 @@ block <- readxl::read_excel(here::here("inst/extdata/pnas.1421968112.sd01.xlsx")
 #> * `` -> ...6
 #> * `` -> ...7
 #> * `` -> ...8
-names(block) <- c("censusdate", "barnacles", "crustose_algae", "mussels", "bare_rock")
+names(block) <- c("date", "barnacles", "crustose_algae", "mussels", "bare_rock")
 ```
 
 ## Analysis
@@ -52,7 +52,7 @@ or (eventual methdos write-up).
 
 ``` r
 results_file <- here::here("output/rocky_intertidal_ds_results.RDS")
-results <- compute_dynamic_stability(block, results_file)
+results <- compute_dynamic_stability(block, results_file, id_var = "date")
 str(results, max.level = 1)
 #> List of 11
 #>  $ block             :Classes 'tbl_df', 'tbl' and 'data.frame':  251 obs. of  5 variables:
@@ -75,7 +75,7 @@ str(results, max.level = 1)
 ## Abundance time series
 
 ``` r
-plot_time_series(results$block)
+plot_time_series(results$block, time_column = "date")
 ```
 
 ![](intertidal_analysis_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->

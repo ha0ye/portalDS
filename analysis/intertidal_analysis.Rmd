@@ -40,7 +40,7 @@ block <- readxl::read_excel(here::here("inst/extdata/pnas.1421968112.sd01.xlsx")
                             col_types = c("text", "numeric", "numeric", "numeric", "numeric", "guess", "guess", "guess")) %>%
   mutate(Date = as.Date(as.numeric(Date) - 366, origin = "0000-12-31")) %>%
   select(1:5)
-names(block) <- c("censusdate", "barnacles", "crustose_algae", "mussels", "bare_rock")
+names(block) <- c("date", "barnacles", "crustose_algae", "mussels", "bare_rock")
 ```
 
 ## Analysis
@@ -49,7 +49,7 @@ We do not go through the full analysis here. Instead, see the [Maizuru Dynamic S
 
 ```{r}
 results_file <- here::here("output/rocky_intertidal_ds_results.RDS")
-results <- compute_dynamic_stability(block, results_file)
+results <- compute_dynamic_stability(block, results_file, id_var = "date")
 str(results, max.level = 1)
 ```
 
@@ -58,7 +58,7 @@ str(results, max.level = 1)
 ## Abundance time series
 
 ```{r, fig.width = 10}
-plot_time_series(results$block)
+plot_time_series(results$block, time_column = "date")
 ```
 
 ## Eigenvalues & Eigenvectors
