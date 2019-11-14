@@ -28,6 +28,7 @@
 #' @inheritParams compute_simplex
 #' @inheritParams compute_ccm
 #' @inheritParams compute_smap_coeffs
+#' @inheritParams plot_eigenvalues
 #'
 #' @return a list with named components for the individual output objects
 #' XXX
@@ -92,14 +93,9 @@ compute_dynamic_stability <- function(block,
     results$smap_matrices <- compute_smap_matrices(
       results$smap_coeffs,
       results$ccm_links
-    )
-
-    # add date labels for each matrix in list
-    if (id_var %in% names(results$block))
-    {
-      stopifnot(length(results$smap_matrices) == NROW(results$block))
-      names(results$smap_matrices) <- results$block[[id_var]]
-    }
+    ) %>%
+      add_date_labels(block = results$block, 
+                      id_var = id_var)
   }
 
   # check for eigenvalues
@@ -133,7 +129,8 @@ compute_dynamic_stability <- function(block,
 
 #' @inheritParams compute_dynamic_stability
 #' @export
-build_dynamic_stability_plan <- function(max_E = 16, E_list = seq(max_E),
+build_dynamic_stability_plan <- function(id_var = "censusdate", 
+                                         max_E = 16, E_list = seq(max_E),
                                          surrogate_method = "annual_spline",
                                          num_surr = 200, surr_params = list(),
                                          lib_sizes = seq(10, 100, by = 10),
@@ -163,7 +160,9 @@ build_dynamic_stability_plan <- function(max_E = 16, E_list = seq(max_E),
       rescale = !!rescale,
       rolling_forecast = !!rolling_forecast
     ),
-    smap_matrices = compute_smap_matrices(smap_coeffs, ccm_links),
+    smap_matrices = compute_smap_matrices(smap_coeffs, ccm_links) %>%
+      add_date_labels(block = block, 
+                      id_var = id_var),
     eigen_decomp = compute_eigen_decomp(smap_matrices),
     eigenvalues = eigen_decomp$values,
     eigenvectors = eigen_decomp$vectors, 
@@ -171,4 +170,17 @@ build_dynamic_stability_plan <- function(max_E = 16, E_list = seq(max_E),
     volume_contraction = compute_volume_contraction(smap_matrices), 
     total_variance = compute_total_variance(smap_matrices)
   )
+}
+
+add_date_labels <- function(smap_matrices, 
+                            block, 
+                            id_var = "censusdate")
+{
+  # add date labels for each matrix in list
+  if (id_var %in% names(block))
+  {
+    stopifnot(length(smap_matrices) == NROW(block))
+    names(smap_matrices) <- block[[id_var]]
+  }
+  return(smap_matrices)
 }

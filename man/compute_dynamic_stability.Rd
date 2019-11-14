@@ -13,10 +13,10 @@ compute_dynamic_stability(block, results_file = NULL,
   RNGseed = 42, silent = TRUE, rescale = TRUE,
   rolling_forecast = FALSE)
 
-build_dynamic_stability_plan(max_E = 16, E_list = seq(max_E),
-  surrogate_method = "annual_spline", num_surr = 200,
-  surr_params = list(), lib_sizes = seq(10, 100, by = 10),
-  random_libs = TRUE, num_samples = 100, replace = TRUE,
+build_dynamic_stability_plan(id_var = "censusdate", max_E = 16,
+  E_list = seq(max_E), surrogate_method = "annual_spline",
+  num_surr = 200, surr_params = list(), lib_sizes = seq(10, 100, by =
+  10), random_libs = TRUE, num_samples = 100, replace = TRUE,
   RNGseed = 42, silent = TRUE, rescale = TRUE,
   rolling_forecast = FALSE)
 }
@@ -26,6 +26,9 @@ column is a time series of abundances, and a \code{censusdate} column is used
 as the column containing the time value.}
 
 \item{results_file}{the location of the results to be stored on disk.}
+
+\item{id_var}{when constructing the long-format tibble,what should be the
+variable name containing the time index}
 
 \item{max_E}{largest E to examine using simplex projection; this sets the
 default range for \code{E_list}, but any setting for \code{E_list} will override the
