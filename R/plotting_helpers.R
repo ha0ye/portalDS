@@ -1,3 +1,20 @@
+#' @title Convert list of eigenvalues into long-form data.frame
+#' @description The output of `compute_eigen_decomp` puts the eigenvalues into 
+#'   a list structure, where each element is a vector that corresponds to the 
+#'   eigenvalues for a given time point. This function does the work of 
+#'   converting the values into a data.frame for more easy analysis.
+#' @param values_list a list of vectors for the eigenvalues:
+#'   the number of elements in the list corresponds to the time points of the
+#'   s-map model, and each element is a vector of the eigenvalues, computed
+#'   from the matrix of the s-map coefficients at that time step
+#' @param id_var when constructing the long-format tibble, what should be the 
+#'   variable name containing the time index
+#'
+#' @return A data.frame with columns for the index variable, the eigenvalue, 
+#'   and the rank
+#'
+#' @export
+#' 
 extract_matrix_values <- function(values_list, id_var = "censusdate")
 {
     # check if we need to convert to complex
