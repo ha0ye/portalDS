@@ -83,7 +83,7 @@
       <h1>Parallelization</h1>
                         <h4 class="author">Hao Ye</h4>
             
-            <h4 class="date">2019-11-14</h4>
+            <h4 class="date">2019-12-11</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ha0ye/portalDS/blob/master/vignettes/parallelization.Rmd"><code>vignettes/parallelization.Rmd</code></a></small>
       <div class="hidden name"><code>parallelization.Rmd</code></div>
@@ -132,7 +132,7 @@
 <a class="sourceLine" id="cb3-6" data-line-number="6">                           <span class="dt">replace =</span> <span class="ot">TRUE</span>, <span class="dt">RNGseed =</span> <span class="dv">42</span>,</a>
 <a class="sourceLine" id="cb3-7" data-line-number="7">                           <span class="dt">silent =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb3-8" data-line-number="8">tictoc<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/tictoc/topics/tic">toc</a></span>()</a>
-<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt; 10.399 sec elapsed</span></a></code></pre></div>
+<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt; 8.468 sec elapsed</span></a></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
 <li>Same calculations as previous, but using asynchronous processes via <code>future.callr</code>.</li>
 </ol>
@@ -144,7 +144,7 @@
 <a class="sourceLine" id="cb4-6" data-line-number="6">                                    <span class="dt">replace =</span> <span class="ot">TRUE</span>, <span class="dt">RNGseed =</span> <span class="dv">42</span>,</a>
 <a class="sourceLine" id="cb4-7" data-line-number="7">                                    <span class="dt">silent =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb4-8" data-line-number="8">tictoc<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/tictoc/topics/tic">toc</a></span>()</a>
-<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; 10.912 sec elapsed</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; 8.996 sec elapsed</span></a></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
 <li>Same calculations as previous, but setup within a Drake plan, and still allowing parallelization to occur within a single target.</li>
 </ol>
@@ -162,7 +162,7 @@
 <a class="sourceLine" id="cb5-12" data-line-number="12"><span class="kw"><a href="https://www.rdocumentation.org/packages/drake/topics/make">make</a></span>(my_plan)</a>
 <a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt; target ccm_results_drake</span></a>
 <a class="sourceLine" id="cb5-14" data-line-number="14">tictoc<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/tictoc/topics/tic">toc</a></span>()</a>
-<a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co">#&gt; 10.994 sec elapsed</span></a></code></pre></div>
+<a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co">#&gt; 9.205 sec elapsed</span></a></code></pre></div>
 </div>
 <div id="validation-of-results" class="section level1">
 <h1 class="hasAnchor">
