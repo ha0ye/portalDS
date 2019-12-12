@@ -141,7 +141,7 @@ test_that("eigen decomposition of smap matrices works as expected", {
   expect_error(idx <- vapply(maizuru_eigenvalues, anyNA, TRUE), NA)
   expect_error(eigenvalue_matrix <- do.call(rbind, maizuru_eigenvalues[!idx]), NA)
   expect_equal(dim(eigenvalue_matrix), c(sum(!idx), 159))
-  expect_known_hash(round(eigenvalue_matrix, 3), "80c3afd19b")
+  expect_known_hash(round(eigenvalue_matrix, 3), "4b83a13dc9")
 
   expect_error(maizuru_eigenvectors <- eigen_decomp$vectors, NA)
   expect_type(maizuru_eigenvectors, "list")
