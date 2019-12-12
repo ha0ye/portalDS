@@ -119,10 +119,10 @@ test_that("compute_smap_coeffs and compute_smap_matrices work as expected", {
   expect_error(idx <- vapply(matrix_sizes, is.null, TRUE), NA)
   expect_equal(
     do.call(rbind, matrix_sizes[!idx]),
-    matrix(312, nrow = sum(!idx), ncol = 2), 
+    matrix(159, nrow = sum(!idx), ncol = 2), 
     check.attributes = FALSE
   )
-  expect_known_hash(smap_matrices, "c2dfbf4bb2")
+  expect_known_hash(smap_matrices, "2ef4704ec1")
 })
 
 data_path <- system.file("extdata", "maizuru_smap_matrices.RDS",

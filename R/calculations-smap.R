@@ -326,8 +326,9 @@ generate_blank_smap_matrices <- function(state_vars, row_range, num_rows)
     dplyr::filter(!is.na(.data$row_idx))
   
   # generate the template matrix
+  full_var_names <- paste(state_vars$base_var, state_vars$lag, sep = "_")
   M <- matrix(0, nrow = num_vars, ncol = num_vars, 
-              dimnames = list(state_vars$name, state_vars$name))
+              dimnames = list(full_var_names, full_var_names))
   M[cbind(lag_cross_links$row_idx, lag_cross_links$col_idx)] <- 1
   
   # create list of smap matrices

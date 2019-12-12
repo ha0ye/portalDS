@@ -47,12 +47,27 @@ test_that("Compute dynamic stability using block_3sp example data", {
   expect_known_hash(lapply(smap_coeffs, round, 4), "c86a8cb782")
 
   expect_error(smap_matrices <- compute_smap_matrices(smap_coeffs, ccm_links), NA)
-  expect_known_hash(lapply(smap_matrices, round, 4), "f837843845")
+  expect_known_hash(lapply(smap_matrices, round, 4), "1eeb9778c0")
 
   expect_error(eigen_decomp <- compute_eigen_decomp(smap_matrices), NA)
   expect_error(eigenvalues <- eigen_decomp$values, NA)
-  expect_known_hash(lapply(eigenvalues, round, 4), "0710a023e3")
+  expect_known_hash(lapply(eigenvalues, round, 4), "1988c00e57")
 
+  # smap_matrices_o <- compute_smap_matrices_o(smap_coeffs, ccm_links)
+  # expect_known_hash(lapply(smap_matrices_o, round, 4), "f837843845")
+  # eigen_decomp_o <- compute_eigen_decomp(smap_matrices_o)
+  # eigenvalues_o <- eigen_decomp_o$values
+  # expect_known_hash(lapply(eigenvalues_o, round, 4), "0710a023e3")
+  # rng <- which(!is.na(smap_matrices))
+  # eigenvalues_equal <- rep(FALSE, length(smap_matrices))
+  # for (i in rng)
+  # {
+  #   eig_AA <- eigenvalues[[i]]
+  #   eig_A <- eigenvalues_o[[i]]
+  #   vv <- length(eig_AA)
+  #   eigenvalues_equal[i] <- isTRUE(all.equal(eigenvalues[[i]], eigenvalues_o[[i]][seq(vv)]))
+  # }
+  
   expect_error(eigenvectors <- eigen_decomp$vectors, NA)
   expect_known_hash(which(is.na(eigenvectors)), "bf89101447")
   expect_error(ev <- eigenvectors[!is.na(eigenvectors)], NA)
@@ -62,7 +77,7 @@ test_that("Compute dynamic stability using block_3sp example data", {
       s <- matrix(s, nrow = nrow(x), ncol = ncol(x), byrow = TRUE)
       round(s * x, 4)
     }),
-    "c26e2df6f9"
+    "9ec8d8efaf"
   )
 })
 
@@ -107,8 +122,8 @@ test_that("Verify compute_dynamic_stability function", {
   )
   expect_known_hash(ccm_links, "70474772ed")
   expect_known_hash(lapply(smap_coeffs, round, 4), "c86a8cb782")
-  expect_known_hash(lapply(smap_matrices, round, 4), "f837843845")
-  expect_known_hash(lapply(eigenvalues, round, 4), "0710a023e3")
+  expect_known_hash(lapply(smap_matrices, round, 4), "1eeb9778c0")
+  expect_known_hash(lapply(eigenvalues, round, 4), "1988c00e57")
   expect_known_hash(which(is.na(eigenvectors)), "bf89101447")
   expect_error(ev <- eigenvectors[!is.na(eigenvectors)], NA)
   expect_known_hash(
@@ -117,6 +132,6 @@ test_that("Verify compute_dynamic_stability function", {
       s <- matrix(s, nrow = nrow(x), ncol = ncol(x), byrow = TRUE)
       round(s * x, 4)
     }),
-    "c26e2df6f9"
+    "9ec8d8efaf"
   )
 })
