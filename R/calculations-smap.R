@@ -280,8 +280,6 @@ compute_smap_matrices <- function(smap_coeffs, ccm_links)
   return(smap_matrices)
 }
 
-
-
 # identify only connected nodes
 # (variables that give or receive influence to other variables)
 identify_connected_nodes <- function(ccm_links)
