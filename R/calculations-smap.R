@@ -306,7 +306,7 @@ get_state_vars <- function(smap_coeffs)
     dplyr::mutate_at("lag", as.numeric) %>%
     tidyr::replace_na(list(lag = 0)) %>%
     dplyr::arrange(.data$lag, .data$base_var)
-  stopifnot(setequal(out %>% dplyr::filter(lag == 0) %>% dplyr::pull(name), 
+  stopifnot(setequal(out %>% dplyr::filter(.data$lag == 0) %>% dplyr::pull(.data$name), 
                      names(smap_coeffs)))
   return(out)
 }
