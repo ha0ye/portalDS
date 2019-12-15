@@ -225,91 +225,47 @@ compute_smap_coeffs <- function(block, ccm_links,
 #' @return A list with the matrix of smap-coefficients at each time point
 #'
 #' @export
-compute_smap_matrices <- function(smap_coeffs, ccm_links) {
+compute_smap_matrices <- function(smap_coeffs, ccm_links)
+{
   # identify only connected nodes
-  ccm_links$lib_column <- as.factor(ccm_links$lib_column)
-  ccm_links$target_column <- as.factor(ccm_links$target_column)
+  vars <- identify_connected_nodes(ccm_links)
   
-  vars <- union(
-    levels(ccm_links$lib_column)[tabulate(ccm_links$lib_column) > 1],
-    levels(ccm_links$target_column)[tabulate(ccm_links$target_column) > 1]
-  )
+  # restrict smap_coeffs to `vars`, and drop the constant coeff.
+  smap_coeffs <- smap_coeffs[vars] %>%
+    purrr::map(~ dplyr::select(., -.data$const))
   
-  # get maximum E value (so we know size of the Jacobian matrix)
-  max_E <- ccm_links %>%
-    dplyr::filter(.data$lib_column %in% vars) %>%
-    dplyr::pull(.data$E) %>%
-    max()
-  jacobian_dim <- max_E * length(vars)
+  # generate the expanded state variables
+  state_vars <- get_state_vars(smap_coeffs)
   
-  # check number of time points
-  ts_length <- unique(purrr::map_dbl(smap_coeffs, NROW))
-  stopifnot(length(ts_length) == 1)
-  
-  # for each predicted variable,
-  #   convert the time-indexed data.frame of coefficients into the
-  #   time-indexed matrix of coefficients
-  smap_matrix_rows <- purrr::map(vars, function(var_name) {
-    # get s-map coefficients without const column
-    smap_df <- smap_coeffs[[var_name]] %>%
-      dplyr::select(-.data$const)
-    
-    # output matrix (each row is 1 time step, each col is a var x lag)
-    out <- matrix(0, nrow = ts_length, ncol = jacobian_dim)
-    
-    # find the correct column locations for the s-map coefficients
-    regex_splits <- stringr::str_match(colnames(smap_df), "(.+)_(\\d+)|(.+)")
-    regex_splits[is.na(regex_splits[, 2]), 2] <- "" # convert NA into ""
-    regex_splits[is.na(regex_splits[, 3]), 3] <- "0" # convert NA into 0
-    regex_splits[is.na(regex_splits[, 4]), 4] <- "" # convert NA into ""
-    col_lookup <- data.frame(
-      var = paste0(regex_splits[, 2], regex_splits[, 4]),
-      lag = as.numeric(regex_splits[, 3])
-    )
-    col_lookup$col_idx <- match(col_lookup$var, vars) +
-      col_lookup$lag * length(vars)
-    
-    # check for NAs
-    if (any(is.na(col_lookup$col_idx))) {
-      warning("Computing column locations and found NAs for variable ", colnames(smap_df)[1])
-    }
-    
-    # populate s-map coefficients into output matrix
-    smap_mat <- as.matrix(smap_df)
-    out[, col_lookup$col_idx] <- smap_mat
-    
-    colnames(out) <- paste0(rep(vars, max_E), "_", rep(seq(max_E), each = length(vars)) - 1)
-    return(out)
+  # identify time steps to generate full matrices for
+  valid_rows <- lapply(smap_coeffs, function(df) {
+    range(which(apply(df, 1, function(x) {all(is.finite(x))})))
   })
+  row_range <- seq(max(vapply(valid_rows, min, 0)), 
+                   min(vapply(valid_rows, max, 0)))
+  num_rows <- min(vapply(smap_coeffs, NROW, 1))
   
-  # for each time step
-  #   create the matrix of smap_coeffs, check for NAs
-  #   otherwise, fill the rest of the matrix accordingly, and compute the largest eigenvalue
+  # generate "blank" smap matrices
+  smap_matrices <- generate_blank_smap_matrices(state_vars, row_range, num_rows)
   
-  smap_matrices <- purrr::map(seq(ts_length), function(t) {
-    # initialize J
-    J <- matrix(0, nrow = jacobian_dim, ncol = jacobian_dim)
+  # for each target variable, copy all the coefficients into the correct matrix
+  for (row_var in names(smap_coeffs))
+  {
+    # identify target row and column indices
+    row_idx <- match(row_var, state_vars$name)
+    coeff_matrix <- smap_coeffs[[row_var]]
+    coeff_matrix <- as.matrix(coeff_matrix)
+    col_var <- colnames(coeff_matrix)
+    col_idx <- match(col_var, state_vars$name)
+    matrix_idx <- cbind(row_idx, col_idx)
     
-    # fill in rows for each predicted variable
-    for (i in seq(smap_matrix_rows)) {
-      J[i, ] <- (smap_matrix_rows[[i]])[t, ]
+    # for each time step, copy values into correct matrix
+    for (t in row_range)
+    {
+      smap_row <- coeff_matrix[t, ]
+      smap_matrices[[t]][matrix_idx] <- smap_row
     }
-    
-    # if there are NA values, then return NA
-    if (any(is.na(J))) {
-      return(NA)
-    }
-    
-    # fill in identity matrix for lag relationships
-    I_row_idx <- length(vars) + seq(length(vars) * (max_E - 1))
-    I_col_idx <- seq(length(vars) * (max_E - 1))
-    J[cbind(I_row_idx, I_col_idx)] <- 1
-    
-    colnames(J) <- colnames(smap_matrix_rows[[1]])
-    rownames(J) <- colnames(J)
-    
-    return(J)
-  })
+  }
   
   # propagate list labels from `smap_coeffs`
   n <- length(smap_matrices)
@@ -322,4 +278,59 @@ compute_smap_matrices <- function(smap_coeffs, ccm_links) {
   names(smap_matrices) <- smap_coeff_names[, 1]
   
   return(smap_matrices)
+}
+
+# identify only connected nodes
+# (variables that give or receive influence to other variables)
+identify_connected_nodes <- function(ccm_links)
+{
+  ccm_links$lib_column <- as.factor(ccm_links$lib_column)
+  ccm_links$target_column <- as.factor(ccm_links$target_column)
+  
+  union(
+    levels(ccm_links$lib_column)[tabulate(ccm_links$lib_column) > 1],
+    levels(ccm_links$target_column)[tabulate(ccm_links$target_column) > 1]
+  )
+}
+
+# get the state variables used in the smap_coeffs
+get_state_vars <- function(smap_coeffs)
+{
+  # organize the expanded state variables for the interaction matrix
+  state_vars <- data.frame(name = unique(do.call(c, lapply(smap_coeffs, names))), 
+                           stringsAsFactors = FALSE)
+  out <- cbind(state_vars, 
+               stringr::str_split(state_vars$name, "_", simplify = TRUE) %>%
+                 as.data.frame(stringsAsFactors = FALSE) %>%
+                 stats::setNames(c("base_var", "lag"))) %>%
+    dplyr::mutate_at("lag", as.numeric) %>%
+    tidyr::replace_na(list(lag = 0)) %>%
+    dplyr::arrange(.data$lag, .data$base_var)
+  stopifnot(setequal(out %>% dplyr::filter(.data$lag == 0) %>% dplyr::pull(.data$name), 
+                     names(smap_coeffs)))
+  return(out)
+}
+
+# generate the list of "blank" smap matrices
+generate_blank_smap_matrices <- function(state_vars, row_range, num_rows)
+{
+  num_vars <- NROW(state_vars)
+  
+  # identify lagged cross-links
+  lag_cross_links <- state_vars %>%
+    dplyr::mutate(lag_name = paste(.data$base_var, .data$lag + 1, sep = "_"), 
+                  row_idx = match(.data$lag_name, .data$name), 
+                  col_idx = dplyr::row_number()) %>%
+    dplyr::filter(!is.na(.data$row_idx))
+  
+  # generate the template matrix
+  full_var_names <- paste(state_vars$base_var, state_vars$lag, sep = "_")
+  M <- matrix(0, nrow = num_vars, ncol = num_vars, 
+              dimnames = list(full_var_names, full_var_names))
+  M[cbind(lag_cross_links$row_idx, lag_cross_links$col_idx)] <- 1
+  
+  # create list of smap matrices
+  out <- as.list(rep(NA, num_rows))
+  out[row_range] <- rep(list(M), length(row_range))
+  return(out)
 }
