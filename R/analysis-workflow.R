@@ -84,12 +84,16 @@ compute_dynamic_stability <- function(block,
     results$ccm_links <- compute_ccm_links(results$ccm_results)
   }
   
-  # check for smap matrices, compute if missing
-  if (is.null(results$smap_matrices)) {
+  # check for smap coefficients, compute if missing
+  if (is.null(results$smap_coeffs)) {
     results$smap_coeffs <- compute_smap_coeffs(results$block, results$ccm_links,
                                                rescale = rescale,
                                                rolling_forecast = rolling_forecast, 
                                                id_var = id_var)
+  }
+  
+  # check for smap matrices, compute if missing
+  if (is.null(results$smap_matrices)) {
     results$smap_matrices <- compute_smap_matrices(results$smap_coeffs,
                                                    results$ccm_links)
   }

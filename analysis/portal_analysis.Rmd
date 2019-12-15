@@ -23,6 +23,7 @@ library(ggplot2)
 
 set.seed(42)
 knitr::opts_chunk$set(
+  fig.width = 10, 
   collapse = TRUE,
   comment = "#>"
 )
@@ -51,11 +52,16 @@ results <- compute_dynamic_stability(block, results_file, id_var = "censusdate")
 str(results, max.level = 1)
 ```
 
+```{r, include = FALSE}
+results_file <- here::here("output/portal_ds_results_50.RDS")
+results <- readRDS(results_file)
+```
+
 # Results
 
 ## Abundance time series
 
-```{r, fig.width = 10}
+```{r}
 plot_time_series(results$block)
 ```
 
@@ -69,7 +75,7 @@ plot_eigenvalues(results$eigenvalues,
     add_regime_shift_highlight()
 ```
 
-```{r, fig.width = 10}
+```{r}
 plot_eigenvectors(results$eigenvectors) %>% 
     add_regime_shift_highlight()
 ```
@@ -84,7 +90,7 @@ plot_svd_values(results$svd_decomp$d,
     add_regime_shift_highlight()
 ```
 
-```{r, fig.width = 10}
+```{r}
 plot_svd_vectors(results$svd_decomp$u) %>% 
     add_regime_shift_highlight()
 ```
@@ -99,6 +105,35 @@ plot_volume_contraction(results$volume_contraction) %>%
 ```{r}
 plot_total_variance(results$total_variance) %>%
   add_regime_shift_highlight()
+```
+
+# Detailed Results
+
+## Eigenvectors over specific time spans
+
+In the second half of the time series, there are 3 periods where the dominant eigenvalue is complex. Two of these periods also coincide with community shifts described in Christensen et al. 2018. Here we look at the dominant eigenvector in more detail:
+
+```{r}
+lower_date <- as.Date(c("1999-01-12", "2003-09-17", "2009-08-13"))
+upper_date <- as.Date(c("2000-01-12", "2004-09-17", "2011-01-15"))
+```
+
+```{r}
+plot_eigenvectors(results$eigenvectors) +
+  scale_x_date(limits = c(lower_date[1], upper_date[1]),
+               expand = c(0.01, 0))
+```
+
+```{r}
+plot_eigenvectors(results$eigenvectors) +
+  scale_x_date(limits = c(lower_date[2], upper_date[2]),
+               expand = c(0.01, 0))
+```
+
+```{r}
+plot_eigenvectors(results$eigenvectors) +
+  scale_x_date(limits = c(lower_date[3], upper_date[3]),
+               expand = c(0.01, 0))
 ```
 
 # References

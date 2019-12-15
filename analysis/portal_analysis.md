@@ -1,7 +1,7 @@
 Portal Dynamic Stability Analysis
 ================
 Hao Ye
-2019-11-14
+2019-12-15
 
 # Introduction
 
@@ -17,6 +17,7 @@ library(ggplot2)
 
 set.seed(42)
 knitr::opts_chunk$set(
+  fig.width = 10, 
   collapse = TRUE,
   comment = "#>"
 )
@@ -69,15 +70,15 @@ str(results, max.level = 1)
 #>  $ simplex_results   :Classes 'tbl_df', 'tbl' and 'data.frame':  7 obs. of  5 variables:
 #>  $ ccm_results       :'data.frame':  88641 obs. of  9 variables:
 #>  $ ccm_links         :Classes 'tbl_df', 'tbl' and 'data.frame':  35 obs. of  5 variables:
-#>  $ svd_decomp        :List of 3
+#>  $ smap_coeffs       :List of 7
+#>  $ smap_matrices     :List of 440
 #>  $ eigenvalues       :List of 440
 #>  $ eigenvectors      :List of 440
+#>  $ svd_decomp        :List of 3
 #>  $ volume_contraction: Named num [1:440] NA NA NA NA NA NA NA NA NA NA ...
 #>   ..- attr(*, "names")= chr [1:440] "1979-09-22" "1979-10-24" "1979-11-17" "1979-12-16" ...
 #>  $ total_variance    : Named num [1:440] NA NA NA NA NA NA NA NA NA NA ...
 #>   ..- attr(*, "names")= chr [1:440] "1979-09-22" "1979-10-24" "1979-11-17" "1979-12-16" ...
-#>  $ smap_coeffs       :List of 7
-#>  $ smap_matrices     :List of 440
 ```
 
 # Results
@@ -88,7 +89,7 @@ str(results, max.level = 1)
 plot_time_series(results$block)
 ```
 
-![](portal_analysis_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](portal_analysis_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ## Eigenvalues & Eigenvectors
 
@@ -101,14 +102,14 @@ plot_eigenvalues(results$eigenvalues,
     add_regime_shift_highlight()
 ```
 
-![](portal_analysis_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](portal_analysis_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 plot_eigenvectors(results$eigenvectors) %>% 
     add_regime_shift_highlight()
 ```
 
-![](portal_analysis_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](portal_analysis_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ## Singular values and SVD vectors
 
@@ -121,14 +122,14 @@ plot_svd_values(results$svd_decomp$d,
     add_regime_shift_highlight()
 ```
 
-![](portal_analysis_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](portal_analysis_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 plot_svd_vectors(results$svd_decomp$u) %>% 
     add_regime_shift_highlight()
 ```
 
-![](portal_analysis_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](portal_analysis_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ## Volume contraction and total variance
 
@@ -138,7 +139,7 @@ plot_volume_contraction(results$volume_contraction) %>%
 #> Warning: Removed 11 rows containing missing values (geom_path).
 ```
 
-![](portal_analysis_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](portal_analysis_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 plot_total_variance(results$total_variance) %>%
@@ -146,7 +147,54 @@ plot_total_variance(results$total_variance) %>%
 #> Warning: Removed 11 rows containing missing values (geom_path).
 ```
 
-![](portal_analysis_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](portal_analysis_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+# Detailed Results
+
+## Eigenvectors over specific time spans
+
+In the second half of the time series, there are 3 periods where the
+dominant eigenvalue is complex. Two of these periods also coincide with
+community shifts described in Christensen et al. 2018. Here we look at
+the dominant eigenvector in more detail:
+
+``` r
+lower_date <- as.Date(c("1999-01-12", "2003-09-17", "2009-08-13"))
+upper_date <- as.Date(c("2000-01-12", "2004-09-17", "2011-01-15"))
+```
+
+``` r
+plot_eigenvectors(results$eigenvectors) +
+  scale_x_date(limits = c(lower_date[1], upper_date[1]),
+               expand = c(0.01, 0))
+#> Scale for 'x' is already present. Adding another scale for 'x', which
+#> will replace the existing scale.
+#> Warning: Removed 2912 rows containing missing values (geom_path).
+```
+
+![](portal_analysis_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
+``` r
+plot_eigenvectors(results$eigenvectors) +
+  scale_x_date(limits = c(lower_date[2], upper_date[2]),
+               expand = c(0.01, 0))
+#> Scale for 'x' is already present. Adding another scale for 'x', which
+#> will replace the existing scale.
+#> Warning: Removed 2912 rows containing missing values (geom_path).
+```
+
+![](portal_analysis_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+``` r
+plot_eigenvectors(results$eigenvectors) +
+  scale_x_date(limits = c(lower_date[3], upper_date[3]),
+               expand = c(0.01, 0))
+#> Scale for 'x' is already present. Adding another scale for 'x', which
+#> will replace the existing scale.
+#> Warning: Removed 2877 rows containing missing values (geom_path).
+```
+
+![](portal_analysis_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 # References
 
