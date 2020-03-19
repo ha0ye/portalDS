@@ -3,8 +3,8 @@ title: "Dynamic indicators of systemic change and resilience"
 author: "Hao Ye"
 date: "`r Sys.Date()`"
 output:
-  - bookdown::html_document2
   - bookdown::pdf_document2
+  - bookdown::html_document2
 vignette: >
   %\VignetteIndexEntry{Dynamic indicators of systemic change and resilience}
   %\VignetteEngine{knitr::rmarkdown_notangle}
@@ -89,9 +89,11 @@ We test our EDM-based community change metrics on abundance time series from the
 
 ## Data
 
-Following [@Christensen_2018], we compute the site-wide abundance on the 8 control plots for the Portal data up through April 2015. Although data collection at this site is ongoing, treatments were changed on half of the plots in 2015. Extending the time series past this point would reduce the number of plots with continuous observations of the control condition. More importantly, using a different set of plots would complicate comparisons with the dataset used by @Christensen_2018. Rodent abundances are aggregated across plots and scaled to 8 plots of sampling; in some cases, only some of the plots at the site were sampled, e.g. due to weather.
+Following [@Christensen_2018], we compute site-wide rodent abundances on the 8 control plots of the Portal Project from September 1979 through March 2015. Although data collection at this site is ongoing, treatments were changed on half of the plots in 2015; consequently, extending the time series to present would reduce the number of plots containing continuous observations of the community on control plots. More importantly, using a different set of plots would complicate comparisons with @Christensen_2018.
 
-Because EDM methods rely on extracting signal from the time series directly, it is important that the data contain enough variation for meaningful analysis. Thus, we pre-filter the species to those where at least half of the time points yielded one observation (i.e. non-zero observed abundance). This reduces the number of species from 21 to 7 (see Figure \@ref(fig:portal-time-series)). Finally, to address missing censuses, we apply linear interpolation to construct time series with regular time intervals using the `na.interp()` function from the `forecast` R package [@Hyndman_2019].
+Because EDM methods rely on extracting signal from the data directly, it is important that individual time series contain enough variation for meaningful analysis. Thus, we pre-filter the set of species to those where at least half of the time points yielded one observation (i.e. non-zero observed abundance). This reduces the number of species from 21 to 7 (see Figure \@ref(fig:portal-time-series)).
+
+Rodent abundances are aggregated across plots and scaled to the equivalent of 8 sampled plots; for some time points, not all 8 of the control plots were sampled, e.g. due to weather. The rodent censuses are typically scheduled to coincide with the new moon. However, this does not always occur, and so there may be missing censuses that interrupte the otherwise near-regular sampling in time. To address these missing censuses, we apply linear interpolation to construct time series with regular time intervals (1 time step = 1 lunar cycle) using the `na.interp()` function from the `forecast` R package [@Hyndman_2019].
 
 ## Dynamic Stability Analysis
 
@@ -169,6 +171,18 @@ For example, as reported in [@Ushio_2018], stability occurs when the magnitude o
 Thus, we generate surrogate time series by computing the average annual pattern (using the day of year for each observation), and then shuffling the residuals (i.e. the null model is a fixed seasonal pattern, with resampled deviations estimated from the actual time series). 
 
 # Results
+
+## Figure 2
+
+Schematic of dynamic stability operation
+a. community time series
+b. network of interactions (inferred from CCM)
+c. time-varying community matrix
+d. dynamic stability metric
+
+## Figure 3
+
+Dynamic stability for portal
 
 
 
