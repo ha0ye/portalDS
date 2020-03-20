@@ -1,0 +1,89 @@
+---
+title: "Testing Dynamic Stability on Simulations"
+author: "Hao Ye"
+date: "`r Sys.Date()`"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+This report documents applying the dynamic stability analysis to the Portal dataset.
+
+First, some setup for the environment:
+
+```{r packages, message = FALSE}
+library(portalDS)
+library(dplyr)
+library(ggplot2)
+
+set.seed(42)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Workflow
+
+## Data
+
+We use data from the 8 control plots, up to the 2015 treatment-switch. Abundances are summed, and scaled according to the number of plots sampled in each census (sometimes, incomplete sampling occurred). Only species with at least 50% non-zero abundance across the time series were kept. Missing censuses had abundances imputed using linear interpolation for each individual species.
+
+```{r, collapse = TRUE}
+block <- make_portal_block(filter_q = 0.5)
+str(block)
+```
+
+## Analysis
+
+We do not go through the full analysis here. Instead, see the [Maizuru Dynamic Stability vignette](https://ha0ye.github.io/portalDS/articles/maizuru-dynamic-stability.html) or (eventual methdos write-up).
+
+We specify a results file for storing the outputs of the analysis. The `compute_dynamic_stability()` function will check for the presence of individual output components and will skip them if they've already been computed.
+
+```{r}
+results_file <- here::here("output/portal_ds_results_50.RDS")
+results <- compute_dynamic_stability(block, results_file)
+str(results, max.level = 1)
+```
+
+# Results
+
+## Abundance time series
+
+```{r, fig.width = 10}
+plot_time_series(results$block)
+```
+
+## Eigenvalues & Eigenvectors
+
+Highlighted segments are the posterior estimates of regime shifts from Christensen et al. 2018.
+
+```{r}
+plot_eigenvalues(results$eigenvalues, 
+                 num_values = 3) %>% 
+    add_regime_shift_highlight()
+```
+
+```{r, fig.width = 10}
+plot_eigenvectors(results$eigenvectors) %>% 
+    add_regime_shift_highlight()
+```
+
+## Singular values and SVD vectors
+
+Again, highlighted segments are the posterior estimates of regime shifts from Christensen et al. 2018.
+
+```{r}
+plot_svd_values(results$svd_decomp$d, 
+                num_values = 3) %>% 
+    add_regime_shift_highlight()
+```
+
+```{r, fig.width = 10}
+plot_svd_vectors(results$svd_decomp$u) %>% 
+    add_regime_shift_highlight()
+```
